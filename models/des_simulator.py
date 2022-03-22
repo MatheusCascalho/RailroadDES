@@ -1,4 +1,4 @@
-import event_calendar as ec
+from models import event_calendar as ec
 from datetime import datetime
 
 
