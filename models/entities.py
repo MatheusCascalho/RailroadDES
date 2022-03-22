@@ -7,13 +7,18 @@ Uma entidade é um objeto que realiza/sofre eventos. Toda entidade possui um Est
 import abc
 from models.des_simulator import DESSimulator
 from models.constants import (
-    EPSILON
+    EPSILON,
+    TrainActions
 )
 import models.model_queue as mq
 from dataclasses import dataclass, field, InitVar
 from typing import Any, Generator
 from datetime import timedelta, datetime
 from models.exceptions import TrainExceptions
+from models.states import (
+    TrainState,
+    TimeRegister
+)
 
 
 @dataclass
@@ -27,25 +32,22 @@ class Train(Entity):
     origin: int
     destination: int
     model: int
-    current_location: Any
-    eta: datetime
-    etd: datetime
-    volume: float
     path: list[int]
-    start_process: datetime = field(init=False, default=None)
-    finish_process: datetime = field(init=False, default=None)
-    leave_time: datetime = field(init=False, default=None)
-    time_blocked: timedelta = field(init=False, default=None)
+    state: TrainState = field(init=False)
+    time_table: dict[int, TimeRegister] = field(init=False)
+    initial_volume: InitVar[float] = field(default=0.0)
 
+    def __post_init__(self, initial_volume: float):
+        self.state = TrainState(
+            volume=initial_volume,
+            current_location=self.path.pop(0),
+            action=TrainActions.MOVING
+        )
+
+    # ====== Properties ==========
     @property
     def is_empty(self):
-        return self.volume <= EPSILON
-
-    def arrive(self):
-        self.current_location = self.path.pop(0)
-
-    def leave(self):
-        self.current_location = (self.current_location, self.next_location)
+        return self.state.volume <= EPSILON
 
     @property
     def next_location(self):
@@ -53,6 +55,41 @@ class Train(Entity):
             return self.path[0]
         except IndexError:
             TrainExceptions.path_is_finished()
+
+    @property
+    def volume(self):
+        return self.state.volume
+
+    @volume.setter
+    def volume(self, new_volume):
+        self.volume = new_volume
+
+    # ====== Properties ==========
+    # ====== Events ==========
+    def load(self, volume, start, end):
+        self.volume += volume
+        self.state.action = TrainActions.LOADING
+
+    def unload(self, volume):
+        if volume > self.volume:
+            TrainExceptions.volume_to_unload_is_greater_than_current_volume()
+        self.volume -= volume
+        self.state.action = TrainActions.UNLOADING
+
+    def maneuvering_to_enter(self):
+        self.state.action = TrainActions.MANEUVERING_TO_ENTER
+
+    def maneuvering_to_leave(self):
+        self.state.action = TrainActions.MANEUVERING_TO_LEAVE
+
+    def arrive(self):
+        self.state.current_location = self.path.pop(0)
+        self.state.action = TrainActions.MANEUVERING_TO_ENTER
+
+    def leave(self):
+        self.state.current_location = (self.state.current_location, self.next_location)
+
+    # ====== Events ==========
 
 
 class Node(Entity):
