@@ -1,11 +1,10 @@
 import abc
-from des_simulator import DESSimulator
-import model_queue as mq
+from models.des_simulator import DESSimulator
+import models.model_queue as mq
 from dataclasses import dataclass, field, InitVar
 from typing import Any, Generator, Callable
 from datetime import timedelta, datetime
-from entities import Node, Train
-from event_calendar import Event
+from interfaces.node_interce import NodeInterface
 
 
 @dataclass
@@ -18,8 +17,8 @@ class TransitTime:
 
 @dataclass
 class RailroadMesh:
-    load_points: tuple[Node]
-    unload_points: tuple[Node]
+    load_points: tuple[NodeInterface]
+    unload_points: tuple[NodeInterface]
     transit_times: list[TransitTime]
 
     def __iter__(self):

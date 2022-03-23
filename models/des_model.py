@@ -1,15 +1,10 @@
 import abc
-from des_simulator import DESSimulator
-import model_queue as mq
-from dataclasses import dataclass, field, InitVar
-from typing import Any, Generator, Callable
-from datetime import timedelta, datetime
-from models.entities import Node, Train, Entity
-from event_calendar import Event
+from models.des_simulator import DESSimulator
+from interfaces.train_interface import TrainInterface
+from models.event_calendar import Event
 from models.conditions import RailroadMesh
 from models.states import RailroadState
 from models.inputs import Demand
-from models.exceptions import TrainExceptions
 
 
 class DESModel(abc.ABC):
@@ -26,8 +21,8 @@ class DESModel(abc.ABC):
         pass
 
 
-class Railroad(DESModel, Entity):
-    def __init__(self, mesh: RailroadMesh, trains: list[Train], demands: list[Demand]):
+class Railroad(DESModel):
+    def __init__(self, mesh: RailroadMesh, trains: list[TrainInterface], demands: list[Demand]):
         super().__init__(
             controllable_events=[],
             uncontrollable_events=[]
@@ -47,7 +42,7 @@ class Railroad(DESModel, Entity):
             origin = train.current_location
             try:
                 destination = train.next_location
-            except TrainExceptions:
+            except TrainInterfaceExceptions:
                 train.path = self.create_new_path(current_location=origin)
                 destination = train.next_location
 
@@ -60,7 +55,7 @@ class Railroad(DESModel, Entity):
                 train=train
             )
 
-    def on_finish_loaded_path(self, simulator, train: Train):
+    def on_finish_loaded_path(self, simulator, train: TrainInterface):
 
         time = 0#simulator.time + train.state.time_register.tim
         simulator.add_event(
