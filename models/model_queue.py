@@ -1,11 +1,12 @@
 from dataclasses import dataclass, field
 from typing import Any
 from datetime import datetime
+from interfaces.train_interface import TrainInterface
 
 
 @dataclass
 class QueueElement:
-    element: Any
+    element: TrainInterface
     arrive: datetime
     departure: datetime = field(init=False, default=None)
 
@@ -23,6 +24,7 @@ class Queue:
         data = self.elements.pop()
         data.departure = current_time
         self.history.append(data)
+        return data.element
 
     def push(self, element, arrive):
         if len(self.elements) < self.capacity - 1:

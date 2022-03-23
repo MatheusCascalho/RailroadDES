@@ -4,7 +4,7 @@ from enum import IntEnum
 EPSILON = 1e-1
 
 
-class TrainActions:
+class TrainActions(IntEnum):
     MOVING = 0
     LOADING = 1
     UNLOADING = 2

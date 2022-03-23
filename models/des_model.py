@@ -4,10 +4,12 @@ import model_queue as mq
 from dataclasses import dataclass, field, InitVar
 from typing import Any, Generator, Callable
 from datetime import timedelta, datetime
-from entities import Node, Train
+from models.entities import Node, Train, Entity
 from event_calendar import Event
 from models.conditions import RailroadMesh
-
+from models.states import RailroadState
+from models.inputs import Demand
+from models.exceptions import TrainExceptions
 
 
 class DESModel(abc.ABC):
@@ -24,22 +26,28 @@ class DESModel(abc.ABC):
         pass
 
 
-class Railroad(DESModel):
-    def __init__(self, mesh: RailroadMesh, trains: list[Train]):
+class Railroad(DESModel, Entity):
+    def __init__(self, mesh: RailroadMesh, trains: list[Train], demands: list[Demand]):
         super().__init__(
             controllable_events=[],
             uncontrollable_events=[]
         )
         self.mesh = mesh
         self.trains = trains
+        self.state: RailroadState = RailroadState(
+            operated_volume=0,
+            completed_travels=0,
+            loaded_trains=0,
+            empty_trains=0
+        )
 
+    # ===== Events =========
     def starting_events(self, simulator: DESSimulator):
         for train in self.trains:
             origin = train.current_location
-
             try:
                 destination = train.next_location
-            except Exception:
+            except TrainExceptions:
                 train.path = self.create_new_path(current_location=origin)
                 destination = train.next_location
 
@@ -53,7 +61,8 @@ class Railroad(DESModel):
             )
 
     def on_finish_loaded_path(self, simulator, train: Train):
-        time = simulator.time + train.time_blocked
+
+        time = 0#simulator.time + train.state.time_register.tim
         simulator.add_event(
             time=time,
             callback=self.on_unfinish_loading,
@@ -70,3 +79,8 @@ class Railroad(DESModel):
             simulator=simulator,
             train=train
         )
+
+    # ===== Events =========
+    # ===== Decision Methods =========
+    def create_new_path(self, current_location: int):
+        return [current_location, 1, 0]
