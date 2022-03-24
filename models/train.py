@@ -2,7 +2,8 @@ import abc
 from models.des_simulator import DESSimulator
 from models.constants import (
     EPSILON,
-    TrainActions
+    TrainActions,
+    Process
 )
 import models.model_queue as mq
 from dataclasses import dataclass, field, InitVar
@@ -96,6 +97,7 @@ class Train(TrainInterface):
         # Changing State
         self.volume += self.capacity
         self.state.action = TrainActions.LOADING
+        self.time_table[self.current_location][-1].process = Process.LOAD
         self.time_table[self.current_location][-1].start_process = start
         self.time_table[self.current_location][-1].finish_process = start + process_time
 
@@ -123,6 +125,8 @@ class Train(TrainInterface):
         self.state.action = TrainActions.UNLOADING
         self.time_table[self.current_location][-1].start_process = start
         self.time_table[self.current_location][-1].finish_process = start + process_time
+        self.time_table[self.current_location][-1].process = Process.UNLOAD
+
 
         # Add next event to calendar
         simulator.add_event(
@@ -166,6 +170,7 @@ class Train(TrainInterface):
 
     def leave(self, simulator: DESSimulator, node: NodeInterface):
         print(f'{simulator.current_date}:: Train leaving node!')
+        self.time_table[self.current_location][-1].departure = simulator.current_date
         try:
             self.current_location = [self.current_location, self.next_location]
             self.state.action = TrainActions.MOVING
@@ -182,3 +187,26 @@ class Train(TrainInterface):
             if error.args[0].lower() == 'path is finished!':
                 raise FinishedTravelException.path_is_finished(train=self)
     # ====== Events ==========
+
+    # ====== Statistics ==========
+    def loaded_volume(self):
+        operated = {
+            node: sum(
+                self.capacity
+                for register in registers
+                if register.process == Process.LOAD
+            )
+            for node, registers in self.time_table.items()
+        }
+        return operated
+
+    def unloaded_volume(self):
+        operated = {
+            node: sum(
+                self.capacity
+                for register in registers
+                if register.process == Process.UNLOAD
+            )
+            for node, registers in self.time_table.items()
+        }
+        return operated

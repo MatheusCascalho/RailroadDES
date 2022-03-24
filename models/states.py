@@ -1,12 +1,13 @@
 from dataclasses import dataclass, field
 from typing import Any
 from datetime import datetime, timedelta
-from models.constants import TrainActions
+from models.constants import TrainActions, Process
 from models.exceptions import TrainExceptions
 
 
 @dataclass
 class TimeRegister:
+    process: Process = field(default=None)
     arrive: datetime = field(default=None)
     start_process: datetime = field(default=None)
     finish_process: datetime = field(default=None)
