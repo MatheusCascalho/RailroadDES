@@ -46,8 +46,8 @@ class RailroadMesh:
         for transit in self.transit_times:
             if (
                     is_loaded_transit and
-                    self.name_to_id[transit.load_origin] == origin_id and
-                    self.name_to_id[transit.load_destination] == destination_id
+                    self.name_to_node[transit.load_origin].identifier == origin_id and
+                    self.name_to_node[transit.load_destination].identifier == destination_id
             ):
                 return transit.loaded_time
             elif not is_loaded_transit and transit.load_origin == destination_id and transit.load_destination == origin_id:
@@ -55,7 +55,7 @@ class RailroadMesh:
         return timedelta(days=float('inf'))
 
     def node_by_id(self, identifier):
-        name = self.id_to_name[identifier]['name']
-        node = self.name_to_id[name]['node']
+        name = self.id_to_name[identifier]
+        node = self.name_to_node[name]
         return node
 
