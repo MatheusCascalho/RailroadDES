@@ -99,7 +99,6 @@ class Node(NodeInterface):
             time=timedelta(),
             callback=train.process,
             simulator=simulator,
-            volume=5e3,
             start=simulator.current_date,
             process_time=self.process_time,
             node=self,

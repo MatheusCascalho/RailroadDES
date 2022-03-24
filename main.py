@@ -43,10 +43,11 @@ trains = [
         origin=0,
         destination=1,
         model=0,
-        path=[0, 1, 0]
+        path=[0, 1, 0],
+        capacity=1000.0
     )
 ]
 model = Railroad(mesh=mesh, trains=trains, demands=None)
-time_horizon = timedelta(hours=80)
+time_horizon = timedelta(days=5)
 simulator = DESSimulator(initial_date=datetime(2020, 1, 1))
 simulator.simulate(model=model, time_horizon=time_horizon)

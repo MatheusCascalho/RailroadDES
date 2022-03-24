@@ -30,6 +30,7 @@ class Train(TrainInterface):
     destination: int
     model: int
     path: list[int]
+    capacity: float
     state: TrainState = field(init=False)
     time_table: dict[int, list[TimeRegister]] = field(init=False, default_factory=lambda : defaultdict(list))
     initial_volume: InitVar[float] = field(default=0.0)
@@ -83,7 +84,6 @@ class Train(TrainInterface):
     def load(
         self,
         simulator: DESSimulator,
-        volume,
         start: datetime,
         process_time: timedelta,
         node: NodeInterface,
@@ -94,7 +94,7 @@ class Train(TrainInterface):
         if self.state.action == TrainActions.MOVING:
             TrainExceptions.processing_when_train_is_moving()
         # Changing State
-        self.volume += volume
+        self.volume += self.capacity
         self.state.action = TrainActions.LOADING
         self.time_table[self.current_location][-1].start_process = start
         self.time_table[self.current_location][-1].finish_process = start + process_time
@@ -110,7 +110,6 @@ class Train(TrainInterface):
     def unload(
         self,
         simulator: DESSimulator,
-        volume,
         start: datetime,
         process_time: timedelta,
         node: NodeInterface,
@@ -118,9 +117,9 @@ class Train(TrainInterface):
    ):
         print(f'{simulator.current_date}:: Train unloading!')
         # Changing State
-        if volume > self.volume:
+        if self.capacity > self.volume:
             TrainExceptions.volume_to_unload_is_greater_than_current_volume()
-        self.volume -= volume
+        self.volume -= self.capacity
         self.state.action = TrainActions.UNLOADING
         self.time_table[self.current_location][-1].start_process = start
         self.time_table[self.current_location][-1].finish_process = start + process_time
