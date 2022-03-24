@@ -8,7 +8,7 @@ import models.model_queue as mq
 from dataclasses import dataclass, field, InitVar
 from typing import Any, Generator, Callable
 from datetime import timedelta, datetime
-from models.exceptions import TrainExceptions
+from models.exceptions import TrainExceptions, FinishedTravelException
 from models.states import (
     TrainState,
     TimeRegister,
@@ -37,7 +37,7 @@ class Train(TrainInterface):
     def __post_init__(self, initial_volume: float):
         self.state = TrainState(
             volume=initial_volume,
-            current_location=self.path.pop(0),
+            current_location=[self.path[0], self.path[1]],
             action=TrainActions.MOVING,
             time_register=TimeRegister()
         )
@@ -74,6 +74,9 @@ class Train(TrainInterface):
     def process(self) -> Callable:
         return self.load if self.is_empty else self.unload
 
+    @property
+    def action(self):
+        return self.state.action
     # ====== Properties ==========
     # ====== Events ==========
 
@@ -145,6 +148,7 @@ class Train(TrainInterface):
     def arrive(self, simulator: DESSimulator, node: NodeInterface):
         print(f'{simulator.current_date}:: train arrive!!')
         # Changing State
+        self.current_location = self.path.pop(0)
         self.state.action = TrainActions.MANEUVERING_TO_ENTER
         self.time_table[self.current_location].append(
             TimeRegister(
@@ -163,14 +167,19 @@ class Train(TrainInterface):
 
     def leave(self, simulator: DESSimulator, node: NodeInterface):
         print(f'{simulator.current_date}:: Train leaving node!')
-        self.current_location = self.path.pop(0)
-        self.state.action = TrainActions.MOVING
+        try:
+            self.current_location = [self.current_location, self.next_location]
+            self.state.action = TrainActions.MOVING
 
-        simulator.add_event(
-            time=node.neighbors[self.current_location].transit_time,
-            callback=self.arrive,
-            simulator=simulator,
-            node=node.neighbors[self.current_location].neighbor
-        )
-
+            simulator.add_event(
+                time=node.neighbors[self.next_location].transit_time,
+                callback=self.arrive,
+                simulator=simulator,
+                node=node.neighbors[self.next_location].neighbor
+            )
+        except IndexError:
+            raise FinishedTravelException.path_is_finished(train=self)
+        except TrainExceptions as error:
+            if error.args[0].lower() == 'path is finished!':
+                raise FinishedTravelException.path_is_finished(train=self)
     # ====== Events ==========

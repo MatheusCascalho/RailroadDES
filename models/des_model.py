@@ -1,11 +1,12 @@
 import abc
-from models.des_simulator import DESSimulator
+from interfaces.des_simulator_interface import DESSimulatorInterface
 from interfaces.train_interface import TrainInterface
 from models.event_calendar import Event
 from models.conditions import RailroadMesh
 from models.states import RailroadState
 from models.inputs import Demand
-from models.exceptions import TrainExceptions
+from models.exceptions import TrainExceptions, FinishedTravelException
+from models.constants import TrainActions
 
 
 class DESModel(abc.ABC):
@@ -18,7 +19,11 @@ class DESModel(abc.ABC):
         self.uncontrollable_events = []
 
     @abc.abstractmethod
-    def starting_events(self, simulator: DESSimulator):
+    def starting_events(self, simulator: DESSimulatorInterface):
+        pass
+
+    @abc.abstractmethod
+    def solver_exceptions(self, exception: Exception, event: Event):
         pass
 
 
@@ -38,14 +43,18 @@ class Railroad(DESModel):
         )
 
     # ===== Events =========
-    def starting_events(self, simulator: DESSimulator):
+    def starting_events(self, simulator: DESSimulatorInterface):
         for train in self.trains:
-            origin = train.current_location
-            try:
-                destination = train.next_location
-            except TrainExceptions:
-                train.path = self.create_new_path(current_location=origin)
-                destination = train.next_location
+            if train.action == TrainActions.MOVING:
+                origin = train.current_location[0]
+                destination = train.current_location[1]
+            else:
+                origin = train.current_location
+                try:
+                    destination = train.next_location
+                except TrainExceptions:
+                    train.path = self.create_new_path(current_location=origin)
+                    destination = train.next_location
 
             time = self.mesh.transit_time(origin_id=origin, destination_id=destination)
 
@@ -55,6 +64,12 @@ class Railroad(DESModel):
                 simulator=simulator,
                 node=self.mesh.load_points[0],
             )
+
+    def solver_exceptions(self, exception: Exception, event: Event):
+        if isinstance(exception, FinishedTravelException):
+            train: TrainInterface = exception.train
+            train.path = self.create_new_path(current_location=train.current_location)
+
 
     def on_finish_loaded_path(self, simulator, train: TrainInterface):
 
@@ -78,5 +93,6 @@ class Railroad(DESModel):
 
     # ===== Events =========
     # ===== Decision Methods =========
-    def create_new_path(self, current_location: int):
-        return [current_location, 1, 0]
+    @staticmethod
+    def create_new_path(current_location: int):
+        return [1, 0]

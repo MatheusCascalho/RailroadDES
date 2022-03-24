@@ -28,6 +28,11 @@ class TrainInterface(ABC):
     def current_location(self):
         pass
 
+    @property
+    @abstractmethod
+    def action(self):
+        pass
+
     # @property
     # @abstractmethod
     # def next_process(self):

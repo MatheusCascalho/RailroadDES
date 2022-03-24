@@ -1,8 +1,11 @@
+from interfaces.des_simulator_interface import DESSimulatorInterface
 from models import event_calendar as ec
 from datetime import datetime, timedelta
+from models.exceptions import FinishedTravelException
+from models.des_model import DESModel
 
 
-class DESSimulator:
+class DESSimulator(DESSimulatorInterface):
     """
     Discrete Event System simulator
     """
@@ -15,11 +18,16 @@ class DESSimulator:
     def add_event(self, time, callback, **data):
         self.calendar.push(time, callback, **data)
 
-    def simulate(self, model, time_horizon=timedelta(hours=28 * 3600)):
+    def simulate(self, model: DESModel, time_horizon=timedelta(hours=28 * 3600)):
         model.starting_events(simulator=self)
         end_date = self.initial_date + time_horizon
         while not self.calendar.is_empty and self.current_date <= end_date:
             # get next event and execute callback
             event = self.calendar.pop()
             self.current_date += event.time_until_happen
-            event.callback(**event.data)
+            try:
+                event.callback(**event.data)
+            except Exception as error:
+                model.solver_exceptions(exception=error, event=event)
+                event.callback(**event.data)
+

@@ -1,3 +1,16 @@
+from interfaces.train_interface import TrainInterface
+
+
+class FinishedTravelException(Exception):
+    def __init__(self, value, train: TrainInterface):
+        self.value = value
+        self.train = train
+
+    @staticmethod
+    def path_is_finished(train: TrainInterface):
+        raise FinishedTravelException('Travel is finished!', train=train)
+
+
 class TrainExceptions(Exception):
     @staticmethod
     def path_is_finished():
