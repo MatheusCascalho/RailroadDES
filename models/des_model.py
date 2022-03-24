@@ -5,6 +5,7 @@ from models.event_calendar import Event
 from models.conditions import RailroadMesh
 from models.states import RailroadState
 from models.inputs import Demand
+from models.exceptions import TrainExceptions
 
 
 class DESModel(abc.ABC):
@@ -42,17 +43,17 @@ class Railroad(DESModel):
             origin = train.current_location
             try:
                 destination = train.next_location
-            except TrainInterfaceExceptions:
+            except TrainExceptions:
                 train.path = self.create_new_path(current_location=origin)
                 destination = train.next_location
 
-            time = self.mesh.transit_time(origin=origin, destination=destination)
+            time = self.mesh.transit_time(origin_id=origin, destination_id=destination)
 
             simulator.add_event(
                 time=time,
-                callback=self.on_finish_loaded_path,
+                callback=train.arrive,
                 simulator=simulator,
-                train=train
+                node=self.mesh.load_points[0]
             )
 
     def on_finish_loaded_path(self, simulator, train: TrainInterface):
@@ -67,7 +68,7 @@ class Railroad(DESModel):
     def on_finish_loading(self, simulator, train):
         origin = train.current_location
         destination = train.next_location
-        time = simulator.time + self.mesh.transit_time(origin=origin, destination=destination)
+        time = simulator.current_date + self.mesh.transit_time(origin_id=origin, destination_id=destination)
         simulator.add_event(
             time=time,
             callback=self.on_finish_loaded_path,

@@ -66,7 +66,7 @@ class Train(TrainInterface):
         return self.state.current_location
 
     @property
-    def next_process(self) -> Callable:
+    def process(self) -> Callable:
         return self.load if self.is_empty else self.unload
 
     # ====== Properties ==========
@@ -78,8 +78,10 @@ class Train(TrainInterface):
         volume,
         start: datetime,
         process_time: timedelta,
-        node: NodeInterface
+        node: NodeInterface,
+        slot: Slot
     ):
+        print(f'{simulator.current_date}:: Train loading!')
         if self.state.action == TrainActions.MOVING:
             TrainExceptions.processing_when_train_is_moving()
         # Changing State
@@ -89,12 +91,11 @@ class Train(TrainInterface):
         self.time_table[self.current_location][-1].finish_process = start + process_time
 
         # Add next event to calendar
-        next_time = start + process_time
         simulator.add_event(
-            time=next_time,
+            time=process_time,
             callback=node.maneuver_to_dispatch,
             simulator=simulator,
-            train=self
+            slot=slot
         )
 
     def unload(
@@ -103,8 +104,10 @@ class Train(TrainInterface):
         volume,
         start: datetime,
         process_time: timedelta,
-        node: NodeInterface
+        node: NodeInterface,
+        slot: Slot
    ):
+        print(f'{simulator.current_date}:: Train unloading!')
         # Changing State
         if volume > self.volume:
             TrainExceptions.volume_to_unload_is_greater_than_current_volume()
@@ -119,13 +122,13 @@ class Train(TrainInterface):
             time=next_time,
             callback=node.maneuver_to_dispatch,
             simulator=simulator,
-            train=self
+            slot=slot
         )
 
     def maneuvering_to_enter(self, simulator: DESSimulator, node: NodeInterface):
         self.state.action = TrainActions.MANEUVERING_TO_ENTER
 
-        time = simulator.time + node.time_to_call
+        time = simulator.current_date + node.time_to_call
         simulator.add_event(
             time=time,
             callback=None#node.
@@ -135,22 +138,23 @@ class Train(TrainInterface):
         self.state.action = TrainActions.MANEUVERING_TO_LEAVE
 
     def arrive(self, simulator: DESSimulator, node: NodeInterface):
+        print(f'{simulator.current_date}:: train arrive!!')
         # Changing State
         self.state.current_location = self.path.pop(0)
         self.state.action = TrainActions.MANEUVERING_TO_ENTER
         self.time_table[self.current_location].append(
             TimeRegister(
-                arrive=simulator.time
+                arrive=simulator.current_date
             )
         )
 
         # Add next event to calendar
-        next_time = simulator.time + node.time_to_call
         simulator.add_event(
-            time=next_time,
+            time=timedelta(),
             callback=node.call_to_enter,
             simulator=simulator,
-            train=self
+            train=self,
+            arrive=simulator.current_date
         )
 
     def leave(self):

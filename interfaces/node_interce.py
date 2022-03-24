@@ -5,31 +5,27 @@ class NodeInterface(ABC):
     # ====== Properties ==========
     @property
     @abstractmethod
-    def time_to_call(self):
+    def identifier(self):
         pass
 
-    # @property
-    # def identifier(self):
-    #     pass
-    #
-    # @abstractmethod
-    # @identifier.setter
-    # def identifier(self, **kwargs):
-    #     pass
-    #
-    # @abstractmethod
-    # @property
-    # def process_time(self):
-    #     pass
-    #
-    # @abstractmethod
-    # @property
-    # def processing_slots(self):
-    #     pass
-    #
-    # @abstractmethod
-    # def next_idle_slot(self, current_time):
-    #     pass
+    @identifier.setter
+    @abstractmethod
+    def identifier(self, **kwargs):
+        pass
+
+    @property
+    @abstractmethod
+    def process_time(self):
+        pass
+
+    @property
+    @abstractmethod
+    def processing_slots(self):
+        pass
+
+    @abstractmethod
+    def next_idle_slot(self, current_time):
+        pass
 
     # ====== Properties ==========
     # ====== Events ==========
@@ -43,4 +39,10 @@ class NodeInterface(ABC):
 
     @abstractmethod
     def maneuver_to_dispatch(self, **kwargs):
+        pass
+
+    # ====== Events ==========
+    # ====== Methods ==========
+    @abstractmethod
+    def time_to_call(self, **kwargs):
         pass

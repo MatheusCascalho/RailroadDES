@@ -16,19 +16,19 @@ from models.states import (
 )
 from models.entities import Entity
 from interfaces.node_interce import NodeInterface
+from interfaces.train_interface import TrainInterface
+from models.resources import Slot
+import models.model_queue as mq
 
 
 class Node(NodeInterface):
-    from models.train import Train
-    import models.model_queue as mq
-    from models.resources import Slot
-
-    def __init__(self, queue_capacity: int, identifier: int, slots: int):
-        self._id = identifier
+    def __init__(self, queue_capacity: int, name: Any, slots: int):
+        self._id = name
+        self.name = name
         self.queue_to_enter = mq.Queue(capacity=queue_capacity)
         self.queue_to_leave = mq.Queue(capacity=float('inf'))
         self.slots: list[Slot] = [Slot() for _ in range(slots)]
-        self.train_schedule: list[Train] = []
+        self.train_schedule: list[TrainInterface] = []
         self.state: NodeState = NodeState(
             average_time_on_queue_to_enter=timedelta(),
             average_time_on_queue_to_leave=timedelta(),
@@ -56,10 +56,16 @@ class Node(NodeInterface):
         slots = sorted(self.slots, key=lambda slot: slot.time_to_be_idle(current_time))
         return slots[0]
 
+    def time_to_call(self, current_time):
+        process_train_on_queue = self.queue_to_enter.current_size * self.process_time
+        minimum_slot_time = self.next_idle_slot(current_time=current_time).time_to_be_idle(current_time=current_time)
+        return process_train_on_queue + minimum_slot_time
 
     # ====== Properties ==========
     # ====== Events ==========
-    def call_to_enter(self, simulator: DESSimulator, train: Train, arrive):
+    def call_to_enter(self, simulator: DESSimulator, train: TrainInterface, arrive: datetime):
+        print(f"{simulator.current_date}:: Train enter on queue")
+        time = self.time_to_call(current_time=simulator.current_date)
         self.queue_to_enter.push(
             element=train,
             arrive=arrive
@@ -67,23 +73,22 @@ class Node(NodeInterface):
         self.state.trains_on_queue_to_enter = self.queue_to_enter.current_size
 
         # Add next event
-        process_current_train = self.next_idle_slot(simulator.time).time_to_be_idle(simulator.time)
-        process_trains_in_queue = self.queue_to_enter.current_size * self.process_time
-        time = simulator.time + process_current_train + process_trains_in_queue
+        slot = self.next_idle_slot(current_time=simulator.current_date)
         simulator.add_event(
             time=time,
             callback=self.process,
-            simulator=simulator
+            simulator=simulator,
+            slot=slot
         )
 
     def process(self, simulator: DESSimulator, slot: Slot):
         # Update resources
         train = self.queue_to_enter.pop(
-            current_time=simulator.time
+            current_time=simulator.current_date
         )
         slot.put(
             train=train,
-            date=simulator.time,
+            date=simulator.current_date,
             time=self.process_time
         )
 
@@ -93,12 +98,23 @@ class Node(NodeInterface):
 
         # Add next event
         simulator.add_event(
-            time=simulator.time,
-            callback=train.next_process,
+            time=timedelta(),
+            callback=train.process,
+            simulator=simulator,
             volume=5e3,
-            start=simulator.time,
-            process_time=self.process_time
+            start=simulator.current_date,
+            process_time=self.process_time,
+            node=self,
+            slot=slot
         )
 
-    def maneuver_to_dispatch(self, simulator, train):
-        ...
+    def maneuver_to_dispatch(self, simulator: DESSimulator, slot: Slot):
+        print(f'{simulator.current_date}:: Train entering on leaving queue!')
+        train = slot.clear()
+        self.queue_to_leave.push(
+            element=train,
+            arrive=simulator.current_date
+        )
+        pass
+
+

@@ -3,33 +3,33 @@ from abc import ABC, abstractmethod
 
 class TrainInterface(ABC):
     # ====== Properties ==========
-    # @abstractmethod
+    @property
+    @abstractmethod
+    def is_empty(self):
+        pass
+
+    @property
+    @abstractmethod
+    def next_location(self):
+        pass
+
+    @property
+    @abstractmethod
+    def volume(self):
+        pass
+
+    @volume.setter
+    @abstractmethod
+    def volume(self, new_volume):
+        pass
+
+    @property
+    @abstractmethod
+    def current_location(self):
+        pass
+
     # @property
-    # def is_empty(self):
-    #     pass
-    #
     # @abstractmethod
-    # @property
-    # def next_location(self):
-    #     pass
-    #
-    # @abstractmethod
-    # @property
-    # def volume(self):
-    #     pass
-    #
-    # @abstractmethod
-    # @volume.setter
-    # def volume(self, new_volume):
-    #     pass
-    #
-    # @abstractmethod
-    # @property
-    # def current_location(self):
-    #     pass
-    #
-    # @abstractmethod
-    # @property
     # def next_process(self):
     #     pass
 
