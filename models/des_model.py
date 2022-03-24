@@ -53,7 +53,8 @@ class Railroad(DESModel):
                 time=time,
                 callback=train.arrive,
                 simulator=simulator,
-                node=self.mesh.load_points[0]
+                node=self.mesh.load_points[0],
+                model=self
             )
 
     def on_finish_loaded_path(self, simulator, train: TrainInterface):

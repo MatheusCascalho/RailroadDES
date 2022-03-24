@@ -46,3 +46,7 @@ class NodeInterface(ABC):
     @abstractmethod
     def time_to_call(self, **kwargs):
         pass
+
+    @abstractmethod
+    def connect_neighbor(self, **kwargs):
+        pass

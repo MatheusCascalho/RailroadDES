@@ -19,6 +19,7 @@ from models.entities import Entity
 from interfaces.train_interface import TrainInterface
 from interfaces.node_interce import NodeInterface
 from collections import defaultdict
+from models.conditions import RailroadMesh
 
 
 @dataclass
@@ -79,7 +80,8 @@ class Train(TrainInterface):
         start: datetime,
         process_time: timedelta,
         node: NodeInterface,
-        slot: Slot
+        slot: Slot,
+        **kwargs
     ):
         print(f'{simulator.current_date}:: Train loading!')
         if self.state.action == TrainActions.MOVING:
@@ -95,7 +97,7 @@ class Train(TrainInterface):
             time=process_time,
             callback=node.maneuver_to_dispatch,
             simulator=simulator,
-            slot=slot
+            slot=slot,
         )
 
     def unload(
@@ -157,7 +159,16 @@ class Train(TrainInterface):
             arrive=simulator.current_date
         )
 
-    def leave(self):
-        self.state.current_location = (self.state.current_location, self.next_location)
+    def leave(self, simulator: DESSimulator, mesh: RailroadMesh):
+        transit = mesh.transit_time(origin_id=self.current_location, destination_id=self.next_location)
+        self.state.current_location = self.path.pop(0)
+        self.state.action = TrainActions.MOVING
+
+        simulator.add_event(
+            time=transit,
+            callback=self.arrive,
+            simulator=simulator,
+            node=mesh.node_by_id(self.next_location)
+        )
 
     # ====== Events ==========

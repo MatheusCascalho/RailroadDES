@@ -21,6 +21,12 @@ from models.resources import Slot
 import models.model_queue as mq
 
 
+@dataclass
+class Neighbor:
+    neighbor: NodeInterface
+    transit_time: float
+
+
 class Node(NodeInterface):
     def __init__(self, queue_capacity: int, name: Any, slots: int):
         self._id = name
@@ -34,6 +40,7 @@ class Node(NodeInterface):
             average_time_on_queue_to_leave=timedelta(),
 
         )
+        self.neighbors: list[Neighbor] = []
 
     # ====== Properties ==========
     @property
@@ -51,15 +58,6 @@ class Node(NodeInterface):
     @property
     def processing_slots(self):
         return len([1 for slot in self.slots if slot.is_idle])
-
-    def next_idle_slot(self, current_time) -> Slot:
-        slots = sorted(self.slots, key=lambda slot: slot.time_to_be_idle(current_time))
-        return slots[0]
-
-    def time_to_call(self, current_time):
-        process_train_on_queue = self.queue_to_enter.current_size * self.process_time
-        minimum_slot_time = self.next_idle_slot(current_time=current_time).time_to_be_idle(current_time=current_time)
-        return process_train_on_queue + minimum_slot_time
 
     # ====== Properties ==========
     # ====== Events ==========
@@ -116,5 +114,27 @@ class Node(NodeInterface):
             arrive=simulator.current_date
         )
         pass
+    # ====== Events ==========
+    # ====== Methods ==========
 
+    def __repr__(self):
+        return self.name
 
+    __str__ = __repr__
+
+    def next_idle_slot(self, current_time) -> Slot:
+        slots = sorted(self.slots, key=lambda slot: slot.time_to_be_idle(current_time))
+        return slots[0]
+
+    def time_to_call(self, current_time):
+        process_train_on_queue = self.queue_to_enter.current_size * self.process_time
+        minimum_slot_time = self.next_idle_slot(current_time=current_time).time_to_be_idle(current_time=current_time)
+        return process_train_on_queue + minimum_slot_time
+
+    def connect_neighbor(self, node: NodeInterface, transit_time: float):
+        self.neighbors.append(
+            Neighbor(
+                neighbor=node,
+                transit_time=transit_time
+            )
+        )

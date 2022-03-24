@@ -56,7 +56,7 @@ class TrainInterface(ABC):
         pass
 
     @abstractmethod
-    def leave(self):
+    def leave(self, **kwargs):
         pass
 
     # ====== Events ==========
