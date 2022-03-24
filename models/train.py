@@ -66,6 +66,10 @@ class Train(TrainInterface):
     def current_location(self):
         return self.state.current_location
 
+    @current_location.setter
+    def current_location(self, location):
+        self.state.current_location = location
+
     @property
     def process(self) -> Callable:
         return self.load if self.is_empty else self.unload
@@ -119,9 +123,8 @@ class Train(TrainInterface):
         self.time_table[self.current_location][-1].finish_process = start + process_time
 
         # Add next event to calendar
-        next_time = start + process_time
         simulator.add_event(
-            time=next_time,
+            time=process_time,
             callback=node.maneuver_to_dispatch,
             simulator=simulator,
             slot=slot
@@ -142,7 +145,6 @@ class Train(TrainInterface):
     def arrive(self, simulator: DESSimulator, node: NodeInterface):
         print(f'{simulator.current_date}:: train arrive!!')
         # Changing State
-        self.state.current_location = self.path.pop(0)
         self.state.action = TrainActions.MANEUVERING_TO_ENTER
         self.time_table[self.current_location].append(
             TimeRegister(
@@ -159,16 +161,16 @@ class Train(TrainInterface):
             arrive=simulator.current_date
         )
 
-    def leave(self, simulator: DESSimulator, mesh: RailroadMesh):
-        transit = mesh.transit_time(origin_id=self.current_location, destination_id=self.next_location)
-        self.state.current_location = self.path.pop(0)
+    def leave(self, simulator: DESSimulator, node: NodeInterface):
+        print(f'{simulator.current_date}:: Train leaving node!')
+        self.current_location = self.path.pop(0)
         self.state.action = TrainActions.MOVING
 
         simulator.add_event(
-            time=transit,
+            time=node.neighbors[self.current_location].transit_time,
             callback=self.arrive,
             simulator=simulator,
-            node=mesh.node_by_id(self.next_location)
+            node=node.neighbors[self.current_location].neighbor
         )
 
     # ====== Events ==========

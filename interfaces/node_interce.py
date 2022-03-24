@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 
 
 class NodeInterface(ABC):
@@ -40,6 +41,8 @@ class NodeInterface(ABC):
     @abstractmethod
     def maneuver_to_dispatch(self, **kwargs):
         pass
+
+
 
     # ====== Events ==========
     # ====== Methods ==========

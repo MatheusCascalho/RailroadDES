@@ -40,7 +40,7 @@ class Node(NodeInterface):
             average_time_on_queue_to_leave=timedelta(),
 
         )
-        self.neighbors: list[Neighbor] = []
+        self.neighbors: dict[int, Neighbor] = {}
 
     # ====== Properties ==========
     @property
@@ -109,11 +109,17 @@ class Node(NodeInterface):
     def maneuver_to_dispatch(self, simulator: DESSimulator, slot: Slot):
         print(f'{simulator.current_date}:: Train entering on leaving queue!')
         train = slot.clear()
-        self.queue_to_leave.push(
-            element=train,
-            arrive=simulator.current_date
+        # self.queue_to_leave.push(
+        #     element=train,
+        #     arrive=simulator.current_date
+        # )
+
+        simulator.add_event(
+            time=timedelta(),
+            callback=train.leave,
+            simulator=simulator,
+            node=self
         )
-        pass
     # ====== Events ==========
     # ====== Methods ==========
 
@@ -132,9 +138,7 @@ class Node(NodeInterface):
         return process_train_on_queue + minimum_slot_time
 
     def connect_neighbor(self, node: NodeInterface, transit_time: float):
-        self.neighbors.append(
-            Neighbor(
-                neighbor=node,
-                transit_time=transit_time
-            )
+        self.neighbors[node.identifier] = Neighbor(
+            neighbor=node,
+            transit_time=transit_time
         )
