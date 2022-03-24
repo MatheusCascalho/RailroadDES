@@ -10,6 +10,11 @@ class Event:
     callback: Callable
     data: Any
 
+    def __repr__(self):
+        return self.callback.__qualname__
+
+    __str__ = __repr__
+
 
 class EventCalendar:
     def __init__(self):
