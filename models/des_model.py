@@ -7,6 +7,7 @@ from models.states import RailroadState
 from models.inputs import Demand
 from models.exceptions import TrainExceptions, FinishedTravelException
 from models.constants import TrainActions
+from datetime import datetime
 
 
 class DESModel(abc.ABC):
@@ -41,6 +42,7 @@ class Railroad(DESModel):
             loaded_trains=0,
             empty_trains=0
         )
+        self.demands = demands
 
     # ===== Events =========
     def starting_events(self, simulator: DESSimulatorInterface):
@@ -53,7 +55,9 @@ class Railroad(DESModel):
                 try:
                     destination = train.next_location
                 except TrainExceptions:
-                    train.path = self.create_new_path(current_location=origin)
+                    train.path, train.target_demand = self.create_new_path(
+                        current_time=simulator.current_date, current_location=train.current_location
+                    )
                     destination = train.next_location
 
             time = self.mesh.transit_time(origin_id=origin, destination_id=destination)
@@ -68,31 +72,28 @@ class Railroad(DESModel):
     def solver_exceptions(self, exception: Exception, event: Event):
         if isinstance(exception, FinishedTravelException):
             train: TrainInterface = exception.train
-            train.path = self.create_new_path(current_location=train.current_location)
+            train.path, train.target_demand = self.create_new_path(current_time=exception.current_time, current_location=train.current_location)
+            self.state.operated_volume += train.capacity
+            self.state.completed_travels += 1
 
-
-    def on_finish_loaded_path(self, simulator, train: TrainInterface):
-
-        time = 0#simulator.time + train.state.time_register.tim
-        simulator.add_event(
-            time=time,
-            callback=self.on_unfinish_loading,
-            simulator=simulator
-        )
-
-    def on_finish_loading(self, simulator, train):
-        origin = train.current_location
-        destination = train.next_location
-        time = simulator.current_date + self.mesh.transit_time(origin_id=origin, destination_id=destination)
-        simulator.add_event(
-            time=time,
-            callback=self.on_finish_loaded_path,
-            simulator=simulator,
-            train=train
-        )
 
     # ===== Events =========
     # ===== Decision Methods =========
-    @staticmethod
-    def create_new_path(current_location: int):
-        return [1, 0]
+    def create_new_path(self, current_time: datetime, current_location):
+        path, demand = self.choose_path(current_time=current_time, current_location=current_location)
+        return path, demand
+
+    def choose_path(self, current_time, current_location):
+        paths = []
+        for demand in self.demands:
+            if not demand.is_completed:
+                path = self.mesh.complete_path(
+                    origin_name=demand.origin, destination_name=demand.destination
+                )
+                predicted_time = self.mesh.predicted_time_for_path(path=path, current_time=current_time)
+                paths.append((predicted_time, path, demand))
+
+        paths = sorted(paths, key=lambda x: x[0])
+        choosed_path = paths[0][1]
+        demand = paths[0][2]
+        return choosed_path, demand

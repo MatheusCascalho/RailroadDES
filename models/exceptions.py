@@ -1,14 +1,16 @@
 from interfaces.train_interface import TrainInterface
+from datetime import datetime
 
 
 class FinishedTravelException(Exception):
-    def __init__(self, value, train: TrainInterface):
+    def __init__(self, value, train: TrainInterface, current_time: datetime):
+        self.current_time = current_time
         self.value = value
         self.train = train
 
     @staticmethod
-    def path_is_finished(train: TrainInterface):
-        raise FinishedTravelException('Travel is finished!', train=train)
+    def path_is_finished(train: TrainInterface, current_time):
+        raise FinishedTravelException('Travel is finished!', train=train, current_time=current_time)
 
 
 class TrainExceptions(Exception):

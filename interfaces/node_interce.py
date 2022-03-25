@@ -53,3 +53,8 @@ class NodeInterface(ABC):
     @abstractmethod
     def connect_neighbor(self, **kwargs):
         pass
+
+    @abstractmethod
+    def predicted_time(self, current_time):
+        pass
+

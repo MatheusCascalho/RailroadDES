@@ -28,7 +28,7 @@ class Neighbor:
 
 
 class Node(NodeInterface):
-    def __init__(self, queue_capacity: int, name: Any, slots: int):
+    def __init__(self, queue_capacity: int, name: Any, slots: int, process_time: timedelta):
         self._id = name
         self.name = name
         self.queue_to_enter = mq.Queue(capacity=queue_capacity)
@@ -41,6 +41,7 @@ class Node(NodeInterface):
 
         )
         self.neighbors: dict[int, Neighbor] = {}
+        self._process_time = process_time
 
     # ====== Properties ==========
     @property
@@ -53,7 +54,7 @@ class Node(NodeInterface):
 
     @property
     def process_time(self) -> timedelta:
-        return timedelta(hours=10.0)
+        return self._process_time
 
     @property
     def processing_slots(self):
@@ -62,7 +63,7 @@ class Node(NodeInterface):
     # ====== Properties ==========
     # ====== Events ==========
     def call_to_enter(self, simulator: DESSimulator, train: TrainInterface, arrive: datetime):
-        print(f"{simulator.current_date}:: Train enter on queue")
+        print(f"{simulator.current_date}:: Train {train.id} enter on queue of node {self}")
         time = self.time_to_call(current_time=simulator.current_date)
         self.queue_to_enter.push(
             element=train,
@@ -141,3 +142,7 @@ class Node(NodeInterface):
             neighbor=node,
             transit_time=transit_time
         )
+
+    def predicted_time(self, current_time: datetime):
+        return self.process_time + self.time_to_call(current_time)
+
