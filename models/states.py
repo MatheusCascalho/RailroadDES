@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Any
 from datetime import datetime, timedelta
-from models.constants import TrainActions, Process
+from models.constants import TrainActions, Process, EPSILON
 from models.exceptions import TrainExceptions
 
 
@@ -28,6 +28,11 @@ class RailroadState:
     completed_travels: int
     loaded_trains: int
     empty_trains: int
+    target_volume: float
+
+    @property
+    def is_incomplete(self):
+        return self.target_volume - self.operated_volume > EPSILON
 
 
 @dataclass

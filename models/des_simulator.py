@@ -25,6 +25,7 @@ class DESSimulator(DESSimulatorInterface):
             # get next event and execute callback
             event = self.calendar.pop()
             self.current_date += event.time_until_happen
+            self.calendar.update_events(time_step=event.time_until_happen)
             try:
                 event.callback(**event.data)
             except Exception as error:

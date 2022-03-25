@@ -21,7 +21,7 @@ class Queue:
         ...
 
     def pop(self, current_time):
-        data = self.elements.pop()
+        data = self.elements.pop(0)
         data.departure = current_time
         self.history.append(data)
         return data.element

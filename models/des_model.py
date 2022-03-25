@@ -1,4 +1,7 @@
 import abc
+
+import pandas as pd
+
 from interfaces.des_simulator_interface import DESSimulatorInterface
 from interfaces.train_interface import TrainInterface
 from models.event_calendar import Event
@@ -40,7 +43,8 @@ class Railroad(DESModel):
             operated_volume=0,
             completed_travels=0,
             loaded_trains=0,
-            empty_trains=0
+            empty_trains=0,
+            target_volume=sum(demand.volume for demand in demands)
         )
         self.demands = demands
 
@@ -72,11 +76,16 @@ class Railroad(DESModel):
     def solver_exceptions(self, exception: Exception, event: Event):
         if isinstance(exception, FinishedTravelException):
             train: TrainInterface = exception.train
-            train.path, train.target_demand = self.create_new_path(current_time=exception.current_time, current_location=train.current_location)
             self.state.operated_volume += train.capacity
             self.state.completed_travels += 1
 
+            if self.state.is_incomplete:
+                train.path, train.target_demand = self.create_new_path(current_time=exception.current_time, current_location=train.current_location)
+            else:
+                event.callback = self.stop_train
 
+    def stop_train(self, **kwargs):
+        pass
     # ===== Events =========
     # ===== Decision Methods =========
     def create_new_path(self, current_time: datetime, current_location):
@@ -97,3 +106,11 @@ class Railroad(DESModel):
         choosed_path = paths[0][1]
         demand = paths[0][2]
         return choosed_path, demand
+
+    def statistics(self):
+        operated_volume = [
+            {"Origin": demand.origin, "Destination": demand.destination, "Demand": demand.volume,
+             "Operated": demand.operated, "Cut": demand.cut}
+            for demand in self.demands
+        ]
+        return pd.DataFrame(operated_volume)

@@ -94,7 +94,7 @@ class Train(TrainInterface):
         slot: Slot,
         **kwargs
     ):
-        print(f'{simulator.current_date}:: Train loading!')
+        print(f'{simulator.current_date}:: Train {self.id} loading!')
         if self.state.action == TrainActions.MOVING:
             TrainExceptions.processing_when_train_is_moving()
         # Changing State
@@ -173,7 +173,7 @@ class Train(TrainInterface):
         )
 
     def leave(self, simulator: DESSimulator, node: NodeInterface):
-        print(f'{simulator.current_date}:: Train leaving node!')
+        print(f'{simulator.current_date}:: Train {self.id} leaving node {node}!')
         self.time_table[self.current_location][-1].departure = simulator.current_date
         try:
             self.current_location = [self.current_location, self.next_location]

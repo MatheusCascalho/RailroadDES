@@ -54,6 +54,10 @@ class EventCalendar:
         """
         return len(self.calendar) == 0
 
+    def update_events(self, time_step: timedelta):
+        for event in self.calendar:
+            event.time_until_happen -= time_step
+
 
 if __name__ == '__main__':
     print("="*50)

@@ -64,55 +64,70 @@ class Node(NodeInterface):
     # ====== Events ==========
     def call_to_enter(self, simulator: DESSimulator, train: TrainInterface, arrive: datetime):
         print(f"{simulator.current_date}:: Train {train.id} enter on queue of node {self}")
-        time = self.time_to_call(current_time=simulator.current_date)
         self.queue_to_enter.push(
             element=train,
             arrive=arrive
         )
+        time = self.time_to_call(current_time=simulator.current_date)
+        self.train_schedule.append(train)
         self.state.trains_on_queue_to_enter = self.queue_to_enter.current_size
 
         # Add next event
-        slot = self.next_idle_slot(current_time=simulator.current_date)
         simulator.add_event(
             time=time,
             callback=self.process,
             simulator=simulator,
-            slot=slot
         )
 
-    def process(self, simulator: DESSimulator, slot: Slot):
+    def process(self, simulator: DESSimulator):
         # Update resources
-        train = self.queue_to_enter.pop(
-            current_time=simulator.current_date
-        )
-        slot.put(
-            train=train,
-            date=simulator.current_date,
-            time=self.process_time
-        )
+        slot = self.next_idle_slot(current_time=simulator.current_date)
+        if slot.is_idle:
+            print(
+                f'{simulator.current_date}:: Train {self.queue_to_enter.elements[0].element.id} starts process at node {self}!')
+            train = self.queue_to_enter.pop(
+                current_time=simulator.current_date
+            )
+            self.train_schedule.pop(0)
 
-        # Update state
-        self.state.trains_on_queue_to_enter = self.queue_to_enter.current_size
-        self.state.trains_on_process = self.processing_slots
+            slot.put(
+                train=train,
+                date=simulator.current_date,
+                time=self.process_time
+            )
 
-        # Add next event
-        simulator.add_event(
-            time=timedelta(),
-            callback=train.process,
-            simulator=simulator,
-            start=simulator.current_date,
-            process_time=self.process_time,
-            node=self,
-            slot=slot
-        )
+            # Update state
+            self.state.trains_on_queue_to_enter = self.queue_to_enter.current_size
+            self.state.trains_on_process = self.processing_slots
+            time = timedelta()
+            # Add next event
+            simulator.add_event(
+                time=time,
+                callback=train.process,
+                simulator=simulator,
+                start=simulator.current_date,
+                process_time=self.process_time,
+                node=self,
+                slot=slot
+            )
+
+        else:
+            time = slot.time_to_be_idle(current_time=simulator.current_date)
+            simulator.add_event(
+                time=time,
+                callback=self.process,
+                simulator=simulator,
+            )
+            print(
+                f'{simulator.current_date}:: Train {self.queue_to_enter.elements[0].element.id} waiting idle slot at {self}!')
 
     def maneuver_to_dispatch(self, simulator: DESSimulator, slot: Slot):
-        print(f'{simulator.current_date}:: Train entering on leaving queue!')
+        print(f'{simulator.current_date}:: Train {slot.current_train.id} entering on leaving queue!')
         train = slot.clear()
-        # self.queue_to_leave.push(
-        #     element=train,
-        #     arrive=simulator.current_date
-        # )
+        self.queue_to_leave.push(
+            element=train,
+            arrive=simulator.current_date
+        )
 
         simulator.add_event(
             time=timedelta(),
@@ -129,13 +144,15 @@ class Node(NodeInterface):
     __str__ = __repr__
 
     def next_idle_slot(self, current_time) -> Slot:
-        slots = sorted(self.slots, key=lambda slot: slot.time_to_be_idle(current_time))
+        slots = sorted((slot for slot in self.slots), key=lambda slot: slot.time_to_be_idle(current_time))
         return slots[0]
 
     def time_to_call(self, current_time):
-        process_train_on_queue = self.queue_to_enter.current_size * self.process_time
+        process_scheduled_trains = len(self.train_schedule) * self.process_time
+        # process_train_on_queue = self.queue_to_enter.current_size * self.process_time
         minimum_slot_time = self.next_idle_slot(current_time=current_time).time_to_be_idle(current_time=current_time)
-        return process_train_on_queue + minimum_slot_time
+
+        return minimum_slot_time + process_scheduled_trains
 
     def connect_neighbor(self, node: NodeInterface, transit_time: float):
         self.neighbors[node.identifier] = Neighbor(
