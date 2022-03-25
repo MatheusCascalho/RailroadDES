@@ -18,7 +18,7 @@ class DESSimulator(DESSimulatorInterface):
     def add_event(self, time, callback, **data):
         self.calendar.push(time, callback, **data)
 
-    def simulate(self, model: DESModel, time_horizon=timedelta(hours=28 * 3600)):
+    def simulate(self, model: DESModel, time_horizon=timedelta(hours=28)):
         model.starting_events(simulator=self)
         end_date = self.initial_date + time_horizon
         while not self.calendar.is_empty and self.current_date <= end_date:

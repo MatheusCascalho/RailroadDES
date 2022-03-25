@@ -48,7 +48,7 @@ trains = [
     )
 ]
 model = Railroad(mesh=mesh, trains=trains, demands=None)
-time_horizon = timedelta(days=5)
+time_horizon = timedelta(days=40)
 simulator = DESSimulator(initial_date=datetime(2020, 1, 1))
 simulator.simulate(model=model, time_horizon=time_horizon)
 print("Fim")

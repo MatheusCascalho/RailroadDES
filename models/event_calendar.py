@@ -1,12 +1,12 @@
 import math
 from typing import Callable, Any
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 @dataclass
 class Event:
-    time_until_happen: float
+    time_until_happen: timedelta
     callback: Callable
     data: Any
 
