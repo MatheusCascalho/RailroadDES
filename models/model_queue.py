@@ -20,6 +20,10 @@ class Queue:
     def clear(self):
         ...
 
+    @property
+    def is_full(self):
+        return self.current_size == self.capacity
+
     def pop(self, current_time):
         data = self.elements.pop(0)
         data.departure = current_time
@@ -27,7 +31,7 @@ class Queue:
         return data.element
 
     def push(self, element, arrive):
-        if len(self.elements) < self.capacity - 1:
+        if len(self.elements) < self.capacity:
             queue_element = QueueElement(element=element, arrive=arrive)
             self.elements.append(queue_element)
         else:
