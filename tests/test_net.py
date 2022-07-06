@@ -150,3 +150,203 @@ def test_simple_net():
         [0, -1, 1]
     ])
     testing.assert_equal(actual, expected)
+
+
+def test_simple_net_marking():
+    p1 = Place(
+        tokens=0,
+        meaning="process unit",
+        identifier="LOAD_POINT_1"
+    )
+    p2 = Place(
+        tokens=0,
+        meaning="receiving_vacancy",
+        identifier="RECEIVE_YARD_VACCANCY_POINT_1"
+    )
+    p3 = Place(
+        tokens=1,
+        meaning="receiving_occupancy",
+        identifier="RECEIVE_YARD_POINT_1"
+    )
+
+    t1 = Transition(
+        identifier="enter_to_load_1",
+        intrinsic_time=None,
+        input_places=[],
+        output_places=[],
+        meaning="",
+    )
+    t2 = Transition(
+        identifier="process_in_load_1",
+        intrinsic_time=None,
+        input_places=[],
+        output_places=[],
+        meaning="",
+    )
+    t3 = Transition(
+        identifier="release_from_load_1",
+        intrinsic_time=None,
+        input_places=[],
+        output_places=[],
+        meaning="",
+    )
+
+    arcs = [
+        Arc(input=t1, output=p1),
+        Arc(input=p1, output=t2),
+        Arc(input=t2, output=p2),
+        Arc(input=p2, output=t3),
+        Arc(input=t3, output=p3),
+        Arc(input=p3, output=t2),
+    ]
+    places = [
+        p1, p2, p3
+    ]
+    transitions = [
+        t1, t2, t3
+    ]
+
+    net = PetriNet(
+        places=places,
+        transitions=transitions,
+        arcs=arcs
+    )
+
+    actual = net.marking
+    expected = np.array([0, 0, 1])
+    testing.assert_equal(actual, expected)
+
+
+def test_simple_net_a_minus():
+    p1 = Place(
+        tokens=0,
+        meaning="process unit",
+        identifier="LOAD_POINT_1"
+    )
+    p2 = Place(
+        tokens=0,
+        meaning="receiving_vacancy",
+        identifier="RECEIVE_YARD_VACCANCY_POINT_1"
+    )
+    p3 = Place(
+        tokens=1,
+        meaning="receiving_occupancy",
+        identifier="RECEIVE_YARD_POINT_1"
+    )
+
+    t1 = Transition(
+        identifier="enter_to_load_1",
+        intrinsic_time=None,
+        input_places=[],
+        output_places=[],
+        meaning="",
+    )
+    t2 = Transition(
+        identifier="process_in_load_1",
+        intrinsic_time=None,
+        input_places=[],
+        output_places=[],
+        meaning="",
+    )
+    t3 = Transition(
+        identifier="release_from_load_1",
+        intrinsic_time=None,
+        input_places=[],
+        output_places=[],
+        meaning="",
+    )
+
+    arcs = [
+        Arc(input=t1, output=p1),
+        Arc(input=p1, output=t2),
+        Arc(input=t2, output=p2),
+        Arc(input=p2, output=t3),
+        Arc(input=t3, output=p3),
+        Arc(input=p3, output=t2),
+    ]
+    places = [
+        p1, p2, p3
+    ]
+    transitions = [
+        t1, t2, t3
+    ]
+
+    net = PetriNet(
+        places=places,
+        transitions=transitions,
+        arcs=arcs
+    )
+
+    actual = net.a_minus()
+    expected = np.array([
+        [0, 0, 0],
+        [-1, 0, -1],
+        [0, -1, 0]
+    ])
+    testing.assert_equal(actual, expected)
+
+
+def test_simple_net_allowed_transitions():
+    p1 = Place(
+        tokens=1,
+        meaning="process unit",
+        identifier="LOAD_POINT_1"
+    )
+    p2 = Place(
+        tokens=0,
+        meaning="receiving_vacancy",
+        identifier="RECEIVE_YARD_VACCANCY_POINT_1"
+    )
+    p3 = Place(
+        tokens=1,
+        meaning="receiving_occupancy",
+        identifier="RECEIVE_YARD_POINT_1"
+    )
+
+    t1 = Transition(
+        identifier="enter_to_load_1",
+        intrinsic_time=None,
+        input_places=[],
+        output_places=[],
+        meaning="",
+    )
+    t2 = Transition(
+        identifier="process_in_load_1",
+        intrinsic_time=None,
+        input_places=[],
+        output_places=[],
+        meaning="",
+    )
+    t3 = Transition(
+        identifier="release_from_load_1",
+        intrinsic_time=None,
+        input_places=[],
+        output_places=[],
+        meaning="",
+    )
+
+    arcs = [
+        Arc(input=t1, output=p1),
+        Arc(input=p1, output=t2),
+        Arc(input=t2, output=p2),
+        Arc(input=p2, output=t3),
+        Arc(input=t3, output=p3),
+        Arc(input=p3, output=t2),
+    ]
+    places = [
+        p1, p2, p3
+    ]
+    transitions = [
+        t1, t2, t3
+    ]
+
+    net = PetriNet(
+        places=places,
+        transitions=transitions,
+        arcs=arcs
+    )
+
+    actual = net.allowed_transitions()
+    expected = np.array([t1, t2])
+
+    testing.assert_equal(actual, expected)
