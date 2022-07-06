@@ -59,8 +59,14 @@ class PetriNet:
     def a_plus(self):
         ...
 
-    def update(self):
-        ...
+    def update(self, transition):
+        transition_index = self.indexes['transitions'][transition.identifier]
+        incidence_matrix = self.incidence_matrix()
+        current_marking = self.marking
+        new_marking = current_marking + incidence_matrix[transition_index]
+        for i, new_tokens in enumerate(new_marking):
+            self.places[i].update(tokens=new_tokens)
+        return self.marking
 
     def allowed_transitions(self):
         current_marking = self.marking

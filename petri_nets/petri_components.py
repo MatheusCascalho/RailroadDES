@@ -9,13 +9,14 @@ class Place:
     meaning: str
     identifier: str
 
-    def update(self):
+    def update(self, tokens):
         """
         update number of tokens in place
         Returns:
 
         """
-        ...
+        self.tokens = tokens
+        return self.tokens
 
 
 @dataclass
