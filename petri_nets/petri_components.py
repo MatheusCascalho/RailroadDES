@@ -38,6 +38,15 @@ class Transition:
     def vivacity(self):
         ...
 
+    def __gt__(self, other):
+        return self.identifier > other.identifier
+
+    def __lt__(self, other):
+        return self.identifier < other.identifier
+
+    def __eq__(self, other):
+        return self.identifier == other.identifier
+
 
 @dataclass
 class Arc:

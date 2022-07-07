@@ -499,3 +499,72 @@ def test_coverage_tree():
         '0 0 W 1': []
     }
     assert actual == expected
+
+
+def test_modular_composition():
+    p1 = Place(
+        tokens=0,
+        meaning="waiting space",
+        identifier="p1"
+    )
+
+    t1 = Transition(
+        identifier="t1",
+        intrinsic_time=None,
+        input_places=[],
+        output_places=[],
+        meaning="arrive on waiting space",
+    )
+
+    t2 = Transition(
+        identifier="t2",
+        intrinsic_time=None,
+        input_places=[],
+        output_places=[],
+        meaning="call to enter on server",
+    )
+
+    p2 = Place(
+        tokens=0,
+        meaning="server",
+        identifier="p2"
+    )
+
+    p3 = Place(
+        tokens=1,
+        meaning="server vacancy",
+        identifier="p3"
+    )
+
+    t3 = Transition(
+        identifier="t3",
+        intrinsic_time=None,
+        input_places=[],
+        output_places=[],
+        meaning="departure from server",
+    )
+
+    net1 = PetriNet(
+        places=[p1],
+        transitions=[t1, t2],
+        arcs=[
+            Arc(input=t1, output=p1),
+            Arc(input=p1, output=t2),
+        ]
+    )
+
+    net2 = PetriNet(
+        places=[p2, p3],
+        transitions=[t2, t3],
+        arcs=[
+            Arc(input=t2, output=p2),
+            Arc(input=p2, output=t3),
+            Arc(input=t3, output=p3),
+            Arc(input=p3, output=t2),
+        ]
+    )
+
+    net = net1.modular_composition(net2)
+    assert len(net.places) == 3
+    assert len(net.transitions) == 3
+    assert len(net.arcs) == 6

@@ -124,9 +124,19 @@ class PetriNet:
 
         return adjacency_dict
 
-
-
-
-    def composition(self, net):
-        ...
+    def modular_composition(self, net):
+        places = self.places + net.places
+        transitions = np.unique(
+            np.concatenate(
+                (self.transitions, net.transitions),
+                axis=None
+            )
+        )
+        arcs = self.arcs + net.arcs
+        new_net = PetriNet(
+            places=places,
+            transitions=transitions,
+            arcs=arcs
+        )
+        return new_net
 
