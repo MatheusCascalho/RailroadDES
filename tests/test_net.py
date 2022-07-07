@@ -416,3 +416,86 @@ def test_simple_net_update_marking():
     expected = np.array([0, 1, 0])
 
     testing.assert_equal(actual, expected)
+
+
+def test_coverage_tree():
+    p1 = Place(
+        tokens=1,
+        meaning="",
+        identifier="p1"
+    )
+    p2 = Place(
+        tokens=0,
+        meaning="",
+        identifier="p2"
+    )
+    p3 = Place(
+        tokens=0,
+        meaning="",
+        identifier="p3"
+    )
+    p4 = Place(
+        tokens=0,
+        meaning="",
+        identifier="p4"
+    )
+
+    t1 = Transition(
+        identifier="t1",
+        intrinsic_time=None,
+        input_places=[],
+        output_places=[],
+        meaning="",
+    )
+    t2 = Transition(
+        identifier="t2",
+        intrinsic_time=None,
+        input_places=[],
+        output_places=[],
+        meaning="",
+    )
+    t3 = Transition(
+        identifier="t3",
+        intrinsic_time=None,
+        input_places=[],
+        output_places=[],
+        meaning="",
+    )
+
+    arcs = [
+        Arc(input=p1, output=t1),
+        Arc(input=t1, output=p2),
+        Arc(input=t1, output=p3),
+        Arc(input=p3, output=t3),
+        Arc(input=p2, output=t3),
+        Arc(input=t3, output=p3),
+        Arc(input=t3, output=p4),
+        Arc(input=p2, output=t2),
+        Arc(input=t2, output=p1),
+    ]
+    places = [
+        p1, p2, p3, p4
+    ]
+    transitions = [
+        t1, t2, t3
+    ]
+
+    net = PetriNet(
+        places=places,
+        transitions=transitions,
+        arcs=arcs
+    )
+
+    tree = net.coverage_tree()
+    actual = {
+        father: [str(child) for child in children] for father, children in tree.items()
+    }
+    expected = {
+        '1 0 0 0': ['0 1 1 0'],
+        '0 1 1 0': ['1 0 W 0', '0 0 1 1'],
+        '0 0 1 1': [],
+        '1 0 W 0': ['0 1 W 0'],
+        '0 1 W 0': ['1 0 W 0', '0 0 W 1'],
+        '0 0 W 1': []
+    }
+    assert actual == expected

@@ -1,6 +1,8 @@
-from petri_nets.petri_components import Place, Transition, Arc
+from petri_nets.petri_components import Place, Transition, Arc, MarkingNode
 from typing import List
 import numpy as np
+from collections import defaultdict
+
 
 class PetriNet:
     def __init__(
@@ -36,11 +38,11 @@ class PetriNet:
             if isinstance(arc.input, Transition):
                 i = self.indexes['transitions'][arc.input.identifier]
                 j = self.indexes['places'][arc.output.identifier]
-                matrix[i, j] = arc.weight
+                matrix[i, j] += arc.weight
             else:
                 i = self.indexes['transitions'][arc.output.identifier]
                 j = self.indexes['places'][arc.input.identifier]
-                matrix[i, j] = - arc.weight
+                matrix[i, j] += - arc.weight
         return matrix
 
     def a_minus(self):
@@ -68,8 +70,9 @@ class PetriNet:
             self.places[i].update(tokens=new_tokens)
         return self.marking
 
-    def allowed_transitions(self):
-        current_marking = self.marking
+    def allowed_transitions(self, current_marking=None):
+        if current_marking is None:
+            current_marking = self.marking
         a_minus = self.a_minus()
         places_amount = len(self.places)
         reference_vector = np.zeros(places_amount)
@@ -81,9 +84,48 @@ class PetriNet:
         allowed = self.transitions[valid_transitions]
         return allowed
 
+    def coverage_tree(self, initial_marking=None):
+        if initial_marking is None:
+            initial_marking = self.marking
+        current_node = 0
+        root = MarkingNode(
+            marking=initial_marking, name=f"x{current_node}"
+        )
+        adjacency_dict = defaultdict(list)
+        adjacency_dict[root.hashable_name] = []
 
-    def coverage_tree(self):
-        ...
+        not_evalueated_markings = [root]
+        incidence_matrix = self.incidence_matrix()
+
+        while not_evalueated_markings:
+            current_marking = not_evalueated_markings.pop()
+            allowed_transitions = self.allowed_transitions(current_marking=current_marking.marking)
+            if allowed_transitions.size == 0:
+                root.is_terminal = True
+                adjacency_dict[current_marking.hashable_name] = []
+
+            else:
+                for transition in allowed_transitions:
+                    t = self.indexes['transitions'][transition.identifier]
+                    next_marking = current_marking.marking + incidence_matrix[t]
+                    current_node += 1
+                    node = MarkingNode(
+                        marking=next_marking,
+                        name=f"x{current_node}",
+                        father=current_marking,
+                        transition=transition
+                    )
+                    node.check_dominance()
+                    adjacency_dict[current_marking.hashable_name].append(node)
+                    current_marking.childrens.append(node)
+                    if node.hashable_name in adjacency_dict:
+                        continue
+                    not_evalueated_markings.append(node)
+
+        return adjacency_dict
+
+
+
 
     def composition(self, net):
         ...
