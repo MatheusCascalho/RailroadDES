@@ -6,12 +6,13 @@ import numpy as np
 from numpy import ndarray, where
 
 
-
 @dataclass
 class Place:
     tokens: int
     meaning: str
     identifier: str
+    inputs: List = field(default_factory=list)
+    outputs: List = field(default_factory=list)
 
     def update(self, tokens):
         """
@@ -30,6 +31,8 @@ class Transition:
     input_places: List[Place]
     output_places: List[Place]
     meaning: str
+    inputs: List = field(default_factory=list)
+    outputs: List = field(default_factory=list)
 
     @property
     def is_allowed(self) -> bool:
@@ -53,6 +56,10 @@ class Arc:
     input: Union[Place, Transition]
     output: Union[Place, Transition]
     weight: float = 1
+
+    def __post_init__(self):
+        self.input.outputs.append(self.output)
+        self.output.inputs.append(self.input)
 
     def __repr__(self):
         return str((self.input.identifier, self.output.identifier))

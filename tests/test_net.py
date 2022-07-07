@@ -565,6 +565,8 @@ def test_modular_composition():
     )
 
     net = net1.modular_composition(net2)
-    assert len(net.places) == 3
-    assert len(net.transitions) == 3
-    assert len(net.arcs) == 6
+
+    actual = [p.identifier for p in net.transitions[1].inputs]
+    expected = ['p1', 'p3']
+
+    assert actual == expected

@@ -1,14 +1,15 @@
 from petri_nets.petri_components import Place, Transition, Arc, MarkingNode
-from typing import List
+from typing import List, Union
 import numpy as np
 from collections import defaultdict
+import networkx as nx
 
 
 class PetriNet:
     def __init__(
             self,
             places: List[Place],
-            transitions: List[Transition],
+            transitions: Union[List[Transition], np.ndarray],
             arcs: List[Arc]
     ):
         self.transitions = np.array(transitions)
