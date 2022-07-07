@@ -10,8 +10,23 @@ class PetriNet:
             self,
             places: List[Place],
             transitions: Union[List[Transition], np.ndarray],
-            arcs: List[Arc]
+            arcs: List[Arc],
+            place_invariant: np.ndarray = np.array([]),
+            token_restriction: int = np.inf,
+            name: str = ""
     ):
+        self.token_restriction = token_restriction
+        place_invariant_wrong_size = len(place_invariant) != len(places)
+        place_invariant_wrong_form = (
+            len(place_invariant.shape) != 2 or
+            place_invariant.shape[1] != 1
+        )
+        if place_invariant_wrong_size:
+            place_invariant = np.ones((len(places), 1)) * np.inf
+        if place_invariant_wrong_form:
+            self.place_invariant = place_invariant.reshape((place_invariant.shape[0], 1))
+
+        self.place_invariant = place_invariant
         self.transitions = np.array(transitions)
         self.arcs = arcs
         self.places = places
@@ -23,6 +38,8 @@ class PetriNet:
                 transition.identifier: i for i, transition in enumerate(transitions)
             },
         }
+        self.name = name
+        self.add_control_places()
 
     @property
     def marking(self):
@@ -140,4 +157,27 @@ class PetriNet:
             arcs=arcs
         )
         return new_net
+
+    def add_control_places(self):
+        marking = self.marking
+        incidence_matrix = self.incidence_matrix()
+        control_matrix = -1 * np.matmul(incidence_matrix, self.place_invariant)
+        control_initial_tokens = self.token_restriction - np.matmul(marking, self.place_invariant)
+        control = Place(
+            tokens=control_initial_tokens,
+            meaning=f"Control of net/subnet {self.name}",
+            identifier=f"pc_{self.name}",
+            is_control_place=True
+        )
+        for t, weight in enumerate(control_matrix):
+            if weight > 0:
+                arc = Arc(input=control, output=self.transitions[t])
+            elif weight < 0:
+                arc = Arc(output=control, input=self.transitions[t])
+            else:
+                continue
+            self.arcs.append(arc)
+        self.places.append(control)
+        self.indexes['places'][f"pc_{self.name}"] = len(self.places) - 1
+
 

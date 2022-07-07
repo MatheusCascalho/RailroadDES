@@ -11,6 +11,7 @@ class Place:
     tokens: int
     meaning: str
     identifier: str
+    is_control_place: bool = False
     inputs: List = field(default_factory=list)
     outputs: List = field(default_factory=list)
 

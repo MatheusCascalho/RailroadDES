@@ -570,3 +570,42 @@ def test_modular_composition():
     expected = ['p1', 'p3']
 
     assert actual == expected
+
+
+def test_control_place():
+    p1 = Place(
+        tokens=0,
+        meaning="",
+        identifier="p1"
+    )
+    p2 = Place(
+        tokens=0,
+        meaning="",
+        identifier="p2"
+    )
+
+    transitions = [
+        Transition(
+            identifier=f"t{i}",
+            intrinsic_time=None,
+            input_places=[],
+            output_places=[],
+            meaning="",
+        ) for i in range(1, 5)
+    ]
+
+    net = PetriNet(
+        places=[p1, p2],
+        transitions=transitions,
+        arcs=[
+            Arc(input=transitions[0], output=p1),
+            Arc(input=p1, output=transitions[1]),
+            Arc(input=transitions[2], output=p2),
+            Arc(input=p2, output=transitions[3]),
+        ],
+        place_invariant=np.array([1, 1]),
+        token_restriction=1
+    )
+
+    assert len(net.places) == 3
+    assert net.places[-1].is_control_place
