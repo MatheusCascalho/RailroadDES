@@ -3,6 +3,7 @@ from typing import List, Union
 import numpy as np
 from collections import defaultdict
 import networkx as nx
+import matplotlib.pyplot as plt
 
 
 class PetriNet:
@@ -179,5 +180,22 @@ class PetriNet:
             self.arcs.append(arc)
         self.places.append(control)
         self.indexes['places'][f"pc_{self.name}"] = len(self.places) - 1
+
+    def create_graph(self):
+        adjacency_dict = {
+            node.identifier: [out.identifier for out in node.outputs]
+            for node in self.places + list(self.transitions)
+        }
+        g = nx.Graph(adjacency_dict)
+        # Assign type of node
+        for u in g.nodes():
+            g.nodes[u]['Type'] = 'yellow' if u[0] == 'p' else 'cyan'
+        color_val = [
+            nx.get_node_attributes(g, 'Type').get(node)
+            for node in g.nodes()
+        ]
+        nx.draw(g, with_labels=True, node_color=color_val)
+        plt.show()
+        return g
 
 
