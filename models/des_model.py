@@ -47,8 +47,8 @@ class Railroad(DESModel):
         self.state: RailroadState = RailroadState(
             operated_volume=0,
             completed_travels=0,
-            loaded_trains=0,
-            empty_trains=0,
+            loaded_trains=len([t for t in trains if not t.is_empty]),
+            empty_trains=len([t for t in trains if t.is_empty]),
             target_volume=sum(demand.volume for demand in demands)
         )
         self.demands = demands
@@ -125,26 +125,33 @@ class Railroad(DESModel):
         # demand places
         arcs = []
         places = []
+        transitions = []
+
         for demand in self.demands:
+            origin = self.mesh.name_to_node[demand.origin]
+            destination = self.mesh.name_to_node[demand.destination]
+
             demand_to_be_attended = Place(
                 tokens=demand.volume / self.trains[0].capacity,
                 meaning=f"Demand from {demand.origin} to {demand.destination}",
-                identifier=f"p_demanda_{demand.origin}_{demand.destination}",
+                identifier=f"p_demand_{demand.origin}_{demand.destination}_to_be_attended",
             )
             demand_being_attended = Place(
-                tokens=demand.volume / self.trains[0].capacity,
-                meaning=f"Demand from {demand.origin} to {demand.destination}",
-                identifier=f"p_demanda_{demand.origin}_{demand.destination}",
+                tokens=0,
+                meaning=f"Demand being attended between {demand.origin} and {demand.destination}",
+                identifier=f"p_demand_{demand.origin}_{demand.destination}_being_attended",
             )
-            origin = self.mesh.node_by_id(demand.origin)
-            destination = self.mesh.node_by_id(demand.destination)
+            places.extend([demand_to_be_attended, demand_being_attended])
+            transitions.extend([
+                origin.transitions['receive'],
+                destination.transitions['receive'],
+            ])
             flow_arcs = [
                 Arc(input=demand_to_be_attended, output=origin.transitions['receive']),
                 Arc(input=demand_being_attended, output=destination.transitions['receive']),
                 Arc(input=origin.transitions['receive'], output=demand_being_attended)
             ]
             arcs.extend(flow_arcs)
-
 
         loaded_trains = Place(
             tokens=self.state.loaded_trains,
@@ -157,14 +164,33 @@ class Railroad(DESModel):
             meaning="empty trains on railroad",
             identifier="p_empty_trains"
         )
+        places.extend([loaded_trains, empty_trains])
 
         for unload in self.mesh.unload_points:
             arcs.extend([
                 Arc(input=loaded_trains, output=unload.transitions['receive']),
                 Arc(input=unload.transitions['dispatch'], output=empty_trains)
             ])
+            transitions.extend([
+                unload.transitions['receive'],
+                unload.transitions['dispatch']
+            ])
         for load in self.mesh.load_points:
             arcs.extend([
                 Arc(input=empty_trains, output=load.transitions['receive']),
                 Arc(input=load.transitions['dispatch'], output=loaded_trains)
             ])
+            transitions.extend([
+                load.transitions['receive'],
+                load.transitions['dispatch']
+            ])
+
+        net = PetriNet(
+            places=places,
+            transitions=transitions,
+            arcs=arcs,
+            name="railroad"
+        )
+        node_models = [n.petri_model for n in self.mesh.load_points+self.mesh.unload_points]
+        complete_model = net.modular_composition(node_models)
+        return complete_model

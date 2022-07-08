@@ -7,9 +7,6 @@ from models.demand import Demand
 from datetime import timedelta, datetime
 import pandas as pd
 pd.set_option('display.max_columns', None)
-from IPython.display import HTML, display
-import plotly.express as px
-
 
 
 def create_model(demand=[3500, 0], n_trains=1, terminal_times = [7], port_times=[6, 10], queue_capacity=50):
