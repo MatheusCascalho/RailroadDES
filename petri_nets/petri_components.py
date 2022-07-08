@@ -29,11 +29,12 @@ class Place:
 class Transition:
     identifier: str
     intrinsic_time: timedelta
-    input_places: List[Place]
-    output_places: List[Place]
     meaning: str
+    callback: callable = field(default=lambda: print("Activated!"))
     inputs: List = field(default_factory=list)
     outputs: List = field(default_factory=list)
+    input_places: List[Place] = field(default_factory=list)  # Is it necessary?
+    output_places: List[Place] = field(default_factory=list)  # Is it necessary?
 
     @property
     def is_allowed(self) -> bool:
@@ -91,13 +92,16 @@ class MarkingNode:
 
     def set_omega(self, indexes):
         self.marking[indexes] = np.Inf
-        self.hashable_name = ' '.join(str(int(k)) if i not in indexes else 'W' for i, k in enumerate(self.marking))
+        self.hashable_name = ' '.join(
+            str(int(k)) if i not in indexes and not np.isinf(k) else 'W'
+            for i, k in enumerate(self.marking)
+        )
 
     def check_dominance(self):
         current_node = self.father
         while current_node is not None:
             if self.is_dominant_over(current_node):
-                bigger = where(self.marking > current_node.marking)
+                bigger = where(self.marking > current_node.marking)[0]
                 self.set_omega(bigger)
                 break
             else:

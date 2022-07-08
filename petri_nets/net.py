@@ -40,7 +40,8 @@ class PetriNet:
             },
         }
         self.name = name
-        self.add_control_places()
+        if not np.isinf(token_restriction):
+            self.add_control_places()
 
     @property
     def marking(self):
@@ -143,15 +144,19 @@ class PetriNet:
 
         return adjacency_dict
 
-    def modular_composition(self, net):
-        places = self.places + net.places
-        transitions = np.unique(
-            np.concatenate(
-                (self.transitions, net.transitions),
-                axis=None
+    def modular_composition(self, nets):
+        places = self.places.copy()
+        transitions = self.transitions.copy()
+        arcs = self.arcs.copy()
+        for net in nets:
+            places += net.places
+            transitions = np.unique(
+                np.concatenate(
+                    (transitions, net.transitions),
+                    axis=None
+                )
             )
-        )
-        arcs = self.arcs + net.arcs
+            arcs += net.arcs
         new_net = PetriNet(
             places=places,
             transitions=transitions,
@@ -162,7 +167,7 @@ class PetriNet:
     def add_control_places(self):
         marking = self.marking
         incidence_matrix = self.incidence_matrix()
-        control_matrix = -1 * np.matmul(incidence_matrix, self.place_invariant)
+        control_matrix = np.matmul(incidence_matrix, self.place_invariant)
         control_initial_tokens = self.token_restriction - np.matmul(marking, self.place_invariant)
         control = Place(
             tokens=control_initial_tokens,
@@ -172,9 +177,9 @@ class PetriNet:
         )
         for t, weight in enumerate(control_matrix):
             if weight > 0:
-                arc = Arc(input=control, output=self.transitions[t])
+                arc = Arc(input=control, output=self.transitions[t], weight=weight)
             elif weight < 0:
-                arc = Arc(output=control, input=self.transitions[t])
+                arc = Arc(output=control, input=self.transitions[t], weight=-weight)
             else:
                 continue
             self.arcs.append(arc)

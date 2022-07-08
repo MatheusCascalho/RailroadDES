@@ -564,7 +564,7 @@ def test_modular_composition():
         ]
     )
 
-    net = net1.modular_composition(net2)
+    net = net1.modular_composition([net2])
 
     actual = [p.identifier for p in net.transitions[1].inputs]
     expected = ['p1', 'p3']

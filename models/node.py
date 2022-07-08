@@ -19,6 +19,9 @@ from interfaces.node_interce import NodeInterface
 from interfaces.train_interface import TrainInterface
 from models.resources import Slot
 import models.model_queue as mq
+from petri_nets.petri_components import Place, Transition, Arc
+from petri_nets.net import PetriNet
+import numpy as np
 
 
 @dataclass
@@ -28,7 +31,14 @@ class Neighbor:
 
 
 class Node(NodeInterface):
-    def __init__(self, queue_capacity: int, name: Any, slots: int, process_time: timedelta):
+    def __init__(
+            self,
+            queue_capacity: int,
+            name: Any,
+            slots: int,
+            process_time: timedelta,
+            initial_trains: dict = {"receiving": 0, "processing": 0, "dispatching": 0}
+    ):
         self._id = name
         self.name = name
         self.queue_to_enter = mq.Queue(capacity=queue_capacity)
@@ -42,6 +52,8 @@ class Node(NodeInterface):
         )
         self.neighbors: dict[int, Neighbor] = {}
         self._process_time = process_time
+        self.initial_trains = initial_trains
+        self.petri_model = self.build_petri_model()
 
     # ====== Properties ==========
     @property
@@ -137,6 +149,88 @@ class Node(NodeInterface):
         )
     # ====== Events ==========
     # ====== Methods ==========
+
+    def build_petri_model(self):
+        process_unit = Place(
+            tokens=self.initial_trains.get('processing', 0),
+            meaning="process unit",
+            identifier=f"p_node_{self.name}_process_unit",
+        )
+        receiving_yard = Place(
+            tokens=self.initial_trains.get('receiving', 0),
+            meaning="yard to receiving trains",
+            identifier=f"p_node_{self.name}_receiving_yard",
+        )
+        dispatch_yard = Place(
+            tokens=self.initial_trains.get('dispatching', 0),
+            meaning="yard to dispatch trains",
+            identifier=f"p_node_{self.name}_dispatch_yard",
+        )
+        receive = Transition(
+            intrinsic_time=timedelta(),
+            meaning="receive trains on receiving yard",
+            identifier=f"t_node_{self.name}_receive",
+        )
+
+        call = Transition(
+            intrinsic_time=timedelta(),
+            meaning="call train from receiving yard to process unit",
+            identifier=f"t_node_{self.name}_call",
+            callback=self.call_to_enter,
+        )
+        process = Transition(
+            intrinsic_time=self.process_time,
+            meaning="Execution of process",
+            identifier=f"t_node_{self.name}_process",
+            callback=self.process
+        )
+        dispatch = Transition(
+            intrinsic_time=timedelta(),
+            meaning="dispatch train to railroad",
+            identifier=f"t_node_{self.name}_dispatch",
+            callback=self.maneuver_to_dispatch
+        )
+        receiving_process = [
+            Arc(input=receive, output=receiving_yard),
+            Arc(input=receiving_yard, output=call)
+        ]
+        node_process = [
+            Arc(input=call, output=process_unit),
+            Arc(input=process_unit, output=process)
+        ]
+        dispatch_process = [
+            Arc(input=process, output=dispatch_yard),
+            Arc(input=dispatch_yard, output=dispatch)
+        ]
+        receiving_model = PetriNet(
+            places=[receiving_yard],
+            transitions=[receive, call],
+            arcs=receiving_process,
+            name=f"node_{self.name}_receiving_model",
+            place_invariant=np.array([1]),
+            token_restriction=self.queue_to_enter.capacity
+        )
+        process_model = PetriNet(
+            places=[process_unit],
+            transitions=[call, process],
+            arcs=node_process,
+            name=f"node_{self.name}_process_model",
+            place_invariant=np.array([1]),
+            token_restriction=len(self.slots)
+        )
+        dispatch_model = PetriNet(
+            places=[dispatch_yard],
+            transitions=[process, dispatch],
+            arcs=dispatch_process,
+            name=f"node_{self.name}_dispatch_model",
+            place_invariant=np.array([1]),
+            token_restriction=self.queue_to_leave.capacity
+        )
+
+        node_model = receiving_model.modular_composition([process_model, dispatch_model])
+
+        return node_model
+
 
     def __repr__(self):
         return self.name
