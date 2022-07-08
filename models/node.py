@@ -54,6 +54,7 @@ class Node(NodeInterface):
         self._process_time = process_time
         self.initial_trains = initial_trains
         self.petri_model = self.build_petri_model()
+        self.transitions = self.build_transitions_map()
 
     # ====== Properties ==========
     @property
@@ -230,6 +231,15 @@ class Node(NodeInterface):
         node_model = receiving_model.modular_composition([process_model, dispatch_model])
 
         return node_model
+
+    def build_transitions_map(self):
+        transition_map = {}
+        for transition in self.petri_model.transitions:
+            if "receive" in transition.identifier:
+                transition_map['receive'] = transition
+            elif "dispatch" in transition.identifier:
+                transition_map['dispatch'] = transition
+        return transition_map
 
 
     def __repr__(self):

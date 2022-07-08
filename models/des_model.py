@@ -1,7 +1,5 @@
 import abc
-
 import pandas as pd
-
 from interfaces.des_simulator_interface import DESSimulatorInterface
 from interfaces.train_interface import TrainInterface
 from models.event_calendar import Event
@@ -11,6 +9,8 @@ from models.inputs import Demand
 from models.exceptions import TrainExceptions, FinishedTravelException
 from models.constants import TrainActions
 from datetime import datetime
+from petri_nets.petri_components import Place, Transition, Arc
+from petri_nets.net import PetriNet
 
 
 class DESModel(abc.ABC):
@@ -32,7 +32,12 @@ class DESModel(abc.ABC):
 
 
 class Railroad(DESModel):
-    def __init__(self, mesh: RailroadMesh, trains: list[TrainInterface], demands: list[Demand]):
+    def __init__(
+            self,
+            mesh: RailroadMesh,
+            trains: list[TrainInterface],
+            demands: list[Demand]
+    ):
         super().__init__(
             controllable_events=[],
             uncontrollable_events=[]
@@ -47,6 +52,7 @@ class Railroad(DESModel):
             target_volume=sum(demand.volume for demand in demands)
         )
         self.demands = demands
+        self.petri_model = self.build_petri_model()
 
     # ===== Events =========
     def starting_events(self, simulator: DESSimulatorInterface):
@@ -114,3 +120,51 @@ class Railroad(DESModel):
             for demand in self.demands
         ]
         return pd.DataFrame(operated_volume)
+
+    def build_petri_model(self):
+        # demand places
+        arcs = []
+        places = []
+        for demand in self.demands:
+            demand_to_be_attended = Place(
+                tokens=demand.volume / self.trains[0].capacity,
+                meaning=f"Demand from {demand.origin} to {demand.destination}",
+                identifier=f"p_demanda_{demand.origin}_{demand.destination}",
+            )
+            demand_being_attended = Place(
+                tokens=demand.volume / self.trains[0].capacity,
+                meaning=f"Demand from {demand.origin} to {demand.destination}",
+                identifier=f"p_demanda_{demand.origin}_{demand.destination}",
+            )
+            origin = self.mesh.node_by_id(demand.origin)
+            destination = self.mesh.node_by_id(demand.destination)
+            flow_arcs = [
+                Arc(input=demand_to_be_attended, output=origin.transitions['receive']),
+                Arc(input=demand_being_attended, output=destination.transitions['receive']),
+                Arc(input=origin.transitions['receive'], output=demand_being_attended)
+            ]
+            arcs.extend(flow_arcs)
+
+
+        loaded_trains = Place(
+            tokens=self.state.loaded_trains,
+            meaning="loaded trains on railroad",
+            identifier="p_loaded_trains"
+        )
+
+        empty_trains = Place(
+            tokens=self.state.empty_trains,
+            meaning="empty trains on railroad",
+            identifier="p_empty_trains"
+        )
+
+        for unload in self.mesh.unload_points:
+            arcs.extend([
+                Arc(input=loaded_trains, output=unload.transitions['receive']),
+                Arc(input=unload.transitions['dispatch'], output=empty_trains)
+            ])
+        for load in self.mesh.load_points:
+            arcs.extend([
+                Arc(input=empty_trains, output=load.transitions['receive']),
+                Arc(input=load.transitions['dispatch'], output=loaded_trains)
+            ])
