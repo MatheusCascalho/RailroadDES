@@ -29,7 +29,7 @@ stateDiagram-v2
     IDLE --> BUSY: start_load/start_unload
 ```
 
-### Atendimento de fluxo - FlowState
+### Atendimento de fluxo - TravelState
 
 ```mermaid
 stateDiagram-v2
@@ -37,6 +37,16 @@ stateDiagram-v2
     RUNNING --> INVOICED: finish_load
     INVOICED --> FINISHED: finish_unload
 ```
+
+## Estados Compostos
+
+- TRAIN N -> LOAD_STATE | ACTIVITY | TRAVEL_STATE
+- NODE M -> PROCESSOR_STATE | QUEUE Q_ENTER | QUEUE Q_LEAVE
+- RAIL_SEGMENT R - TO_ORIGIN | TO_DESTINATION
+
+## Ações
+
+-> NEW_TRAVEL 
 
 ## Entidades
 
@@ -65,7 +75,7 @@ classDiagram
         +string product
         +string origin
         +string destination 
-        +FlowState state
+        +TravelState state
     }
 
     class Activity {
@@ -83,7 +93,7 @@ classDiagram
         +EMPTY
     }
     
-    class FlowState {
+    class TravelState {
         <<enumeration>>
         +FINISHED
         +RUNNING
@@ -93,21 +103,12 @@ classDiagram
 
     Train "1" --> "1" Activity : activity
     Train "1" --> "1" Flow : fluxo_atual
-    Train "1" --> "1" LoadState : fluxo_atual
+    Train "1" --> "1" LoadState : load_state
 %%    Train "1" --* "1" Railroad : fluxo_atual
-    Flow "1" --> "1" FlowState : state
+    Flow "1" --> "1" TravelState : state
 
-%% # (```)
 
-%% # ()
-%% # (### Stretch)
-%% # ()
-%% # (**Responsabilidade**: informar a posição dos trens entre uma origem e um destino)
-
-%%```mermaid
-
-%%classDiagram
-    class Stretch {
+    class RailSegment {
         %% Atributos
         +string origin
         +string destination
@@ -120,7 +121,7 @@ classDiagram
     }
     Processor "1" *-- "1" Train : current_train
     Queue "1" *-- "1" Train : to_origin/to_destination
-    Stretch "1" *-- "1" Train : to_origin/to_destination
+    RailSegment "1" *-- "1" Train : to_origin/to_destination
 
 
     class Node {
@@ -129,7 +130,7 @@ classDiagram
         +Queue to_enter
         +Queue to_leave
         +list[Processor] processors
-        +list[Stratch] stretches
+        +list[RailSegment] RailSegmentes
 
     }
     
@@ -164,7 +165,7 @@ classDiagram
         +BUSY
         +IDLE
     }
-    Node "1" *-- "N" Stretch : processors     
+    Node "1" *-- "N" RailSegment : processors     
     Node "1" *-- "N" Processor : processors
     Processor "1" *-- "1" ProcessorState : state
 
@@ -172,25 +173,27 @@ classDiagram
     
     class Railroad{
         +list[Nodes] nodes
-        +list[Stretch] stretches
+        +list[RailSegment] RailSegmentes
 %%        +list[Train] finished_trains
         
 %%        +simulate()
+        +feed_router()
     }
-    Railroad "1" *-- "N" Stretch : stretches
+    Railroad "1" *-- "N" RailSegment : RailSegmentes
     Railroad "1" *-- "N" Node : nodes
 
     class Simulator{
         +Router router
         +Railroad railroad
         +Calendar calendar
-        
+        +Clock clock
         +simulate()
     }
 
     class Router{
         +list[demands] demands
         +new_flow()
+        +add_feedback()
     }
     class Calendar{
         +list[Events] events
@@ -198,12 +201,13 @@ classDiagram
         +push()
         +pop()
     }
+    class Clock{
+        +datetime current_time
+    }
     
     Simulator "1" *-- "1" Router : router
     Simulator "1" *-- "1" Railroad : railroad
     Simulator "1" *-- "1" Calendar : calendar
-
-    
-
+    Simulator "1" *-- "1" Clock : clock
 
 ```
