@@ -115,8 +115,8 @@ def statistics(model):
 
     # fig = px.timeline(df, x_start="start", x_end="end", y="node", color="train")
     # fig.update_yaxes(autorange="reversed")
-    # fig.write_html('simulation.html')
-    # display(HTML(filename='simulation.html'))
+    # fig.write_html('simulation.md.html')
+    # display(HTML(filename='simulation.md.html'))
 
 model = create_model(demand=[14000, 14000], n_trains=4, terminal_times = [7], port_times=[6, 10], queue_capacity=3)
 time_horizon = timedelta(days=2)
