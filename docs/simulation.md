@@ -211,3 +211,19 @@ classDiagram
     Simulator "1" *-- "1" Clock : clock
 
 ```
+
+## Responsabilidades
+
+* **Railroad**: É o modelo completo. É responsável por conter todas as entidades menores e representar o estado global do sistema para o simulador
+  * Implicação: caso o estado seja representado de forma diferente, uma classe irmã de railroad deve ser implementada
+
+* **Router**: Responsável por injetar eventos de decisão - new_flow()
+  * Implicação: Aqui temos o algoritmo de otimização. Se a estratégia de otimização mudar, uma classe irmã deve ser implementada
+
+* **Calendar**: Responsável por armazenar, ordenar e dispara os eventos de cada entidade;
+
+* **Node**: Responsável por implementar as restrições de consumo e liberação de trens;
+
+* **RailSegment**: Responsável por representar a posição dos trens quando não estiverem parados em nós;
+
+* **Queue**: Responsável por representar os trens em estado ocioso da ferrovia.
