@@ -1,37 +1,25 @@
-```mermaid
+# Train
 
-classDiagram
-    class Train {
-        %% Atributos
-        +int train_id 
-        +float max_capacity
-        +float volume
-        +string next_station
-        +string current_station
-        +Activity activity
-        +Flow flow
-        
-        +load(volume_a_adicionar: float, tempo_carregamento: float)
-        +unload(volume_a_reduzir: float, tempo_descarregamento: float)
-        +arrive(novo_local: string)
-        +leave(nova_parada: string, tempo_transito: float)
-    }
+**Responsabilidade**: Realizar a sequencia de eventos que permita aceitar o volume de cada demanda.
 
-    class Flow {
-        +string product
-        +string origin
-        +string destination 
-    }
+- Sequencia de eventos: 
+  1. Receber novo fluxo - Router.new_flow();
+  1. Ir até o nó de carregamento - Train.arrive();
+  1. Carregar - Train.load()
+  1. Saír do nó de carregamento - Train.leave()
+  1. Ir até o nó de descarregamento - Train.arrive();
+  1. Descarregar - Train.unload()
 
-    class Activity {
-        <<enumeration>>
-        +MOVING
-        +LOADING
-        +UNLOADING
-        +WAITING_ON_QUEUE_TO_ENTER
-        +WAITING_ON_QUEUE_TO_LEAVE
-    }
-    
+- Parâmetros
+  1. Capacity - para load()
+  1. Tempos de trânsito - para arrive()
+     1. Fornecidos por RailSegment.get_transit_time()
+  1. Path - para arrive()
+     1. Fornecido por Railroad.get_path()
 
-    Train "1" --> "1" Flow : fluxo_atual
-```
+- Callbacks
+  1. Train.arrive() (após Train.leave())
+  2. Node.finish_load()/finish_unload()
+
+
+
