@@ -19,6 +19,7 @@
 
 - Callbacks
   1. Train.arrive() (após Train.leave())
+  2. Train.leave() 
   2. Node.finish_load()/finish_unload()
 
 
