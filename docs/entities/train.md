@@ -2,7 +2,7 @@
 
 **Responsabilidade**: Realizar a sequencia de eventos que permita aceitar o volume de cada demanda.
 
-- Sequencia de eventos: 
+## Sequencia de eventos: 
   1. Receber novo fluxo - Router.new_flow();
   1. Ir até o nó de carregamento - Train.arrive();
   1. Carregar - Train.load()
@@ -10,17 +10,28 @@
   1. Ir até o nó de descarregamento - Train.arrive();
   1. Descarregar - Train.unload()
 
-- Parâmetros
+## Parâmetros
   1. Capacity - para load()
   1. Tempos de trânsito - para arrive()
      1. Fornecidos por RailSegment.get_transit_time()
   1. Path - para arrive()
      1. Fornecido por Railroad.get_path()
 
-- Callbacks
+# Componentes
+
+1. StateMachine - Responsável por Habilitar e disparar as transições de estado
+2. TimeTable - Responsável por armazenar o histórico de atividades do trem
+3. Task - Responsável por detalhar a tarefa atual do trem
+
+## Callbacks
   1. Train.arrive() (após Train.leave())
   2. Train.leave() 
   2. Node.finish_load()/finish_unload()
 
+## Propiedades
+1. Um trem só pode descarregar se estiver na sua estação de destino;
+2. Um trem só pode carregar se estiver na sua estação de origem;
+3. Um trem só pode chegar em um lugar após ter saído do anterior;
+4. Um trem deve registrar o instante de cada evento que faz com que ele evolua;
 
 
