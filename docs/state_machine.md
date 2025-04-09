@@ -54,3 +54,33 @@ quando determinado estado observado pela transição passa a estar marcado.
 * Escalabilidade: Se você tem muitos estados e transições (por exemplo, considerando diferentes tipos de trens, diferentes condições de pista, etc.), a máquina de estados pode se tornar complexa e difícil de gerenciar. No entanto, isso pode ser resolvido com técnicas de modelagem hierárquica.
 
 * Eventos Assíncronos: Se o trem interage com outros sistemas (como outros trens, sinais, controles automáticos), os eventos podem ocorrer de maneira assíncrona. Isso pode exigir um tratamento especial, mas não é um obstáculo impossível de ser superado em uma máquina de estados bem projetada.
+
+
+## Exemplo de Uso
+
+```python
+from state_machine import State, Transition, StateMachine
+
+# Criando estados
+estado_a = State(name="Estado A", is_marked=False)
+estado_b = State(name="Estado B", is_marked=False)
+
+# Criando uma transição entre os estados
+transicao = Transition(name="A->B", origin=estado_a, action=lambda: print("Transição de A para B"), destination=estado_b)
+
+# Criando a máquina de estados
+maquina = StateMachine(transitions=[transicao])
+
+# Ativando o estado A
+estado_a.activate()
+
+# Verificando o estado atual
+print(f"Estado atual: {maquina.current_state.name}")  # Deve imprimir "Estado A"
+
+# Realizando a transição
+transicao.force_trigger()
+
+# Verificando o estado após a transição
+print(f"Estado atual: {maquina.current_state.name}")  # Deve imprimir "Estado B"
+
+```
