@@ -39,4 +39,18 @@ quando determinado estado observado pela transição passa a estar marcado.
 * Um evento só pode habilitar uma transição por vez;
 * Somente as transições do estado atual podem ser habilitadas;
 * Uma máquina é dita bloqueante se algum estado não possuir transições;
-* 
+
+
+## Benefícios da Máquina de Estados para a Simulação de Trens
+* Simulação Realista: Uma máquina de estados permite que você modele as diferentes fases do comportamento do trem de maneira clara e concisa. Pode refletir as transições entre acelerar, parar e estar em movimento de forma natural.
+
+* Facilidade de Manutenção e Expansão: À medida que novos comportamentos são adicionados (como novos tipos de falha ou interação com outros trens), você pode simplesmente adicionar novos estados e transições. Isso torna a expansão e a manutenção mais fáceis.
+
+* Controle e Previsibilidade: Uma máquina de estados permite que você tenha um controle rigoroso sobre o sistema, garantindo que ele se comporte de maneira previsível. Isso é crucial em simulações de transporte, onde um pequeno erro pode levar a grandes falhas.
+
+* Modelo Simples de Compreender: Como a máquina de estados divide o sistema em estados distintos, é mais fácil entender o comportamento do sistema. Você pode observar exatamente em que estado o trem está e como ele deve se comportar em cada momento.
+
+## Possíveis Desafios
+* Escalabilidade: Se você tem muitos estados e transições (por exemplo, considerando diferentes tipos de trens, diferentes condições de pista, etc.), a máquina de estados pode se tornar complexa e difícil de gerenciar. No entanto, isso pode ser resolvido com técnicas de modelagem hierárquica.
+
+* Eventos Assíncronos: Se o trem interage com outros sistemas (como outros trens, sinais, controles automáticos), os eventos podem ocorrer de maneira assíncrona. Isso pode exigir um tratamento especial, mas não é um obstáculo impossível de ser superado em uma máquina de estados bem projetada.
