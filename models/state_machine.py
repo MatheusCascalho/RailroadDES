@@ -92,6 +92,9 @@ class StateMachine:
                 self.machine[transition.origin] = [transition]
             else:
                 self.machine[transition.origin].append(transition)
+            if transition.destination not in self.machine:
+                self.machine[transition.destination] = []
+
         self.__current_state = self.get_current_state()
 
     @property
