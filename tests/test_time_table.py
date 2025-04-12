@@ -8,7 +8,8 @@ from models.time_table import (
     TimeRegister,
     AlreadyRegisteredError,
     EventSequenceError,
-    TimeSequenceErro
+    TimeSequenceErro,
+    RepeatedProcessError
 )
 
 @pytest.fixture
@@ -80,8 +81,8 @@ def test_calculate_transit_time(time_table):
     event2 = TimeEvent(event=EventName.ARRIVE, instant=datetime(2025, 4, 11, 13, 0))  # Arrival 1 day later
 
     # Update the time table with the departure and arrival events
-    time_table.update(event1)
-    time_table.update(event2)
+    time_table.update(event1, process=Process.UNLOAD)
+    time_table.update(event2, process=Process.LOAD)
 
     # Transit time should be 1 day (departure of previous register to arrival of current register)
     expected_transit_time = timedelta(days=1)
@@ -148,12 +149,12 @@ def test_update_event_when_already_exists(time_table):
 def test_update_should_raise_when_arrive_is_before_departure(time_table):
     """Test that an exception is raised when trying to update an already existing event."""
     event1 = TimeEvent(event=EventName.DEPARTURE, instant=datetime(2025, 4, 10, 12, 0))
-    time_table.update(event1)
+    time_table.update(event1, process=Process.LOAD)
 
     event2 = TimeEvent(event=EventName.ARRIVE,
                        instant=datetime(2025, 4, 9, 12, 10))  # Trying to update ARRIVE event again
     with pytest.raises(TimeSequenceErro):
-        time_table.update(event2)
+        time_table.update(event2, process=Process.UNLOAD)
 
 def test_update_should_raise_when_start_is_before_arrive(time_table):
     """Test that an exception is raised when trying to update an already existing event."""
@@ -184,3 +185,13 @@ def test_update_should_raise_when_process_is_not_starting_with_arrive(time_table
                        instant=datetime(2025, 4, 9, 12, 10))  # Trying to update ARRIVE event again
     with pytest.raises(TimeSequenceErro):
         time_table.update(event2, process=Process.LOAD)
+
+def test_update_should_raise_when_process_is_repeated(time_table):
+    """Test that an exception is raised when trying to update an already existing event."""
+    event1 = TimeEvent(event=EventName.DEPARTURE, instant=datetime(2025, 4, 10, 12, 0))
+    time_table.update(event1, process=Process.UNLOAD)
+
+    event2 = TimeEvent(event=EventName.ARRIVE,
+                       instant=datetime(2025, 4, 9, 12, 10))  # Trying to update ARRIVE event again
+    with pytest.raises(RepeatedProcessError):
+        time_table.update(event2, process=Process.UNLOAD)

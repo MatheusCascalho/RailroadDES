@@ -19,6 +19,13 @@ class TimeSequenceErro(Exception):
         self.message = message
         super().__init__(self.message)
 
+class RepeatedProcessError(Exception):
+    """Exceção customizada para erro de repetição de processo."""
+
+    def __init__(self, message="Process is repeated."):
+        self.message = message
+        super().__init__(self.message)
+
 
 class AlreadyRegisteredError(Exception):
     """Exceção customizada para erro na sequência de eventos."""
@@ -238,6 +245,8 @@ class TimeTable:
             elif self.current_process and self.registers[-1].departure.instant is None:
                 raise TimeSequenceErro()
         if self.registers and event.event == EventName.ARRIVE:
+            if self.current_process == process:
+                raise RepeatedProcessError()
             if self.registers[-1].departure.instant is None:
                 raise EventSequenceError()
             if event.instant < self.registers[-1].departure.instant:
