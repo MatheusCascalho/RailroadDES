@@ -133,9 +133,12 @@ class TimeRegister:
         timedelta: The total queue time.
         """
         queue = timedelta()
-        if self.start_process is not None:
+        if self.start_process.instant is not None:
             queue += self.start_process - self.arrive
-        if self.departure is not None:
+        if (
+                self.departure.instant is not None and
+                self.finish_process.instant is not None
+        ):
             queue += self.departure - self.finish_process
         return queue
 
