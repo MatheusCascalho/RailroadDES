@@ -99,7 +99,7 @@ def test_calculate_util_time(time_table, time_register):
     assert time_table.util_time == expected_util_time
 
 
-def test_initial_register(time_table):
+def test_not_initial_register(time_table):
     """Test that the initial register is correctly identified."""
     event1 = TimeEvent(event=EventName.ARRIVE, instant=datetime(2025, 4, 10, 12, 0))
     time_table.update(event1)
@@ -113,9 +113,27 @@ def test_initial_register(time_table):
     event4 = TimeEvent(event=EventName.DEPARTURE, instant=datetime(2025, 4, 10, 13, 0))
     time_table.update(event4)
 
+    # Checking if all events are registered on the same register
+    assert len(time_table.registers) == 1
     # Checking if the initial register is correctly identified
     assert time_table.registers[0].is_initial_register is False
 
+
+def test_initial_register(time_table):
+    """Test that the initial register is correctly identified."""
+    event2 = TimeEvent(event=EventName.START_PROCESS, instant=datetime(2025, 4, 10, 12, 15))
+    time_table.update(event2)
+
+    event3 = TimeEvent(event=EventName.FINISH_PROCESS, instant=datetime(2025, 4, 10, 12, 45))
+    time_table.update(event3)
+
+    event4 = TimeEvent(event=EventName.DEPARTURE, instant=datetime(2025, 4, 10, 13, 0))
+    time_table.update(event4)
+
+    # Checking if all events are registered on the same register
+    assert len(time_table.registers) == 1
+    # Checking if the initial register is correctly identified
+    assert time_table.registers[0].is_initial_register
 
 def test_update_event_when_already_exists(time_table):
     """Test that an exception is raised when trying to update an already existing event."""

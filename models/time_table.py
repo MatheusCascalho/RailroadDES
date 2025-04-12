@@ -71,7 +71,7 @@ class TimeEvent:
 def register_id_gen():
     i = 0
     while True:
-        name = f"task_{i}"
+        name = f"register_{i}"
         yield name
         i += 1
 
@@ -152,14 +152,15 @@ class TimeRegister:
         Returns:
         bool: True if the register is initial, False otherwise.
         """
-        is_initial = (
-            self.departure is not None and (
-                self.finish_process is None or
-                self.start_process is None or
-                self.arrive is None
-            )
+        first_defined = next(
+            (self.event_attr[e] for e in self.sequence if self.event_attr[e].instant is not None),
+            None
         )
-        return is_initial
+        if first_defined is None:
+            return False
+        if first_defined.event != EventName.ARRIVE:
+            return True
+        return False
 
     def update(self, event: TimeEvent):
         """
@@ -174,10 +175,9 @@ class TimeRegister:
         if self.event_attr[event.event].instant is not None:
             raise AlreadyRegisteredError()
         event_index = self.sequence.index(event.event)
-
         predecessors = self.sequence[:event_index]
         all_predecessor_are_defined = all(self.event_attr[p].instant is not None for p in predecessors)
-        is_initial_register = all(self.event_attr[p].instant is None for p in predecessors)
+        is_initial_register = self.is_initial_register or all(self.event_attr[p].instant is None for p in predecessors)
         if all_predecessor_are_defined:
             if predecessors and self.event_attr[predecessors[-1]].instant > event.instant:
                 raise TimeSequenceErro()
