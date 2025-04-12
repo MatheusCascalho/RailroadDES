@@ -164,3 +164,23 @@ def test_update_should_raise_when_start_is_before_arrive(time_table):
                        instant=datetime(2025, 4, 9, 12, 10))  # Trying to update ARRIVE event again
     with pytest.raises(TimeSequenceErro):
         time_table.update(event2)
+
+def test_update_should_raise_when_event_is_from_new_process_and_current_process_is_not_finished(time_table):
+    """Test that an exception is raised when trying to update an already existing event."""
+    event1 = TimeEvent(event=EventName.ARRIVE, instant=datetime(2025, 4, 10, 12, 0))
+    time_table.update(event1, process=Process.UNLOAD)
+
+    event2 = TimeEvent(event=EventName.ARRIVE,
+                       instant=datetime(2025, 4, 9, 12, 10))  # Trying to update ARRIVE event again
+    with pytest.raises(TimeSequenceErro):
+        time_table.update(event2, process=Process.LOAD)
+
+def test_update_should_raise_when_process_is_not_starting_with_arrive(time_table):
+    """Test that an exception is raised when trying to update an already existing event."""
+    event1 = TimeEvent(event=EventName.DEPARTURE, instant=datetime(2025, 4, 10, 12, 0))
+    time_table.update(event1, process=Process.UNLOAD)
+
+    event2 = TimeEvent(event=EventName.START_PROCESS,
+                       instant=datetime(2025, 4, 9, 12, 10))  # Trying to update ARRIVE event again
+    with pytest.raises(TimeSequenceErro):
+        time_table.update(event2, process=Process.LOAD)

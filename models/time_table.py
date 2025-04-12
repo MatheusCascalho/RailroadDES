@@ -225,20 +225,25 @@ class TimeTable:
             registers = []
         self.registers = registers
 
-    def update(self, event: TimeEvent):
+    def update(self, event: TimeEvent, process: Process = Process.UNLOAD):
         """
         Updates the last TimeRegister with the provided event, or creates a new TimeRegister if necessary.
 
         Args:
         event (TimeEvent): The event to be recorded in the TimeTable.
         """
+        if self.current_process is not None and self.current_process != process:
+            if event.event != EventName.ARRIVE:
+                raise TimeSequenceErro()
+            elif self.current_process and self.registers[-1].departure.instant is None:
+                raise TimeSequenceErro()
         if self.registers and event.event == EventName.ARRIVE:
             if self.registers[-1].departure.instant is None:
                 raise EventSequenceError()
             if event.instant < self.registers[-1].departure.instant:
                 raise TimeSequenceErro()
         if not self.registers or event.event == EventName.ARRIVE:
-            self.registers.append(TimeRegister())
+            self.registers.append(TimeRegister(process=process))
         self.registers[-1].update(event)
 
     @property
@@ -282,4 +287,10 @@ class TimeTable:
         for register in self.registers:
             util += register.get_process_time()
         return util
+
+    @property
+    def current_process(self):
+        if not self.registers:
+            return None
+        return self.registers[-1].process
 
