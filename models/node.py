@@ -189,11 +189,6 @@ class Node(NodeInterface):
         self.neighbors: dict[int, RailSegment] = {}
         self._process_time = process_time
 
-    @property
-    def processing_slots(self):
-        return len([1 for slot in self.slots if slot.is_idle])
-
-    # ====== Properties ==========
     # ====== Events ==========
     def receive(self, train):
         self.queue_to_enter.push(train, arrive=self.clock.current_time)
@@ -205,46 +200,41 @@ class Node(NodeInterface):
             self.neighbors[next_node].send(train)
 
     def process(self, simulator: DESSimulator):
-        # Update resources
-        slot = self.next_idle_slot(current_time=simulator.current_date)
-        if slot.is_idle:
-            print(
-                f'{simulator.current_date}:: Train {self.queue_to_enter.elements[0].element.id} starts process at node {self}!')
-            train = self.queue_to_enter.pop(
-                current_time=simulator.current_date
-            )
-            self.train_schedule.pop(0)
+        while True:
+            # Update resources
+            train = self.queue_to_enter.first
+            if not train:
+                break
+            process = train.current_process_name
+            if self.process_constraint[process].is_blocked():
+                self.queue_to_enter.skip_process(process)
+                break
+            processors = self.load_units if process == Process.LOAD else self.unload_units
+            slot = next((p for p in processors if p.is_idle), None)
+            if slot is not None:
+                print(f'{simulator.current_date}:: Train {self.queue_to_enter.elements[0].element.ID} starts process at node {self}!')
+                train = self.queue_to_enter.pop(
+                    current_time=simulator.current_date
+                )
 
-            slot.put(
-                train=train,
-                date=simulator.current_date,
-                time=self.process_time
-            )
+                slot.put_in(train=train)
 
-            # Update state
-            self.state.trains_on_queue_to_enter = self.queue_to_enter.current_size
-            self.state.trains_on_process = self.processing_slots
-            time = timedelta()
-            # Add next event
-            simulator.add_event(
-                time=time,
-                callback=train.process,
-                simulator=simulator,
-                start=simulator.current_date,
-                process_time=self.process_time,
-                node=self,
-                slot=slot
-            )
+                # Update state
+                time = timedelta()
+                # Add next event
+                simulator.add_event(
+                    time=time,
+                    callback=train.process,
+                    simulator=simulator,
+                    start=simulator.current_date,
+                    process_time=self.process_time,
+                    node=self,
+                    slot=slot
+                )
+            else:
+                self.queue_to_enter.skip_process(process)
 
-        else:
-            time = slot.time_to_be_idle(current_time=simulator.current_date)
-            simulator.add_event(
-                time=time,
-                callback=self.process,
-                simulator=simulator,
-            )
-            print(
-                f'{simulator.current_date}:: Train {self.queue_to_enter.elements[0].element.id} waiting idle slot at {self}!')
+        self.queue_to_enter.recover()
 
     def maneuver_to_dispatch(self, simulator: DESSimulator, slot: Slot):
         print(f'{simulator.current_date}:: Train {slot.current_train.id} entering on leaving queue!')
