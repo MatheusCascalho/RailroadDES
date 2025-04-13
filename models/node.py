@@ -267,11 +267,8 @@ class Node(NodeInterface):
 
         return minimum_slot_time + process_scheduled_trains
 
-    def connect_neighbor(self, node: NodeInterface, transit_time: float):
-        self.neighbors[node.identifier] = Neighbor(
-            neighbor=node,
-            transit_time=transit_time
-        )
+    def connect_neighbor(self, rail_segment: RailSegment):
+        self.neighbors[rail_segment.destination.identifier] = rail_segment
 
     def predicted_time(self, current_time: datetime):
         return self.process_time + self.time_to_call(current_time)
