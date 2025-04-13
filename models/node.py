@@ -256,10 +256,6 @@ class Node(NodeInterface):
 
     __str__ = __repr__
 
-    def next_idle_slot(self, current_time) -> Slot:
-        slots = sorted((slot for slot in self.slots), key=lambda slot: slot.time_to_be_idle(current_time))
-        return slots[0]
-
     def time_to_call(self, current_time):
         process_scheduled_trains = len(self.train_schedule) * self.process_time
         # process_train_on_queue = self.queue_to_enter.current_size * self.process_time
@@ -272,4 +268,18 @@ class Node(NodeInterface):
 
     def predicted_time(self, current_time: datetime):
         return self.process_time + self.time_to_call(current_time)
+    # ====== Methods ==========
+    # ====== Properties ==========
+    @property
+    def identifier(self):
+        return self._id
 
+    @identifier.setter
+    def identifier(self, new_identifier: int):
+        self._id = new_identifier
+
+    @property
+    def process_time(self) -> timedelta:
+        return self._process_time
+
+    # ====== Properties ==========
