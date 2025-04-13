@@ -1,24 +1,37 @@
 from dataclasses import dataclass, field
 from typing import Any
-from datetime import datetime, timedelta
-from models.constants import TrainActions, Process, EPSILON
-from models.exceptions import TrainExceptions
+from datetime import timedelta
+from models.constants import TrainActions, EPSILON
+from models.time_table import TimeRegister
+from enum import Enum
 
+class LoadState(Enum):
+    LOADING = "Loading"
+    LOADED = "Loaded"
+    UNLOADING = "Unloading"
+    EMPTY = "Empty"
 
-@dataclass
-class TimeRegister:
-    process: Process = field(default=None)
-    arrive: datetime = field(default=None)
-    start_process: datetime = field(default=None)
-    finish_process: datetime = field(default=None)
-    departure: datetime = field(default=None)
+class ActivityState(Enum):
+    MOVING = "Moving"
+    QUEUE_TO_ENTER = "Queue to enter"
+    PROCESSING = "Processing"
+    QUEUE_TO_LEAVE = "Queue to leave"
+
+class ProcessorState(Enum):
+    IDLE = "Idle"
+    BUSY = "Busy"
+
+class NodeProcesState(Enum):
+    READY = "Ready"
+    BUSY = "Busy"
+    BLOCKED = "Blocked"
+
 
 
 @dataclass
 class TrainState:
     current_location: Any
     action: TrainActions
-    time_register: TimeRegister
     volume: float = field(default_factory=float)
 
 
