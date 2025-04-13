@@ -158,10 +158,12 @@ class Transition(AbstractObserver):
         :return:
         """
         self.trigger = True
-        if self.trigger and self.origin.is_marked:
-            self.origin.deactivate()
-            self.destination.activate()
-            self.trigger = False
+        self.shoot()
+
+class MultiCriteriaTransition(Transition):
+    def update(self, state: State):
+        self.trigger = all(s.is_marked for s in self.subjects)
+        self.shoot()
 
 
 class StateMachine:
