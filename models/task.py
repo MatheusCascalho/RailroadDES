@@ -19,6 +19,7 @@ class Task:
     def __init__(
             self,
             demand: Demand,
+            path: list[str],
             task_volume: float,
             current_time: datetime
     ):
@@ -32,6 +33,7 @@ class Task:
         """
         self.ID = next(task_id)
         self.demand = demand
+        self.path = path
         self.time_table = TimeTable()
         event = TimeEvent(
             event=EventName.DEPARTURE,
@@ -59,6 +61,7 @@ class Task:
         )
         if update_invoiced_volume:
             self.invoiced_volume = self.task_volume
+            self.demand.operated += self.invoiced_volume
 
     def penalty(self):
         """
