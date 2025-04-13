@@ -3,6 +3,17 @@ from abc import ABC, abstractmethod
 
 class TrainInterface(ABC):
     # ====== Properties ==========
+
+    @property
+    @abstractmethod
+    def current_task(self):
+        pass
+
+    @current_task.setter
+    @abstractmethod
+    def current_task(self, value):
+        pass
+
     @property
     @abstractmethod
     def is_empty(self):
@@ -30,22 +41,23 @@ class TrainInterface(ABC):
 
     @property
     @abstractmethod
-    def action(self):
+    def process_end(self):
         pass
 
-    # @property
-    # @abstractmethod
-    # def next_process(self):
-    #     pass
+
+    @property
+    @abstractmethod
+    def current_process_name(self):
+        pass
 
     # ====== Properties ==========
     # ====== Events ==========
     @abstractmethod
-    def load(self, **kwargs):
+    def start_load(self, **kwargs):
         pass
 
     @abstractmethod
-    def unload(self, **kwargs):
+    def start_unload(self, **kwargs):
         pass
 
     @abstractmethod
