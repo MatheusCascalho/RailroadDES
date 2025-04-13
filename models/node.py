@@ -140,22 +140,53 @@ class Node(NodeInterface):
             self,
             queue_capacity: int,
             name: Any,
-            slots: int,
             process_time: timedelta,
-            initial_trains: dict = {"receiving": 0, "processing": 0, "dispatching": 0}
+            clock: Clock,
+            load_constraint_system: ProcessConstraintSystem,
+            unload_constraint_system: ProcessConstraintSystem,
+            load_units_amount: int = 0,
+            unload_units_amount: int = 0
     ):
         self._id = name
         self.name = name
+        self.clock = clock
+        self.process_constraint = {
+            Process.LOAD: load_constraint_system,
+            Process.UNLOAD: unload_constraint_system
+        }
         self.queue_to_enter = mq.Queue(capacity=queue_capacity)
         self.queue_to_leave = mq.Queue(capacity=float('inf'))
-        self.slots: list[Slot] = [Slot() for _ in range(slots)]
-        self.train_schedule: list[TrainInterface] = []
-        self.state: NodeState = NodeState(
-            average_time_on_queue_to_enter=timedelta(),
-            average_time_on_queue_to_leave=timedelta(),
-
-        )
-        self.neighbors: dict[int, Neighbor] = {}
+        self.load_units: list[ProcessorSystem] = [
+            ProcessorSystem(
+                processor_type=Process.LOAD,
+                queue_to_leave=self.queue_to_leave,
+                clock=clock
+            )
+            for _ in range(load_units_amount)
+        ]
+        for unit in self.load_units:
+            unit.state_machine.states[ProcessorState.BUSY].add_observer(
+                self.process_constraint[Process.LOAD].state_machine.transitions["start"]
+            )
+            unit.state_machine.states[ProcessorState.IDLE].add_observer(
+                self.process_constraint[Process.LOAD].state_machine.transitions["finish"]
+            )
+        self.unload_units: list[ProcessorSystem] = [
+            ProcessorSystem(
+                processor_type=Process.UNLOAD,
+                queue_to_leave=self.queue_to_leave,
+                clock=clock
+            )
+            for _ in range(unload_units_amount)
+        ]
+        for unit in self.unload_units:
+            unit.state_machine.states[ProcessorState.BUSY].add_observer(
+                self.process_constraint[Process.UNLOAD].state_machine.transitions["start"]
+            )
+            unit.state_machine.states[ProcessorState.IDLE].add_observer(
+                self.process_constraint[Process.UNLOAD].state_machine.transitions["finish"]
+            )
+        self.neighbors: dict[int, RailSegment] = {}
         self._process_time = process_time
         self.initial_trains = initial_trains
         self.petri_model = self.build_petri_model()
