@@ -180,7 +180,11 @@ class StateMachine:
             t.name: t
             for t in transitions
         }
+        self.states = {}
         for transition in transitions:
+            self.states[transition.origin.name] = transition.origin
+            self.states[transition.destination.name] = transition.destination
+
             if transition.origin not in self.machine:
                 self.machine[transition.origin] = [transition]
             else:
@@ -191,7 +195,7 @@ class StateMachine:
         self.__current_state = self.get_current_state()
 
     @property
-    def current_state(self):
+    def current_state(self) -> State:
         """
          Getter para o estado atual da máquina. Retorna o estado ativo ou o estado marcado mais recente.
         :return:
