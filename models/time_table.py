@@ -111,6 +111,13 @@ class TimeRegister:
     event_attr: dict[EventName, TimeEvent] = field(default=dict)
     ID: str = field(init=False)
 
+    def __str__(self):
+        times = (f"ARRIVE: {self.arrive.instant} | START: {self.start_process.instant} "
+                 f"| FINISH: {self.finish_process.instant} | DEPARTURE: {self.departure.instant}.instant")
+        return f"{self.ID} | {self.process} | {times}"
+
+    __repr__ = __str__
+
     def __post_init__(self):
         self.ID = next(register_id)
         self.arrive = TimeEvent(EventName.ARRIVE) if self.arrive is None else self.arrive
@@ -235,6 +242,11 @@ class TimeTable:
             registers = []
         self.registers = registers
 
+    def __str__(self):
+        return f"Table with {len(self.registers)} registers"
+
+    __repr__ = __str__
+
     def update(self, event: TimeEvent, process: Process = Process.UNLOAD):
         """
         Updates the last TimeRegister with the provided event, or creates a new TimeRegister if necessary.
@@ -306,3 +318,6 @@ class TimeTable:
             return None
         return self.registers[-1].process
 
+    @property
+    def process_end(self):
+        return self.registers[-1].finish_process.instant
