@@ -236,113 +236,20 @@ class Node(NodeInterface):
 
         self.queue_to_enter.recover()
 
-    def maneuver_to_dispatch(self, simulator: DESSimulator, slot: Slot):
-        print(f'{simulator.current_date}:: Train {slot.current_train.id} entering on leaving queue!')
-        train = slot.clear()
-        self.queue_to_leave.push(
-            element=train,
-            arrive=simulator.current_date
-        )
 
-        simulator.add_event(
-            time=timedelta(),
-            callback=train.leave,
-            simulator=simulator,
-            node=self
-        )
+    def maneuver_to_dispatch(self, simulator: DESSimulator):
+        for slot in self.load_units + self.unload_units:
+            if slot.current_train:
+                print(f'{simulator.current_date}:: Train {slot.current_train.ID} entering on leaving queue!')
+                train = slot.clear()
+                simulator.add_event(
+                    time=timedelta(),
+                    callback=train.leave,
+                    simulator=simulator,
+                    node=self
+                )
     # ====== Events ==========
     # ====== Methods ==========
-
-    def build_petri_model(self):
-        process_unit = Place(
-            tokens=self.initial_trains.get('processing', 0),
-            meaning="process unit",
-            identifier=f"p_node_{self.name}_process_unit",
-        )
-        receiving_yard = Place(
-            tokens=self.initial_trains.get('receiving', 0),
-            meaning="yard to receiving trains",
-            identifier=f"p_node_{self.name}_receiving_yard",
-        )
-        dispatch_yard = Place(
-            tokens=self.initial_trains.get('dispatching', 0),
-            meaning="yard to dispatch trains",
-            identifier=f"p_node_{self.name}_dispatch_yard",
-        )
-        receive = Transition(
-            intrinsic_time=timedelta(),
-            meaning="receive trains on receiving yard",
-            identifier=f"t_node_{self.name}_receive",
-        )
-
-        call = Transition(
-            intrinsic_time=timedelta(),
-            meaning="call train from receiving yard to process unit",
-            identifier=f"t_node_{self.name}_call",
-            callback=self.call_to_enter,
-        )
-        process = Transition(
-            intrinsic_time=self.process_time,
-            meaning="Execution of process",
-            identifier=f"t_node_{self.name}_process",
-            callback=self.process
-        )
-        dispatch = Transition(
-            intrinsic_time=timedelta(),
-            meaning="dispatch train to railroad",
-            identifier=f"t_node_{self.name}_dispatch",
-            callback=self.maneuver_to_dispatch
-        )
-        receiving_process = [
-            Arc(input=receive, output=receiving_yard),
-            Arc(input=receiving_yard, output=call)
-        ]
-        node_process = [
-            Arc(input=call, output=process_unit),
-            Arc(input=process_unit, output=process)
-        ]
-        dispatch_process = [
-            Arc(input=process, output=dispatch_yard),
-            Arc(input=dispatch_yard, output=dispatch)
-        ]
-        receiving_model = PetriNet(
-            places=[receiving_yard],
-            transitions=[receive, call],
-            arcs=receiving_process,
-            name=f"node_{self.name}_receiving_model",
-            place_invariant=np.array([1]),
-            token_restriction=self.queue_to_enter.capacity
-        )
-        process_model = PetriNet(
-            places=[process_unit],
-            transitions=[call, process],
-            arcs=node_process,
-            name=f"node_{self.name}_process_model",
-            place_invariant=np.array([1]),
-            token_restriction=len(self.slots)
-        )
-        dispatch_model = PetriNet(
-            places=[dispatch_yard],
-            transitions=[process, dispatch],
-            arcs=dispatch_process,
-            name=f"node_{self.name}_dispatch_model",
-            place_invariant=np.array([1]),
-            token_restriction=self.queue_to_leave.capacity
-        )
-
-        node_model = receiving_model.modular_composition([process_model, dispatch_model])
-
-        return node_model
-
-    def build_transitions_map(self):
-        transition_map = {}
-        for transition in self.petri_model.transitions:
-            if "receive" in transition.identifier:
-                transition_map['receive'] = transition
-            elif "dispatch" in transition.identifier:
-                transition_map['dispatch'] = transition
-        return transition_map
-
 
     def __repr__(self):
         return self.name
