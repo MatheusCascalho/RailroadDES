@@ -15,7 +15,28 @@ class Queue:
     def __init__(self, capacity: int):
         self.capacity: int = capacity
         self.elements: list[QueueElement] = []
+        self.skipped: list[QueueElement] = []
         self.history: list[QueueElement] = []
+
+    def __str__(self):
+        return f"Queue with {self.current_size} elements"
+
+    __repr__ = __str__
+
+    @property
+    def first(self):
+        if not self.elements:
+            return None
+        return self.elements[0].element
+
+
+    def skip_process(self, process):
+        self.skipped = [e for e in self.elements if e.element.current_process_name == process]
+        self.elements = [e for e in self.elements if e.element.current_process_name != process]
+
+    def recover(self):
+        self.elements += self.skipped
+        self.skipped = []
 
     def clear(self):
         ...
@@ -23,6 +44,10 @@ class Queue:
     @property
     def is_full(self):
         return self.current_size == self.capacity
+
+    @property
+    def is_busy(self):
+        return self.current_size > 0
 
     def pop(self, current_time):
         data = self.elements.pop(0)
@@ -42,7 +67,7 @@ class Queue:
 
     @property
     def current_size(self):
-        return len(self.elements)
+        return len(self.elements) + len(self.skipped)
 
     def __iter__(self):
         return self.elements.__iter__()
