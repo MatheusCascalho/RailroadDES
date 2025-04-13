@@ -370,31 +370,29 @@ class Train(TrainInterface):
         self.state.action = TrainActions.MANEUVERING_TO_LEAVE
 
     def arrive(self, simulator: DESSimulator, node: NodeInterface):
-        print(f'{simulator.current_date}:: train {self.id} arrive at node {node}!!')
+        print(f'{simulator.current_date}:: train {self.ID} arrive at node {node}!!')
         # Changing State
-        self.current_location = self.path.pop(0)
-        self.state.action = TrainActions.MANEUVERING_TO_ENTER
-        self.time_table[self.current_location].append(
-            TimeRegister(
-                arrive=simulator.current_date
-            )
+        self.activity_system.arrive()
+        event = TimeEvent(
+            EventName.ARRIVE,
+            instant=simulator.current_date
         )
-
-        # Add next event to calendar
-        simulator.add_event(
-            time=timedelta(),
-            callback=node.call_to_enter,
-            simulator=simulator,
-            train=self,
-            arrive=simulator.current_date
-        )
+        on_load_point = self.activity_system.current_location == self.current_task.demand.flow.origin
+        process = Process.LOAD if on_load_point else Process.UNLOAD
+        self.current_task.update(event=event,process=process)
 
     def leave(self, simulator: DESSimulator, node: NodeInterface):
-        print(f'{simulator.current_date}:: Train {self.id} leaving node {node}!')
-        self.time_table[self.current_location][-1].departure = simulator.current_date
+        print(f'{simulator.current_date}:: Train {self.ID} leaving node {node}!')
+        self.activity_system.leave()
+        event = TimeEvent(
+            EventName.DEPARTURE,
+            instant=simulator.current_date
+        )
+        on_load_point = self.activity_system.current_location == self.current_task.demand.flow.origin
+        process = Process.LOAD if on_load_point else Process.UNLOAD
+        self.current_task.update(event=event, process=process)
+
         try:
-            self.current_location = [self.current_location, self.next_location]
-            self.state.action = TrainActions.MOVING
 
             simulator.add_event(
                 time=node.neighbors[self.next_location].transit_time,
