@@ -3,17 +3,22 @@ from models import event_calendar as ec
 from datetime import datetime, timedelta
 from models.exceptions import FinishedTravelException
 from models.des_model import DESModel
+from models.clock import Clock
 
 
 class DESSimulator(DESSimulatorInterface):
     """
     Discrete Event System simulator
     """
-    def __init__(self, initial_date: datetime):
+    def __init__(self, initial_date: datetime, clock: Clock):
         # setup
         self.calendar = ec.EventCalendar()
-        self.current_date = initial_date
+        self.clock = clock
         self.initial_date = initial_date
+
+    @property
+    def current_date(self):
+        return self.clock.current_time
 
     def add_event(self, time, callback, **data):
         self.calendar.push(time, callback, **data)
