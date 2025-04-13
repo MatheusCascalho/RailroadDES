@@ -36,6 +36,11 @@ class State:
     is_marked: bool
     observers: list[AbstractObserver] = field(default_factory=list)
 
+    def __str__(self):
+        return str(self.name)
+
+    __repr__ = __str__
+
 
     def __bool__(self):
         """
@@ -98,6 +103,8 @@ class State:
         :param observer:
         :return:
         """
+        if not isinstance(observer, list):
+            observer = [observer]
         self.observers.extend(observer)
         for observer in observer:
             if self not in observer.subjects:
