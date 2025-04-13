@@ -5,10 +5,17 @@
 ## Sequencia de eventos: 
   1. Receber novo fluxo - Router.new_flow();
   1. Ir até o nó de carregamento - Train.arrive();
+     2. Agendado pelo RailSegment.send()
   1. Carregar - Train.load()
+     2. Agendado pelo Node.process
+        3. Que por sua vez é acionado pelo Node.process_constraint (máquina de estados) quando a transição 
+        start é acionada pela chegada de um trem 
   1. Saír do nó de carregamento - Train.leave()
+     2. Agendado pelo Node.dispatch()
   1. Ir até o nó de descarregamento - Train.arrive();
+      2. Agendado pelo RailSegment.send()
   1. Descarregar - Train.unload()
+     2. Agendado pelo Node.process
 
 ## Parâmetros
   1. Capacity - para load()
