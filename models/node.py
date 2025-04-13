@@ -3,7 +3,8 @@ import abc
 from models.des_simulator import DESSimulator
 from models.constants import (
     EPSILON,
-    TrainActions
+    TrainActions,
+    Process
 )
 from dataclasses import dataclass, field, InitVar
 from typing import Any, Generator, Callable
@@ -11,16 +12,17 @@ from datetime import timedelta, datetime
 from models.exceptions import TrainExceptions
 from models.states import (
     TrainState,
-    TimeRegister,
-    NodeState
+    NodeState,
+    ProcessorState,
+    NodeProcesState
 )
+from models.time_table import TimeRegister
 from models.entities import Entity
+from models.railroad import RailSegment
 from interfaces.node_interce import NodeInterface
 from interfaces.train_interface import TrainInterface
 from models.resources import Slot
 import models.model_queue as mq
-from petri_nets.petri_components import Place, Transition, Arc
-from petri_nets.net import PetriNet
 import numpy as np
 
 
