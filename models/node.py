@@ -188,22 +188,6 @@ class Node(NodeInterface):
             )
         self.neighbors: dict[int, RailSegment] = {}
         self._process_time = process_time
-        self.initial_trains = initial_trains
-        self.petri_model = self.build_petri_model()
-        self.transitions = self.build_transitions_map()
-
-    # ====== Properties ==========
-    @property
-    def identifier(self):
-        return self._id
-
-    @identifier.setter
-    def identifier(self, new_identifier: int):
-        self._id = new_identifier
-
-    @property
-    def process_time(self) -> timedelta:
-        return self._process_time
 
     @property
     def processing_slots(self):
@@ -211,22 +195,14 @@ class Node(NodeInterface):
 
     # ====== Properties ==========
     # ====== Events ==========
-    def call_to_enter(self, simulator: DESSimulator, train: TrainInterface, arrive: datetime):
-        print(f"{simulator.current_date}:: Train {train.id} enter on queue of node {self}")
-        self.queue_to_enter.push(
-            element=train,
-            arrive=arrive
-        )
-        time = self.time_to_call(current_time=simulator.current_date)
-        self.train_schedule.append(train)
-        self.state.trains_on_queue_to_enter = self.queue_to_enter.current_size
+    def receive(self, train):
+        self.queue_to_enter.push(train, arrive=self.clock.current_time)
 
-        # Add next event
-        simulator.add_event(
-            time=time,
-            callback=self.process,
-            simulator=simulator,
-        )
+    def dispatch(self):
+        while self.queue_to_leave.is_busy:
+            train = self.queue_to_leave.pop(self.clock.current_time)
+            next_node = train.next_location
+            self.neighbors[next_node].send(train)
 
     def process(self, simulator: DESSimulator):
         # Update resources
