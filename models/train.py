@@ -260,35 +260,53 @@ class Train(TrainInterface):
     # ====== Properties ==========
     # ====== Events ==========
 
-    def load(
+    def finish_load(
         self,
         simulator: DESSimulator,
-        start: datetime,
-        process_time: timedelta,
         node: NodeInterface,
-        slot: Slot,
         **kwargs
     ):
-        print(f'{simulator.current_date}:: Train {self.id} loading!')
-        if self.state.action == TrainActions.MOVING:
-            TrainExceptions.processing_when_train_is_moving()
-        # Changing State
-        self.volume += self.capacity
-        self.state.action = TrainActions.LOADING
-        self.time_table[self.current_location][-1].process = Process.LOAD
-        self.time_table[self.current_location][-1].start_process = start
-        self.time_table[self.current_location][-1].finish_process = start + process_time
-        self.target_demand.operated += self.capacity
+        print(f'{simulator.current_date}:: Train {self.ID} finish load!')
+        self.activity_system.finish_process()
+        event = TimeEvent(
+            event=EventName.FINISH_PROCESS,
+            instant=simulator.current_date
+        )
+        self.current_task.update(
+            event=event,
+            process=Process.LOAD
+        )
+        # Add next event to calendar
+        simulator.add_event(
+            time=timedelta(),
+            callback=node.maneuver_to_dispatch,
+            simulator=simulator,
+        )
 
+    def start_load(
+        self,
+        simulator: DESSimulator,
+        process_time: timedelta,
+        **kwargs
+    ):
+        print(f'{simulator.current_date}:: Train {self.ID} start load!')
+        self.activity_system.start_process()
+        event = TimeEvent(
+            event=EventName.START_PROCESS,
+            instant=simulator.current_date
+        )
+        self.current_task.update(
+            event=event,
+            process=Process.LOAD
+        )
         # Add next event to calendar
         simulator.add_event(
             time=process_time,
-            callback=node.maneuver_to_dispatch,
+            callback=self.finish_load,
             simulator=simulator,
-            slot=slot,
         )
 
-    def unload(
+    def start_unload(
         self,
         simulator: DESSimulator,
         start: datetime,
@@ -298,21 +316,45 @@ class Train(TrainInterface):
    ):
         print(f'{simulator.current_date}:: Train unloading!')
         # Changing State
-        if self.capacity > self.volume:
-            TrainExceptions.volume_to_unload_is_greater_than_current_volume()
-        self.volume -= self.capacity
-        self.state.action = TrainActions.UNLOADING
-        self.time_table[self.current_location][-1].start_process = start
-        self.time_table[self.current_location][-1].finish_process = start + process_time
-        self.time_table[self.current_location][-1].process = Process.UNLOAD
-
-
+        self.activity_system.start_process()
+        event = TimeEvent(
+            event=EventName.START_PROCESS,
+            instant=simulator.current_date
+        )
+        self.current_task.update(
+            event=event,
+            process=Process.UNLOAD
+        )
         # Add next event to calendar
         simulator.add_event(
             time=process_time,
+            callback=self.finish_unload,
+            simulator=simulator,
+        )
+
+    def finish_unload(
+        self,
+        simulator: DESSimulator,
+        node: NodeInterface,
+        slot: Slot,
+        **kwargs
+    ):
+        print(f'{simulator.current_date}:: Train {self.ID} finish load!')
+        self.activity_system.finish_process()
+        event = TimeEvent(
+            event=EventName.FINISH_PROCESS,
+            instant=simulator.current_date
+        )
+        self.current_task.update(
+            event=event,
+            process=Process.UNLOAD
+        )
+        # Add next event to calendar
+        simulator.add_event(
+            time=timedelta(),
             callback=node.maneuver_to_dispatch,
             simulator=simulator,
-            slot=slot
+            slot=slot,
         )
 
     def maneuvering_to_enter(self, simulator: DESSimulator, node: NodeInterface):
