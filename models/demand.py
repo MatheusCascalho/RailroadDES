@@ -3,9 +3,15 @@ from models.constants import EPSILON
 
 
 @dataclass
-class Demand:
+class Flow:
     origin: str
     destination: str
+    product: str
+
+
+@dataclass
+class Demand:
+    flow: Flow
     volume: float
     operated: float = 0.0
 
