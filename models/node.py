@@ -87,6 +87,53 @@ class Neighbor:
     neighbor: NodeInterface
     transit_time: float
 
+class ProcessConstraintSystem:
+    def __init__(
+            self,
+    ):
+        self.state_machine = self.build_state_machine()
+
+    def __str__(self):
+        return str(self.state_machine.current_state)
+
+    __repr__ = __str__
+
+    @staticmethod
+    def build_state_machine() -> StateMachine:
+        ready = State(name=NodeProcesState.READY, is_marked=True)
+        busy = State(name=NodeProcesState.BUSY, is_marked=False)
+        blocked = State(name=NodeProcesState.BLOCKED, is_marked=False)
+
+        start = MultiCriteriaTransition(
+            name="start",
+            origin=ready,
+            destination=busy
+        )
+        finish = MultiCriteriaTransition(
+            name="finish",
+            origin=busy,
+            destination=ready
+        )
+        block = MultiCriteriaTransition(
+            name="block",
+            origin=ready,
+            destination=blocked
+        )
+        release = MultiCriteriaTransition(
+            name="release",
+            origin=blocked,
+            destination=ready
+        )
+        sm = StateMachine(transitions=[
+            start,finish,
+            block,release
+        ])
+        return sm
+
+    def is_blocked(self):
+        return self.state_machine.current_state.name == NodeProcesState.BLOCKED
+
+
 
 class Node(NodeInterface):
     def __init__(
