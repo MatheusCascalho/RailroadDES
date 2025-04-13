@@ -131,9 +131,16 @@ class Transition(AbstractObserver):
     name: str
     origin: State
     trigger: bool = field(init=False, default_factory=bool)
-    action: Callable
     destination: State
-    subjects: list = field(init=False, default_factory=list)
+    action: Callable = field(default = lambda : None)
+    subjects: list[State] = field(init=False, default_factory=list)
+
+    def shoot(self):
+        if self.trigger and self.origin.is_marked:
+            self.origin.deactivate()
+            self.destination.activate()
+            self.trigger = False
+        self.action()
 
     def update(self, state: State):
         """
@@ -143,10 +150,7 @@ class Transition(AbstractObserver):
         :return:
         """
         self.trigger = state.is_marked
-        if self.trigger and self.origin.is_marked:
-            self.origin.deactivate()
-            self.destination.activate()
-            self.trigger = False
+        self.shoot()
 
     def force_trigger(self):
         """
