@@ -4,11 +4,18 @@
 
 ### Carga do trem - LoadState
 
+Transições:
+
+* start_loading/start_unloading: só é disparada se a atividade do trem for Processing
+* finish_loading/finish_unloading: só é disparada quando a ativdade for queue_to_leave
+
 ```mermaid
 stateDiagram-v2
     %% [*] --> Cheio
-    LOADED --> EMPTY: finish_unload
-    EMPTY --> LOADED: finish_load
+    EMPTY --> LOADING: start_loading
+    LOADING --> LOADED: finish_load
+    LOADED --> UNLOADING: start_unloading
+    UNLOADING --> EMPTY: finish_unload
 ```
 
 ### Atividade do trem - Activity
@@ -27,6 +34,17 @@ stateDiagram-v2
 stateDiagram-v2
     BUSY --> IDLE: finish_load/finish_unload
     IDLE --> BUSY: start_load/start_unload
+```
+
+### Habilitação de processamento
+
+```mermaid
+
+stateDiagram-v2
+    READY --> PROCESSING: process
+    PROCESSING --> READY: finish
+    READY --> BLOCKED: block_to_process_train
+    BLOCKED --> READY: release
 ```
 
 ### Atendimento de fluxo - TravelState
