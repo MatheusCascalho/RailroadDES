@@ -24,7 +24,63 @@ from interfaces.train_interface import TrainInterface
 from models.resources import Slot
 import models.model_queue as mq
 import numpy as np
+from models.state_machine import StateMachine, State, Transition, MultiCriteriaTransition
+from typing import Union
+from models.clock import Clock
 
+
+class ProcessorSystem:
+    def __init__(self, processor_type: Process, queue_to_leave: mq.Queue, clock: Clock):
+        self.type = processor_type
+        self.state_machine = self.build_state_machine()
+        self.current_train: Union[None, TrainInterface] = None
+        self.queue_to_leave = queue_to_leave
+        self.clock = clock
+
+    def __str__(self):
+        return str(self.state_machine.current_state)
+
+    __repr__ = __str__
+
+    def build_state_machine(self):
+        idle = State(name=ProcessorState.IDLE, is_marked=True)
+        busy = State(name=ProcessorState.BUSY, is_marked=False)
+        put_in = Transition(name="Put in", origin=idle, destination=busy)
+        free_up = Transition(name="Free Up", origin=busy, destination=idle, action=self.clear)
+        sm = StateMachine(transitions=[put_in, free_up])
+        return sm
+
+    def put_in(self, train: TrainInterface):
+        if self.state_machine.current_state.name == ProcessorState.IDLE:
+            self.current_train = train
+            self.state_machine.update()
+        else:
+            raise Exception("Processor is Busy")
+
+    def free_up(self):
+
+        if self.state_machine.current_state.name == ProcessorState.BUSY:
+            self.current_train = None
+            self.state_machine.update()
+        else:
+            raise Exception("Processor is Idle")
+
+    def clear(self):
+        train = self.current_train
+        self.queue_to_leave.push(
+            train,
+            arrive=self.clock.current_time
+        )
+        return train
+
+    def is_ready_to_clear(self):
+        if self.current_train:
+            return self.current_train.process_end <= self.clock.current_time
+        return False
+
+    @property
+    def is_idle(self):
+        return self.state_machine.current_state.name == ProcessorState.IDLE
 
 @dataclass
 class Neighbor:
