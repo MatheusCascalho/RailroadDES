@@ -19,21 +19,12 @@ class NodeInterface(ABC):
     def process_time(self):
         pass
 
-    @property
-    @abstractmethod
-    def processing_slots(self):
-        pass
-
     @abstractmethod
     def next_idle_slot(self, current_time):
         pass
 
     # ====== Properties ==========
     # ====== Events ==========
-    @abstractmethod
-    def call_to_enter(self, **kwargs):
-        pass
-
     @abstractmethod
     def process(self, **kwargs):
         pass
