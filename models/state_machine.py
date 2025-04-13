@@ -234,4 +234,9 @@ class StateMachine:
                 return state
         raise Exception('Nenhum estado está ativado')
 
+    def update(self, transition=None):
+        if transition is None:
+            allowed_transitions = self.allowed_transitions()
+            allowed_transitions[0].force_trigger()
+
 
