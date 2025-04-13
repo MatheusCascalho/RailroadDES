@@ -212,39 +212,51 @@ class Train(TrainInterface):
 
     # ====== Properties ==========
     @property
+    def current_task(self):
+        return self.__current_task
+
+    @property
     def is_empty(self):
-        return self.state.volume <= EPSILON
+        return self.load_system.volume <= EPSILON
 
     @property
     def next_location(self):
         try:
-            return self.path[0]
+            return self.activity_system.path[1]
         except IndexError:
             TrainExceptions.path_is_finished()
 
     @property
     def volume(self):
-        return self.state.volume
+        return self.load_system.volume
 
     @volume.setter
     def volume(self, new_volume):
-        self.state.volume = new_volume
+        self.load_system.volume = new_volume
 
     @property
     def current_location(self):
-        return self.state.current_location
+        return self.activity_system.current_location
 
-    @current_location.setter
-    def current_location(self, location):
-        self.state.current_location = location
+    @property
+    def process_end(self):
+        return self.current_task.time_table.process_end
 
     @property
     def process(self) -> Callable:
-        return self.load if self.is_empty else self.unload
+        return self.start_load if self.is_empty else self.start_unload
 
     @property
-    def action(self):
-        return self.state.action
+    def current_process_name(self):
+        return Process.LOAD if self.is_empty else Process.UNLOAD
+
+    def __str__(self):
+        name = self.ID
+        state = f"Atividade={self.activity_system} | Carga={self.load_system}"
+        return f"{name} | {state}"
+
+    __repr__ = __str__
+
     # ====== Properties ==========
     # ====== Events ==========
 
