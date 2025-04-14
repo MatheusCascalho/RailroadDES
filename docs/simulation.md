@@ -1,6 +1,18 @@
 # Simulação
 
+Uma simulação a eventos discretos (SED) é um tipo de modelagem computacional que simula a operação de um sistema como
+uma sequência de eventos distintos no tempo. Ao contrário das simulações contínuas, onde o estado do sistema muda 
+continuamente ao longo do tempo, na SED, o estado do sistema só muda em instantes específicos, quando ocorrem eventos. 
+Entre esses eventos, assume-se que o sistema permanece inalterado.
+
+
+
 ## Máquinas de Estado
+
+Máquinas de estados são frequentemente utilizadas na modelagem de sistemas para simulação a eventos discretos. Elas são 
+uma ferramenta poderosa para descrever o comportamento de entidades dentro do sistema ao longo do tempo e em resposta a 
+diferentes eventos.
+
 
 ### Carga do trem - LoadState
 
