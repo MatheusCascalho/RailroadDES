@@ -5,11 +5,13 @@ from models.constants import TrainActions, EPSILON
 from models.time_table import TimeRegister
 from enum import Enum
 
+
 class LoadState(Enum):
     LOADING = "Loading"
     LOADED = "Loaded"
     UNLOADING = "Unloading"
     EMPTY = "Empty"
+
 
 class ActivityState(Enum):
     MOVING = "Moving"
@@ -17,15 +19,16 @@ class ActivityState(Enum):
     PROCESSING = "Processing"
     QUEUE_TO_LEAVE = "Queue to leave"
 
+
 class ProcessorState(Enum):
     IDLE = "Idle"
     BUSY = "Busy"
+
 
 class NodeProcesState(Enum):
     READY = "Ready"
     BUSY = "Busy"
     BLOCKED = "Blocked"
-
 
 
 @dataclass

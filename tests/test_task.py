@@ -2,7 +2,8 @@ import pytest
 from datetime import datetime, timedelta
 from models.task import Task, TimeEvent, EventName, Process
 from models.demand import Demand, Flow
-from models.time_table import EventSequenceError
+from models.exceptions import EventSequenceError
+
 
 # Fixture para criar uma instância de Demand (pode ser substituída por uma classe mock)
 @pytest.fixture

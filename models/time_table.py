@@ -3,36 +3,8 @@ from datetime import datetime, timedelta
 from enum import Enum
 from models.constants import Process
 import numpy as np
+from models.exceptions import EventSequenceError, TimeSequenceErro, RepeatedProcessError, AlreadyRegisteredError
 
-
-class EventSequenceError(Exception):
-    """Exceção customizada para erro na sequência de eventos."""
-
-    def __init__(self, message="The event sequence is incorrect."):
-        self.message = message
-        super().__init__(self.message)
-
-class TimeSequenceErro(Exception):
-    """Exceção customizada para erro na sequência de eventos."""
-
-    def __init__(self, message="The current event is before the last event"):
-        self.message = message
-        super().__init__(self.message)
-
-class RepeatedProcessError(Exception):
-    """Exceção customizada para erro de repetição de processo."""
-
-    def __init__(self, message="Process is repeated."):
-        self.message = message
-        super().__init__(self.message)
-
-
-class AlreadyRegisteredError(Exception):
-    """Exceção customizada para erro na sequência de eventos."""
-
-    def __init__(self, message="Event already registered"):
-        self.message = message
-        super().__init__(self.message)
 
 class EventName(Enum):
     """
@@ -82,7 +54,9 @@ def register_id_gen():
         yield name
         i += 1
 
+
 register_id = register_id_gen()
+
 
 @dataclass
 class TimeRegister:
@@ -218,6 +192,7 @@ class TimeRegister:
             if current_is_none ^ previous_is_none:
                 changes += 1
         return changes > 1
+
 
 class TimeTable:
     """

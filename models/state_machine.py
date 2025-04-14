@@ -10,6 +10,7 @@ from dataclasses import dataclass, field
 from typing import Any, Callable, Union
 from abc import ABCMeta, abstractmethod
 
+
 class AbstractObserver:
     """
     Classe abstrata para implementações de observadores. Os observadores são notificados quando um estado é alterado.
@@ -159,6 +160,7 @@ class Transition(AbstractObserver):
         """
         self.trigger = True
         self.shoot()
+
 
 class MultiCriteriaTransition(Transition):
     def update(self, state: State):

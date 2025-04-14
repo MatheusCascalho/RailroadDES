@@ -25,3 +25,35 @@ class TrainExceptions(Exception):
     @staticmethod
     def processing_when_train_is_moving():
         raise TrainExceptions('Train could not be processed if it is moving state. Arrives train at node first!')
+
+
+class EventSequenceError(Exception):
+    """Exceção customizada para erro na sequência de eventos."""
+
+    def __init__(self, message="The event sequence is incorrect."):
+        self.message = message
+        super().__init__(self.message)
+
+
+class TimeSequenceErro(Exception):
+    """Exceção customizada para erro na sequência de eventos."""
+
+    def __init__(self, message="The current event is before the last event"):
+        self.message = message
+        super().__init__(self.message)
+
+
+class RepeatedProcessError(Exception):
+    """Exceção customizada para erro de repetição de processo."""
+
+    def __init__(self, message="Process is repeated."):
+        self.message = message
+        super().__init__(self.message)
+
+
+class AlreadyRegisteredError(Exception):
+    """Exceção customizada para erro na sequência de eventos."""
+
+    def __init__(self, message="Event already registered"):
+        self.message = message
+        super().__init__(self.message)

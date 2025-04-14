@@ -5,12 +5,10 @@ from models.time_table import (
     TimeTable,
     TimeEvent,
     EventName,
-    TimeRegister,
-    AlreadyRegisteredError,
-    EventSequenceError,
-    TimeSequenceErro,
-    RepeatedProcessError
+    TimeRegister
 )
+from models.exceptions import EventSequenceError, TimeSequenceErro, RepeatedProcessError, AlreadyRegisteredError
+
 
 @pytest.fixture
 def time_table():
