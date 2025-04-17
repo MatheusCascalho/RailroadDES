@@ -3,6 +3,7 @@
 ## Contexto
 
 **Que tipo de problemas essa abordagem busca resolver?**
+
 * Falta de clareza sobre como representar o sistema. A abordagem de otimização proposta inicialmente assume que o 
 Roteador (classe Router) é um agente que conhece o estado do sistema e a partir desse estado define uma ação. Uma vez
 a ação é tomada o ambiente (classe Railroad) retorna para o agente a recompensa relacionada a essa ação.
