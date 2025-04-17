@@ -14,50 +14,8 @@ uma ferramenta poderosa para descrever o comportamento de entidades dentro do si
 diferentes eventos.
 
 
-### Carga do trem - LoadState
 
-Transições:
 
-* start_loading/start_unloading: só é disparada se a atividade do trem for Processing
-* finish_loading/finish_unloading: só é disparada quando a ativdade for queue_to_leave
-
-```mermaid
-stateDiagram-v2
-    %% [*] --> Cheio
-    EMPTY --> LOADING: start_loading
-    LOADING --> LOADED: finish_load
-    LOADED --> UNLOADING: start_unloading
-    UNLOADING --> EMPTY: finish_unload
-```
-
-### Atividade do trem - Activity
-
-```mermaid
-stateDiagram-v2
-    MOVING --> QUEUE_TO_ENTER: arrive
-    QUEUE_TO_ENTER --> PROCESSING: start_load/start_unload
-    PROCESSING --> QUEUE_TO_LEAVE: finish_load/finish_unload
-    QUEUE_TO_LEAVE --> MOVING: leave
-```
-
-### Equipamento de processamento
-```mermaid
-
-stateDiagram-v2
-    BUSY --> IDLE: finish_load/finish_unload
-    IDLE --> BUSY: start_load/start_unload
-```
-
-### Habilitação de processamento
-
-```mermaid
-
-stateDiagram-v2
-    READY --> PROCESSING: process
-    PROCESSING --> READY: finish
-    READY --> BLOCKED: block_to_process_train
-    BLOCKED --> READY: release
-```
 
 ### Atendimento de fluxo - TravelState
 
