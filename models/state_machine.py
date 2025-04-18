@@ -7,28 +7,13 @@ A máquina de estados pode ser configurada com observadores, que são notificado
 """
 
 from dataclasses import dataclass, field
-from typing import Any, Callable, Union
-from abc import ABCMeta, abstractmethod
+from typing import Any, Callable
 
-
-class AbstractObserver:
-    """
-    Classe abstrata para implementações de observadores. Os observadores são notificados quando um estado é alterado.
-    """
-    subjects: list
-
-    @abstractmethod
-    def update(self, *args):
-        """
-        Método abstrato que deve ser implementado para lidar com as notificações de alteração de estado.
-        :param args:
-        :return:
-        """
-        pass
+from models.observers import AbstractObserver, AbstractSubject
 
 
 @dataclass
-class State:
+class State(AbstractSubject):
     """
     Representa um estado dentro da máquina de estados. Cada estado tem um nome, uma flag is_marked para indicar se o
     estado está ativo e uma lista de observadores que serão notificados quando o estado mudar.
@@ -69,6 +54,7 @@ class State:
             return self.name == other
         return False
 
+    @AbstractSubject.notify_at_the_end
     def activate(self):
         """
         Marca o estado como ativo, desmarcando quaisquer outros estados previamente ativos. Lança uma exceção se o
@@ -78,8 +64,8 @@ class State:
         if self.is_marked:
             raise Exception("Estado já está ativo!")
         self.is_marked = True
-        self.notify()
 
+    @AbstractSubject.notify_at_the_end
     def deactivate(self):
         """
         Desmarca o estado como ativo. Lança uma exceção se o estado não estiver ativo.
@@ -88,28 +74,6 @@ class State:
         if not self.is_marked:
             raise Exception("Estado não está ativo!")
         self.is_marked = False
-        self.notify()
-
-    def notify(self):
-        """
-        Notifica todos os observadores associados ao estado.
-        :return:
-        """
-        for observer in self.observers:
-            observer.update(self)
-
-    def add_observer(self, observer: list[AbstractObserver]):
-        """
-        Adiciona um ou mais observadores ao estado.
-        :param observer:
-        :return:
-        """
-        if not isinstance(observer, list):
-            observer = [observer]
-        self.observers.extend(observer)
-        for observer in observer:
-            if self not in observer.subjects:
-                observer.subjects.append(self)
 
 
 @dataclass
@@ -143,14 +107,14 @@ class Transition(AbstractObserver):
             self.trigger = False
         self.action()
 
-    def update(self, state: State):
+    def update(self):
         """
         Atualiza o gatilho da transição com base no estado atual. Se o estado de origem estiver marcado, a transição
         será ativada e o estado de origem será desmarcado, enquanto o estado de destino será marcado.
         :param state:
         :return:
         """
-        self.trigger = state.is_marked
+        self.trigger = any(s.is_marked for s in self.subjects)
         self.shoot()
 
     def force_trigger(self):
@@ -163,7 +127,7 @@ class Transition(AbstractObserver):
 
 
 class MultiCriteriaTransition(Transition):
-    def update(self, state: State):
+    def update(self):
         self.trigger = all(s.is_marked for s in self.subjects)
         self.shoot()
 
