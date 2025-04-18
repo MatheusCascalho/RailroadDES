@@ -28,8 +28,7 @@ class AbstractObserver:
     @abstractmethod
     def update(self, *args):
         """
-        Método abstrato que deve ser implementado para lidar com as notificações de alteração de estado.
-        :param args:
+        Abstract method that must be implemented to handle state change notifications.        :param args:
         :return:
         """
         pass
