@@ -1,4 +1,4 @@
-from models.discrete_event_system import ProcessorSystem, ProcessConstraintSystem
+from models.node_constraints import ProcessorSystem, ProcessConstraintSystem
 from models.des_simulator import DESSimulator
 from models.constants import (
     Process

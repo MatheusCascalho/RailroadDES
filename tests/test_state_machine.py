@@ -1,9 +1,9 @@
 from models.state_machine import (
     StateMachine,
     Transition,
-    State,
-    AbstractObserver
+    State
 )
+from models.observers import AbstractObserver
 import pytest
 import random
 
@@ -27,7 +27,7 @@ def test_state_machine_should_should_update_state_when_event_trigger_happen_and_
     transitions = [t1, t2]
 
     allow_turn_on = State("Turn ON", False)
-    allow_turn_on.add_observer([t1])
+    allow_turn_on.add_observers([t1])
     state_machine = StateMachine(
         transitions=transitions,
     )
@@ -66,7 +66,7 @@ def test_notify_on_state_change():
 
     state = State(name="Estado A", is_marked=False)
     observer = TestObserver()
-    state.add_observer([observer])
+    state.add_observers([observer])
 
     state.activate()
     assert observer.called
@@ -89,8 +89,8 @@ def test_update_trigger():
     state2 = State(name="Estado B", is_marked=False)
     transition = Transition(name="A->B", origin=state1, action=lambda: None, destination=state2)
 
-    state1.add_observer([transition])
-    transition.update(state1)
+    state1.add_observers([transition])
+    transition.update()
 
     assert state2.is_marked
     assert not state1.is_marked
@@ -130,7 +130,7 @@ def test_state_transition():
     state1 = State(name="Estado A", is_marked=True)
     state2 = State(name="Estado B", is_marked=False)
     transition = Transition(name="A->B", origin=state1, action=lambda: None, destination=state2)
-    state1.add_observer([transition])
+    state1.add_observers([transition])
     sm = StateMachine(transitions=[transition])
 
     sm.current_state = state1

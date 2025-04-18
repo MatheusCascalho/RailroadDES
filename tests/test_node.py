@@ -2,7 +2,7 @@ import pytest
 
 from models.des_simulator import DESSimulator
 from models.node import Node
-from models.discrete_event_system import ProcessConstraintSystem
+from models.node_constraints import ProcessConstraintSystem
 from datetime import timedelta, datetime
 from models.clock import Clock
 from models.train import Train

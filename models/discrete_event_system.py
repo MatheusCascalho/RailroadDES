@@ -1,11 +1,5 @@
-from typing import Union
-
-from interfaces.train_interface import TrainInterface
-from models import model_queue as mq
-from models.clock import Clock
-from models.constants import Process
-from models.state_machine import State, Transition, StateMachine, MultiCriteriaTransition
-from models.states import ProcessorState, NodeProcesState, LoadState, ActivityState
+from models.state_machine import State, Transition, StateMachine
+from models.states import LoadState, ActivityState
 from abc import abstractmethod
 
 
@@ -21,97 +15,6 @@ class DiscreteEventSystem:
         return str(self.state_machine.current_state)
 
     __repr__ = __str__
-
-
-class ProcessorSystem(DiscreteEventSystem):
-    def __init__(self, processor_type: Process, queue_to_leave: mq.Queue, clock: Clock):
-        self.type = processor_type
-        self.current_train: Union[None, TrainInterface] = None
-        self.queue_to_leave = queue_to_leave
-        self.clock = clock
-        super().__init__()
-
-
-    def build_state_machine(self):
-        idle = State(name=ProcessorState.IDLE, is_marked=True)
-        busy = State(name=ProcessorState.BUSY, is_marked=False)
-        put_in = Transition(name="Put in", origin=idle, destination=busy)
-        free_up = Transition(name="Free Up", origin=busy, destination=idle, action=self.clear)
-        sm = StateMachine(transitions=[put_in, free_up])
-        return sm
-
-    def put_in(self, train: TrainInterface):
-        if self.state_machine.current_state.name == ProcessorState.IDLE:
-            self.current_train = train
-            self.state_machine.update()
-        else:
-            raise Exception("Processor is Busy")
-
-    def free_up(self):
-
-        if self.state_machine.current_state.name == ProcessorState.BUSY:
-            self.current_train = None
-            self.state_machine.update()
-        else:
-            raise Exception("Processor is Idle")
-
-    def clear(self):
-        train = self.current_train
-        self.queue_to_leave.push(
-            train,
-            arrive=self.clock.current_time
-        )
-        return train
-
-    def is_ready_to_clear(self):
-        if self.current_train:
-            return self.current_train.process_end <= self.clock.current_time
-        return False
-
-    @property
-    def is_idle(self):
-        return self.state_machine.current_state.name == ProcessorState.IDLE
-
-
-class ProcessConstraintSystem(DiscreteEventSystem):
-    def __init__(
-            self,
-    ):
-        super().__init__()
-
-    def build_state_machine(self) -> StateMachine:
-        ready = State(name=NodeProcesState.READY, is_marked=True)
-        busy = State(name=NodeProcesState.BUSY, is_marked=False)
-        blocked = State(name=NodeProcesState.BLOCKED, is_marked=False)
-
-        start = MultiCriteriaTransition(
-            name="start",
-            origin=ready,
-            destination=busy
-        )
-        finish = MultiCriteriaTransition(
-            name="finish",
-            origin=busy,
-            destination=ready
-        )
-        block = MultiCriteriaTransition(
-            name="block",
-            origin=ready,
-            destination=blocked
-        )
-        release = MultiCriteriaTransition(
-            name="release",
-            origin=blocked,
-            destination=ready
-        )
-        sm = StateMachine(transitions=[
-            start,finish,
-            block,release
-        ])
-        return sm
-
-    def is_blocked(self):
-        return self.state_machine.current_state.name == NodeProcesState.BLOCKED
 
 
 class LoadSystem(DiscreteEventSystem):
