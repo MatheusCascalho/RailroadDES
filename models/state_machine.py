@@ -204,5 +204,9 @@ class StateMachine:
         if transition is None:
             allowed_transitions = self.allowed_transitions()
             allowed_transitions[0].force_trigger()
+        else:
+            if transition not in self.transitions:
+                raise Exception("Transition doesn't exist!")
+            self.transitions[transition].force_trigger()
 
 
