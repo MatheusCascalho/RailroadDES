@@ -110,3 +110,4 @@ time_table.update(event4)
 print(f"Tempo de Fila Total: {time_table.queue_time}")
 print(f"Tempo de Trânsito Total: {time_table.in_transit_time}")
 print(f"Tempo de Utilização Total: {time_table.util_time}")
+```

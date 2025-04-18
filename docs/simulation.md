@@ -215,3 +215,9 @@ classDiagram
 * **RailSegment**: Responsável por representar a posição dos trens quando não estiverem parados em nós;
 
 * **Queue**: Responsável por representar os trens em estado ocioso da ferrovia.
+
+# Conceitos
+_anotações de estudo do software ARENA_
+* **Entidades**: elementos que fluem no modelo. Corresponde aos clientes em um sistema de filas;
+* **Recursos**: elementos com capacidade limitada pelos quais as entidades concorrem. Correspondem ao servidor em um sistema de filas;
+* **Módulos**: Usados para compor a lógica do modelo.
