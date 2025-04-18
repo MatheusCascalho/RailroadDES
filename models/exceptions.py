@@ -27,6 +27,16 @@ class TrainExceptions(Exception):
         raise TrainExceptions('Train could not be processed if it is moving state. Arrives train at node first!')
 
 
+class StockException(Exception):
+    @staticmethod
+    def stock_is_full():
+        raise StockException("Stock is full!")
+
+    @staticmethod
+    def stock_is_empty():
+        raise StockException("Stock is Empty")
+
+
 class EventSequenceError(Exception):
     """Exceção customizada para erro na sequência de eventos."""
 
