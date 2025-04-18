@@ -1,6 +1,7 @@
 import pytest
 from datetime import datetime, timedelta
-from models.task import Task, TimeEvent, EventName, Process
+from models.task import Task, TimeEvent, Process
+from models.constants import EventName
 from models.demand import Demand, Flow
 from models.exceptions import EventSequenceError
 

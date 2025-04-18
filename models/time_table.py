@@ -1,19 +1,8 @@
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
-from enum import Enum
-from models.constants import Process
+from models.constants import Process, EventName
 import numpy as np
 from models.exceptions import EventSequenceError, TimeSequenceErro, RepeatedProcessError, AlreadyRegisteredError
-
-
-class EventName(Enum):
-    """
-    Enum that defines the possible event types in the simulation process.
-    """
-    ARRIVE = "Arrive"
-    START_PROCESS = "Start Process"
-    FINISH_PROCESS = "Finish Process"
-    DEPARTURE = "Departure"
 
 
 @dataclass

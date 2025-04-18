@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from models.demand import Demand
-from models.time_table import TimeTable, TimeEvent, EventName
-from models.constants import Process
+from models.time_table import TimeTable, TimeEvent
+from models.constants import Process, EventName
 from datetime import datetime
 
 

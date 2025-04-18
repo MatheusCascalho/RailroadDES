@@ -2,7 +2,7 @@ from models.des_simulator import DESSimulator
 from models.constants import (
     EPSILON,
     TrainActions,
-    Process
+    Process, EventName
 )
 from typing import Callable
 from datetime import timedelta, datetime
@@ -13,7 +13,7 @@ from models.resources import Slot
 from interfaces.train_interface import TrainInterface
 from interfaces.node_interce import NodeInterface
 from models.task import Task
-from models.time_table import EventName, TimeEvent
+from models.time_table import TimeEvent
 
 
 def train_id_gen():

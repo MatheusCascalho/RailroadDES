@@ -17,3 +17,15 @@ class TrainActions(IntEnum):
 class Process(Enum):
     LOAD = 'load'
     UNLOAD = 'unload'
+
+
+class EventName(Enum):
+    """
+    Enum that defines the possible event types in the simulation process.
+    """
+    ARRIVE = "Arrive"
+    START_PROCESS = "Start Process"
+    FINISH_PROCESS = "Finish Process"
+    DEPARTURE = "Departure"
+    RECEIVE_VOLUME = "Receive Volume in Stock"
+    DISPATCH_VOLUME = "Dispatch Volume in Stock"
