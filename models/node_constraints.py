@@ -110,6 +110,9 @@ class ProcessConstraintSystem(DiscreteEventSystem):
 
 
 class StockConstraint(ProcessConstraintSystem, AbstractObserver):
+    def update(self, *args):
+        pass
+
     def __init__(self, train_size: float):
         self.train_size = train_size
         ProcessConstraintSystem.__init__(self)
@@ -120,7 +123,6 @@ class StockConstraint(ProcessConstraintSystem, AbstractObserver):
             raise Exception("StockConstraint only look for Stock Objects")
         self.subjects.append(sub)
         self.update()
-
 
 
 class StockLoadConstraint(StockConstraint):
@@ -145,6 +147,7 @@ class StockUnloadConstraint(StockConstraint):
             self.state_machine.update("block")
         else:
             self.state_machine.update("release")
+
 
 if __name__=="__main__":
     from models.stockinterface import OwnStock
