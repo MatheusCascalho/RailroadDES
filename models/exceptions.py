@@ -36,6 +36,24 @@ class StockException(Exception):
     def stock_is_empty():
         raise StockException("Stock is Empty")
 
+    @staticmethod
+    def no_receive_event():
+        raise StockException("Stock has no receive event!")
+
+
+class ProcessException(Exception):
+    @staticmethod
+    def no_promise_to_do():
+        raise ProcessException("There is no promise to do!")
+
+    @staticmethod
+    def process_is_busy():
+        raise ProcessException("Processor is Busy")
+
+    @staticmethod
+    def process_is_blocked():
+        raise ProcessException("Processor is Blocked")
+
 
 class EventSequenceError(Exception):
     """Exceção customizada para erro na sequência de eventos."""
