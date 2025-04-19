@@ -1,13 +1,20 @@
+from itertools import product
+
 import pytest
 
 from models.des_simulator import DESSimulator
-from models.node import Node
-from models.node_constraints import ProcessConstraintSystem
+from models.node import Node, StockNode
+from models.node_constraints import ProcessConstraintSystem, StockLoadConstraint
 from datetime import timedelta, datetime
 from models.clock import Clock
 from models.train import Train
 from models.task import Task
 from models.demand import Flow, Demand
+from models.stock import OwnStock
+from models.stock_replanish import SimpleStockReplanisher, ReplenishRate
+from models.processors import ProcessorRate
+from models.constants import Process
+
 
 # @pytest.fixture
 class FakeSimulator(DESSimulator):
@@ -22,11 +29,11 @@ def test_simulation():
         discretization=timedelta(hours=1)
     )
     sim = FakeSimulator(clock=clk)
-
+    product = "product"
     flow = Flow(
         origin="origin",
         destination="destination",
-        product="product"
+        product=product
     )
     demand = Demand(
         flow=flow,
@@ -45,14 +52,17 @@ def test_simulation():
     )
     constraint = ProcessConstraintSystem()
     process_time = timedelta(hours=5)
+
+    rates = {
+        product: [ProcessorRate(product=product,type=Process.LOAD,rate=40)]
+    }
     node = Node(
         queue_capacity=20,
         name="xpto",
-        process_time=process_time,
         clock=clk,
         load_constraint_system=constraint,
         unload_constraint_system=constraint,
-        load_units_amount=1,
+        process_rates=rates
     )
 
 
@@ -64,4 +74,94 @@ def test_simulation():
     clk.jump(process_time)
     train.finish_load(simulator=sim, node=node)
     node.maneuver_to_dispatch(simulator=sim)
+    assert True
+
+def test_stock_node_simulation():
+    clk = Clock(
+        start=datetime(2025,4,1),
+        discretization=timedelta(hours=1)
+    )
+    sim = FakeSimulator(clock=clk)
+    product = "product"
+    train_size = 6e3
+    flow = Flow(
+        origin="origin",
+        destination="destination",
+        product=product
+    )
+    demand = Demand(
+        flow=flow,
+        volume=103e3
+    )
+    task = Task(
+        demand=demand,
+        path=["origin", "destination"],
+        task_volume=train_size,
+        current_time=clk.current_time
+    )
+    train = Train(
+        capacity=train_size,
+        task=task,
+        is_loaded=False
+    )
+
+    # Construção do NÓ
+    stock = OwnStock(
+        clock=clk,
+        capacity=60e3,
+        product=product,
+        initial_volume=5,
+    )
+    replenisher = SimpleStockReplanisher(
+        replenish_rates=[
+            ReplenishRate(
+                product=product,
+                rate=1e3,
+                discretization=timedelta(hours=1)
+            )
+        ],
+        clock=clk
+    )
+    constraint = StockLoadConstraint(
+        train_size=train_size
+    )
+    stock.add_observers([constraint])
+    process_time = timedelta(hours=5)
+    rates = {
+        product: [ProcessorRate(product=product, type=Process.LOAD, rate=1.2e3)]
+    }
+
+    node = StockNode(
+        queue_capacity=20,
+        name="xpto",
+        clock=clk,
+        load_constraint_system=constraint,
+        unload_constraint_system=constraint,
+        stocks=[stock],
+        replenisher=replenisher,
+        process_rates=rates
+    )
+
+    # Simulacao
+    train.arrive(simulator=sim, node=node)
+    node.receive(train)
+    node.process(simulator=sim)
+    try:
+        train.start_load(simulator=sim, process_time=process_time)
+        clk.jump(process_time)
+        train.finish_load(simulator=sim, node=node)
+        node.maneuver_to_dispatch(simulator=sim)
+    except:
+        clk.jump(timedelta(10))
+        node.process(simulator=sim)
+
+        train.start_load(simulator=sim, process_time=process_time)
+        clk.jump(timedelta(hours=3))
+        node.process(simulator=sim)
+
+        clk.jump(timedelta(hours=2))
+        train.finish_load(simulator=sim, node=node)
+        node.maneuver_to_dispatch(simulator=sim)
+
+
     assert True
