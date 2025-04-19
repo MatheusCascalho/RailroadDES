@@ -66,6 +66,10 @@ class Train(TrainInterface):
     def volume(self):
         return self.load_system.volume
 
+    @property
+    def capacity(self):
+        return self.load_system.capacity
+
     @volume.setter
     def volume(self, new_volume):
         self.load_system.volume = new_volume

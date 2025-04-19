@@ -19,9 +19,7 @@ class NodeInterface(ABC):
     def process_time(self):
         pass
 
-    @abstractmethod
-    def next_idle_slot(self, current_time):
-        pass
+
 
     # ====== Properties ==========
     # ====== Events ==========

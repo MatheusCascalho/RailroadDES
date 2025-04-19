@@ -146,7 +146,7 @@ class StateMachine:
             t.name: t
             for t in transitions
         }
-        self.states = {}
+        self.states: dict[Any, State] = {}
         for transition in transitions:
             self.states[transition.origin.name] = transition.origin
             self.states[transition.destination.name] = transition.destination

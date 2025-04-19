@@ -26,6 +26,11 @@ class TrainInterface(ABC):
 
     @property
     @abstractmethod
+    def capacity(self):
+        pass
+
+    @property
+    @abstractmethod
     def volume(self):
         pass
 

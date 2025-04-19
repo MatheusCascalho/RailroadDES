@@ -16,7 +16,7 @@ class StockEvent:
 
 class StockHistory:
     def __init__(self, events):
-        self.events: events
+        self.events = events
 
 
 class StockInterface(AbstractSubject):
@@ -24,12 +24,12 @@ class StockInterface(AbstractSubject):
         self.events: list[StockEvent] = []
         super().__init__()
 
-
     @AbstractSubject.notify_at_the_end
     @abstractmethod
     def receive(self, volume: float):
         pass
 
+    @AbstractSubject.notify_at_the_end
     @abstractmethod
     def dispatch(self, volume: float):
         pass

@@ -1,4 +1,5 @@
-from models.node_constraints import ProcessorSystem, ProcessConstraintSystem
+from models.node_constraints import ProcessConstraintSystem
+from models.processors import ProcessorSystem
 from models.des_simulator import DESSimulator
 from models.constants import (
     Process
@@ -51,10 +52,10 @@ class Node(NodeInterface):
             for _ in range(load_units_amount)
         ]
         for unit in self.load_units:
-            unit.state_machine.states[ProcessorState.BUSY].add_observer(
+            unit.state_machine.states[ProcessorState.BUSY].add_observers(
                 self.process_constraint[Process.LOAD].state_machine.transitions["start"]
             )
-            unit.state_machine.states[ProcessorState.IDLE].add_observer(
+            unit.state_machine.states[ProcessorState.IDLE].add_observers(
                 self.process_constraint[Process.LOAD].state_machine.transitions["finish"]
             )
         self.unload_units: list[ProcessorSystem] = [
