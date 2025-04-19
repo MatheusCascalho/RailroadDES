@@ -184,3 +184,42 @@ class Node(NodeInterface):
         return self._process_time
 
     # ====== Properties ==========
+
+
+class StockNode(Node):
+    def __init__(
+            self,
+            queue_capacity: int,
+            name: Any,
+            clock: Clock,
+            process_rates: dict[str, list[ProcessorRate]],
+            load_constraint_system: ProcessConstraintSystem,
+            unload_constraint_system: ProcessConstraintSystem,
+            stocks: list[StockInterface],
+            replenisher: StockReplenisherInterface
+    ):
+        super().__init__(
+                queue_capacity=queue_capacity,
+                name=name,
+                clock=clock,
+                process_rates=process_rates,
+                load_constraint_system=load_constraint_system,
+                unload_constraint_system=unload_constraint_system,
+        )
+        self.replenisher = replenisher
+        self.stocks: dict[str, StockInterface] = {s.product: s for s in stocks}
+
+    def pre_processing(self):
+        for stock in self.stocks.values():
+            stock.update_promises()
+        self.replenisher.replenish(list(self.stocks.values()))
+
+    def pos_processing(self):
+        for slot in self.load_units + self.unload_units:
+            if not slot.is_idle:
+                try:
+                    promise = slot.promise()
+                    product = slot.current_train.product
+                    self.stocks[product].save_promise([promise])
+                except ProcessException:
+                    continue
