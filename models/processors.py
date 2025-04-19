@@ -1,12 +1,12 @@
 from typing import Union
 
-from networkx.algorithms.structuralholes import constraint
-
+from datetime import timedelta
 from interfaces.train_interface import TrainInterface
 from models import model_queue as mq
 from models.clock import Clock
-from models.constants import Process
+from models.constants import Process, EventName
 from models.discrete_event_system import DiscreteEventSystem
+from models.exceptions import ProcessException
 from models.state_machine import State, Transition, StateMachine
 from models.states import ProcessorState
 from models.node_constraints import (
@@ -15,7 +15,16 @@ from models.node_constraints import (
     StockLoadConstraint,
     StockUnloadConstraint
 )
-from models.stock import StockInterface
+from models.stock import StockInterface, StockEventPromise
+from dataclasses import dataclass
+
+
+@dataclass
+class ProcessorRate:
+    product: str
+    type: Process
+    rate: float
+    discretization: timedelta = timedelta(hours=1)
 
 
 class ProcessorSystem(DiscreteEventSystem):
@@ -24,6 +33,7 @@ class ProcessorSystem(DiscreteEventSystem):
             processor_type: Process,
             queue_to_leave: mq.Queue,
             clock: Clock,
+            rates: dict[str, ProcessorRate],
             constraints: list[ProcessConstraintSystem] = []
     ):
         self.type = processor_type
@@ -31,6 +41,8 @@ class ProcessorSystem(DiscreteEventSystem):
         self.queue_to_leave = queue_to_leave
         self.clock = clock
         self.constraints = constraints
+        self.rates = rates
+        self.promised = False
         super().__init__()
 
 
@@ -54,21 +66,24 @@ class ProcessorSystem(DiscreteEventSystem):
         if all(not c.is_blocked() for c in self.active_constraints(train)):
             if self.state_machine.current_state.name == ProcessorState.IDLE:
                 self.current_train = train
+                train.add_to_slot()
                 self.state_machine.update()
             else:
-                raise Exception("Processor is Busy")
+                raise ProcessException.process_is_busy()
         else:
-            raise Exception("Processor is Blocked")
+            raise ProcessException.process_is_blocked()
 
     def free_up(self):
         if self.state_machine.current_state.name == ProcessorState.BUSY:
             self.current_train = None
+            self.promised = False
             self.state_machine.update()
         else:
             raise Exception("Processor is Idle")
 
     def clear(self):
         train = self.current_train
+        train.removed_from_slot()
         self.queue_to_leave.push(
             train,
             arrive=self.clock.current_time
@@ -83,6 +98,32 @@ class ProcessorSystem(DiscreteEventSystem):
     @property
     def is_idle(self):
         return self.state_machine.current_state.name == ProcessorState.IDLE
+
+    def promise(self) -> StockEventPromise:
+        if not self.is_idle and not self.promised:
+            product = self.current_train.product
+            time_to_finish = self.get_process_time()
+            completion_date = self.clock.current_time + time_to_finish
+            event = StockEventPromise(
+                event=EventName.DISPATCH_VOLUME if self.type == Process.LOAD else EventName.RECEIVE_VOLUME,
+                promise_date=self.clock.current_time,
+                completion_date=completion_date,
+                volume=self.current_train.capacity
+            )
+            self.promised = True
+            return event
+        raise ProcessException.no_promise_to_do()
+
+    def get_process_time(self) -> timedelta():
+        if not self.is_idle:
+            volume = self.current_train.capacity
+            product = self.current_train.product
+            rate = self.rates[product].rate
+            steps = volume / rate
+            process_time = steps * self.rates[product].discretization
+            return process_time
+        return timedelta()
+
 
 
 class ProcessorSystemBuilder:

@@ -129,7 +129,7 @@ class Node(NodeInterface):
                     callback=train.process,
                     simulator=simulator,
                     start=simulator.current_date,
-                    process_time=self.process_time,
+                    process_time=slot.get_process_time(),
                     node=self,
                     slot=slot
                 )
