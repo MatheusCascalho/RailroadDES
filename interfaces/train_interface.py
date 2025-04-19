@@ -31,6 +31,11 @@ class TrainInterface(ABC):
 
     @property
     @abstractmethod
+    def product(self):
+        pass
+
+    @property
+    @abstractmethod
     def volume(self):
         pass
 
@@ -53,6 +58,14 @@ class TrainInterface(ABC):
     @property
     @abstractmethod
     def current_process_name(self):
+        pass
+
+    @abstractmethod
+    def add_to_slot(self):
+        pass
+
+    @abstractmethod
+    def removed_from_slot(self):
         pass
 
     # ====== Properties ==========

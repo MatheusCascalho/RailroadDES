@@ -44,6 +44,7 @@ class Train(TrainInterface):
             queue_to_leave_state=self.activity_system.queue_to_leave_state
         )
         self.__current_task = task
+        self._in_slot = False
 
 
     # ====== Properties ==========
@@ -70,6 +71,10 @@ class Train(TrainInterface):
     def capacity(self):
         return self.load_system.capacity
 
+    @property
+    def product(self):
+        return self.current_task.demand.flow.product
+
     @volume.setter
     def volume(self, new_volume):
         self.load_system.volume = new_volume
@@ -94,6 +99,12 @@ class Train(TrainInterface):
         name = self.ID
         state = f"Atividade={self.activity_system} | Carga={self.load_system}"
         return f"{name} | {state}"
+
+    def add_to_slot(self):
+        self._in_slot = True
+
+    def removed_from_slot(self):
+        self._in_slot = False
 
     __repr__ = __str__
 
@@ -129,6 +140,8 @@ class Train(TrainInterface):
         process_time: timedelta,
         **kwargs
     ):
+        if not self._in_slot:
+            raise Exception("Train is not in slot!")
         print(f'{simulator.current_date}:: Train {self.ID} start load!')
         self.activity_system.start_process()
         event = TimeEvent(
@@ -154,6 +167,8 @@ class Train(TrainInterface):
         node: NodeInterface,
         slot: Slot
    ):
+        if not self._in_slot:
+            raise Exception("Train is not in slot!")
         print(f'{simulator.current_date}:: Train unloading!')
         # Changing State
         self.activity_system.start_process()
