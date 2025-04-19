@@ -27,12 +27,10 @@ class Node(NodeInterface):
             self,
             queue_capacity: int,
             name: Any,
-            process_time: timedelta,
             clock: Clock,
+            process_rates: dict[str, list[ProcessorRate]],
             load_constraint_system: ProcessConstraintSystem,
             unload_constraint_system: ProcessConstraintSystem,
-            load_units_amount: int = 0,
-            unload_units_amount: int = 0
     ):
         self._id = name
         self.name = name
@@ -43,38 +41,51 @@ class Node(NodeInterface):
         }
         self.queue_to_enter = mq.Queue(capacity=queue_capacity)
         self.queue_to_leave = mq.Queue(capacity=float('inf'))
-        self.load_units: list[ProcessorSystem] = [
+        self.load_units: list[ProcessorSystem] = self.build_load_units(process_rates)
+        self.unload_units: list[ProcessorSystem] = self.build_unload_units(process_rates)
+        self.neighbors: dict[int, RailSegment] = {}
+
+    def build_load_units(self, process_rates: dict[str, list[ProcessorRate]]) -> list[ProcessorSystem]:
+        load_units = [
             ProcessorSystem(
                 processor_type=Process.LOAD,
                 queue_to_leave=self.queue_to_leave,
-                clock=clock
+                clock=self.clock,
+                rates={p: rate}
             )
-            for _ in range(load_units_amount)
+            for p, rates in process_rates.items()
+            for rate in rates
+            if rate.type == Process.LOAD
         ]
-        for unit in self.load_units:
+        for unit in load_units:
             unit.state_machine.states[ProcessorState.BUSY].add_observers(
                 self.process_constraint[Process.LOAD].state_machine.transitions["start"]
             )
             unit.state_machine.states[ProcessorState.IDLE].add_observers(
                 self.process_constraint[Process.LOAD].state_machine.transitions["finish"]
             )
-        self.unload_units: list[ProcessorSystem] = [
+        return load_units
+
+    def build_unload_units(self, process_rates: dict[str, list[ProcessorRate]]) -> list[ProcessorSystem]:
+        unload_units = [
             ProcessorSystem(
                 processor_type=Process.UNLOAD,
                 queue_to_leave=self.queue_to_leave,
-                clock=clock
+                clock=self.clock,
+                rates={p: rate}
             )
-            for _ in range(unload_units_amount)
+            for p, rates in process_rates.items()
+            for rate in rates
+            if rate.type == Process.UNLOAD
         ]
-        for unit in self.unload_units:
+        for unit in unload_units:
             unit.state_machine.states[ProcessorState.BUSY].add_observer(
                 self.process_constraint[Process.UNLOAD].state_machine.transitions["start"]
             )
             unit.state_machine.states[ProcessorState.IDLE].add_observer(
                 self.process_constraint[Process.UNLOAD].state_machine.transitions["finish"]
             )
-        self.neighbors: dict[int, RailSegment] = {}
-        self._process_time = process_time
+        return unload_units
 
     # ====== Events ==========
     def receive(self, train):
