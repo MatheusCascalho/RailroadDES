@@ -31,19 +31,9 @@ class NodeInterface(ABC):
     def maneuver_to_dispatch(self, **kwargs):
         pass
 
-
-
     # ====== Events ==========
     # ====== Methods ==========
-    @abstractmethod
-    def time_to_call(self, **kwargs):
-        pass
 
     @abstractmethod
     def connect_neighbor(self, **kwargs):
         pass
-
-    @abstractmethod
-    def predicted_time(self, current_time):
-        pass
-

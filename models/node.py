@@ -166,18 +166,9 @@ class Node(NodeInterface):
 
     __str__ = __repr__
 
-    def time_to_call(self, current_time):
-        process_scheduled_trains = len(self.train_schedule) * self.process_time
-        # process_train_on_queue = self.queue_to_enter.current_size * self.process_time
-        minimum_slot_time = self.next_idle_slot(current_time=current_time).time_to_be_idle(current_time=current_time)
-
-        return minimum_slot_time + process_scheduled_trains
-
     def connect_neighbor(self, rail_segment: RailSegment):
         self.neighbors[rail_segment.destination.identifier] = rail_segment
 
-    def predicted_time(self, current_time: datetime):
-        return self.process_time + self.time_to_call(current_time)
     # ====== Methods ==========
     # ====== Properties ==========
     @property
