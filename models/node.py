@@ -101,6 +101,7 @@ class Node(NodeInterface):
             self.neighbors[next_node].send(train)
 
     def process(self, simulator: DESSimulator):
+        self.pre_processing()
         while True:
             # Update resources
             train = self.queue_to_enter.first
@@ -136,9 +137,16 @@ class Node(NodeInterface):
                 self.queue_to_enter.skip_process(process)
 
         self.queue_to_enter.recover()
+        self.pos_processing()
 
+    def pos_processing(self):
+        pass
+
+    def pre_processing(self):
+        pass
 
     def maneuver_to_dispatch(self, simulator: DESSimulator):
+        self.pre_processing()
         for slot in self.load_units + self.unload_units:
             if slot.current_train:
                 print(f'{simulator.current_date}:: Train {slot.current_train.ID} entering on leaving queue!')
@@ -149,6 +157,7 @@ class Node(NodeInterface):
                     simulator=simulator,
                     node=self
                 )
+        self.pos_processing()
     # ====== Events ==========
     # ====== Methods ==========
 
