@@ -8,7 +8,7 @@ from models.constants import Process
 from models.discrete_event_system import DiscreteEventSystem
 from models.state_machine import State, Transition, StateMachine, MultiCriteriaTransition
 from models.states import ProcessorState, NodeProcesState
-from models.stockinterface import StockInterface
+from models.stock import StockInterface
 from models.observers import AbstractObserver
 
 
@@ -150,7 +150,7 @@ class StockUnloadConstraint(StockConstraint):
 
 
 if __name__=="__main__":
-    from models.stockinterface import OwnStock
+    from models.stock import OwnStock
     from models.clock import Clock
     from datetime import datetime, timedelta
 
