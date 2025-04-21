@@ -1,18 +1,13 @@
 from abc import abstractmethod
-from typing import Callable
-
-
-
-
+import types
 
 
 class AbstractObserver:
     """
     Classe abstrata para implementações de observadores. Os observadores são notificados quando um estado é alterado.
     """
-    _subjects: list = []
     def __init__(self):
-        self._subjects = []
+        self._subjects: list[AbstractSubject] = []
 
     @property
     def subjects(self):
@@ -23,46 +18,103 @@ class AbstractObserver:
         self._subjects = valor
 
     def append_subject(self, sub):
+        if not isinstance(sub, AbstractSubject):
+            raise Exception("Only objects of type 'Subject' can be added to the observer")
         self.subjects.append(sub)
 
     @abstractmethod
     def update(self, *args):
         """
-        Abstract method that must be implemented to handle state change notifications.        :param args:
+        Abstract method that must be implemented to handle state change notifications.
+        :param args:
         :return:
         """
         pass
 
 
-class AbstractSubject:
-    observers: list[AbstractObserver] = []
+class SubjectNotifier:
+    def notify_at_the_end(self, observers):
+        """
+        Decorator to notify subject observers after executing some functionality
+        :param observers:
+        :return:
+        """
+        def decorator(func):
+            def wrapper(*args, **kwargs):
+                func(*args, **kwargs)
+                self.notify(observers)
+            return wrapper
+        return decorator
 
+    @staticmethod
+    def notify(observers):
+        """
+        Notifies all observers associated with the subject.
+        :return:
+        """
+        for observer in observers:
+            observer.update()
+
+
+def to_notify(decorator_name="notify_at_the_end"):
+    """
+    Decorator to identify that the method should be decorated by a notification decorator.
+    By default, we will use the `notify_at_the_end` decorator
+    :param decorator_name:
+    :return:
+    """
+    def marker(func):
+        func._should_notify = decorator_name
+        return func
+    return marker
+
+
+class SubjectMetaDecorator(type):
+    """Metaclass to decorate methods marked for notification after instance creation"""
+    def __new__(cls, name, bases, dct):
+        """
+        It is called when the class is created, before any instance.
+        The goal here is to override the __init__ method so that when the subject is instantiated,
+        all methods marked for notification are decorated with the respective decoration method.
+        :param args:
+        :param kwargs:
+        """
+        original_init = dct.get("__init__")
+        def new_init(self, *args, **kwargs):
+            notifier = SubjectNotifier()
+            if original_init:
+                original_init(self, *args, **kwargs)
+
+            for attr_name in dir(self):
+                method = getattr(self, attr_name)
+                if isinstance(method, types.MethodType):
+                    decorator_name = getattr(method, "_should_notify", None)
+                    if decorator_name:
+                        decorator_func = getattr(notifier, decorator_name)
+                        decorated = decorator_func(self.observers)(method)
+                        setattr(self, attr_name, decorated)
+
+        dct['__init__'] = new_init
+        return super().__new__(cls, name, bases, dct)
+
+
+class AbstractSubject(metaclass=SubjectMetaDecorator):
+    def __init__(self):
+        self.observers: list[AbstractObserver] = []
 
     def add_observers(self, observers: list[AbstractObserver]):
+        """
+        Adds an observer to the subject and the subject itself to the observer.
+        :param observers:
+        :return:
+        """
         if isinstance(observers, AbstractObserver):
             observers = [observers]
         observers_to_add = [o for o in observers if o not in self.observers]
-        AbstractSubject.observers.extend(observers_to_add)
+        self.observers.extend(observers_to_add)
         for obs in observers:
             if self not in obs.subjects:
                 obs.append_subject(self)
-
-
-    @classmethod
-    def notify(cls):
-        """
-        Notifica todos os observadores associados ao estado.
-        :return:
-        """
-        for observer in cls.observers:
-            observer.update()
-
-    @staticmethod
-    def notify_at_the_end(func: Callable):
-        def wrapper(*args, **kwargs):
-            func(*args, **kwargs)
-            AbstractSubject.notify()
-        return wrapper
 
 
 def id_gen():
@@ -72,12 +124,12 @@ def id_gen():
         i += 1
 
 
-id_fofoqueiro = id_gen()
+id_gossiper = id_gen()
 
 
-class Fofoqueiro(AbstractObserver):
+class Gossiper(AbstractObserver):
     def __init__(self):
-        self.ID = next(id_fofoqueiro)
+        self.ID = next(id_gossiper)
         super().__init__()
     def update(self, *args):
         print(f"Fofoqueiro {self.ID}: Fui notificado!! Tenho: {len(self.subjects)} Sujeito(s)")

@@ -9,18 +9,19 @@ A máquina de estados pode ser configurada com observadores, que são notificado
 from dataclasses import dataclass, field
 from typing import Any, Callable
 
-from models.observers import AbstractObserver, AbstractSubject
+from models.observers import AbstractObserver, AbstractSubject, SubjectNotifier, to_notify
 
 
-@dataclass
+# @dataclass
 class State(AbstractSubject):
     """
     Representa um estado dentro da máquina de estados. Cada estado tem um nome, uma flag is_marked para indicar se o
     estado está ativo e uma lista de observadores que serão notificados quando o estado mudar.
     """
-    name: Any
-    is_marked: bool
-    observers: list[AbstractObserver] = field(default_factory=list)
+    def __init__(self, name, is_marked: bool):
+        self.name = name
+        self.is_marked = is_marked
+        super().__init__()
 
     def __str__(self):
         return str(self.name)
@@ -54,7 +55,7 @@ class State(AbstractSubject):
             return self.name == other
         return False
 
-    @AbstractSubject.notify_at_the_end
+    @to_notify()
     def activate(self):
         """
         Marca o estado como ativo, desmarcando quaisquer outros estados previamente ativos. Lança uma exceção se o
@@ -65,7 +66,7 @@ class State(AbstractSubject):
             raise Exception("Estado já está ativo!")
         self.is_marked = True
 
-    @AbstractSubject.notify_at_the_end
+    @to_notify()
     def deactivate(self):
         """
         Desmarca o estado como ativo. Lança uma exceção se o estado não estiver ativo.

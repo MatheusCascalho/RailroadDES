@@ -4,7 +4,7 @@ from models.exceptions import StockException
 from models.constants import EventName, EPSILON
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from models.observers import AbstractSubject, Fofoqueiro
+from models.observers import AbstractSubject, Gossiper, SubjectNotifier, to_notify
 
 
 @dataclass
@@ -50,12 +50,12 @@ class StockInterface(AbstractSubject):
         self.events: list[StockEvent] = []
         super().__init__()
 
-    @AbstractSubject.notify_at_the_end
+    @to_notify()
     @abstractmethod
     def receive(self, volume: float):
         pass
 
-    @AbstractSubject.notify_at_the_end
+    @to_notify()
     @abstractmethod
     def dispatch(self, volume: float):
         pass
@@ -92,8 +92,6 @@ class StockInterface(AbstractSubject):
     def save_promise(self, promises):
         pass
 
-
-
 class OwnStock(StockInterface):
     def __init__(
             self,
@@ -125,7 +123,7 @@ class OwnStock(StockInterface):
     def space(self):
         return self.capacity - self._volume
 
-    @StockInterface.notify_at_the_end
+    @to_notify()
     def receive(self, volume: float):
         if self.volume + volume > self.capacity:
             StockException.stock_is_full()
@@ -137,7 +135,7 @@ class OwnStock(StockInterface):
         )
         self.events.append(event)
 
-    @StockInterface.notify_at_the_end
+    @to_notify()
     def dispatch(self, volume: float):
         if self.volume - volume < 0:
             StockException.stock_is_empty()
@@ -167,8 +165,9 @@ class OwnStock(StockInterface):
             method(event.volume)
         self.promises = [p for p in self.promises if not p.is_done]
 
+
 if __name__=="__main__":
-    fofoqueiro_1 = Fofoqueiro()
+    fofoqueiro_1 = Gossiper()
     clk = Clock(
         start=datetime(2025,4,1),
         discretization=timedelta(hours=1)
@@ -183,7 +182,7 @@ if __name__=="__main__":
 
     stock1.receive(volume=5e3)
 
-    fofoqueiro_2 = Fofoqueiro()
+    fofoqueiro_2 = Gossiper()
     stock2 = OwnStock(
         clock=clk,
         capacity=40,
