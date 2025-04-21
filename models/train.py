@@ -98,7 +98,7 @@ class Train(TrainInterface):
     def __str__(self):
         name = self.ID
         state = f"Atividade={self.activity_system} | Carga={self.load_system}"
-        return f"{name} | {state}"
+        return f"{name} | Capacidade: {self.capacity} | {state}"
 
     def add_to_slot(self):
         self._in_slot = True
