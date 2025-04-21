@@ -22,34 +22,41 @@ class FakeSimulator(DESSimulator):
         super().__init__(initial_date=datetime(2025,4,1), clock=clock)
 
 
+@pytest.fixture
+def simple_train():
+    def make(product, clk, train_size=6e3):
+        flow = Flow(
+            origin="origin",
+            destination="destination",
+            product=product
+        )
+        demand = Demand(
+            flow=flow,
+            volume=103e3
+        )
+        task = Task(
+            demand=demand,
+            path=["origin", "destination"],
+            task_volume=train_size,
+            current_time=clk.current_time
+        )
+        train = Train(
+            capacity=train_size,
+            task=task,
+            is_loaded=False
+        )
+        return train
 
-def test_simulation():
+    return make
+
+def test_simulation(simple_train):
     clk = Clock(
         start=datetime(2025,4,1),
         discretization=timedelta(hours=1)
     )
     sim = FakeSimulator(clock=clk)
     product = "product"
-    flow = Flow(
-        origin="origin",
-        destination="destination",
-        product=product
-    )
-    demand = Demand(
-        flow=flow,
-        volume=103e3
-    )
-    task = Task(
-        demand=demand,
-        path=["origin", "destination"],
-        task_volume=6e3,
-        current_time=clk.current_time
-    )
-    train = Train(
-        capacity=6e3,
-        task=task,
-        is_loaded=False
-    )
+    train = simple_train(product=product, clk=clk)
     constraint = ProcessConstraintSystem()
     process_time = timedelta(hours=5)
 
@@ -76,7 +83,7 @@ def test_simulation():
     node.maneuver_to_dispatch(simulator=sim)
     assert True
 
-def test_stock_node_simulation():
+def test_stock_node_simulation(simple_train):
     clk = Clock(
         start=datetime(2025,4,1),
         discretization=timedelta(hours=1)
@@ -84,26 +91,7 @@ def test_stock_node_simulation():
     sim = FakeSimulator(clock=clk)
     product = "product"
     train_size = 6e3
-    flow = Flow(
-        origin="origin",
-        destination="destination",
-        product=product
-    )
-    demand = Demand(
-        flow=flow,
-        volume=103e3
-    )
-    task = Task(
-        demand=demand,
-        path=["origin", "destination"],
-        task_volume=train_size,
-        current_time=clk.current_time
-    )
-    train = Train(
-        capacity=train_size,
-        task=task,
-        is_loaded=False
-    )
+    train = simple_train(product, clk, train_size)
 
     # Construção do NÓ
     stock = OwnStock(
@@ -151,7 +139,7 @@ def test_stock_node_simulation():
         clk.jump(process_time)
         train.finish_load(simulator=sim, node=node)
         node.maneuver_to_dispatch(simulator=sim)
-    except:
+    except Exception as e:
         clk.jump(timedelta(10))
         node.process(simulator=sim)
 
