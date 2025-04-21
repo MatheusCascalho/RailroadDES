@@ -179,9 +179,6 @@ class Node(NodeInterface):
     def identifier(self, new_identifier: int):
         self._id = new_identifier
 
-    @property
-    def process_time(self) -> timedelta:
-        return self._process_time
 
     # ====== Properties ==========
 

@@ -14,13 +14,6 @@ class NodeInterface(ABC):
     def identifier(self, **kwargs):
         pass
 
-    @property
-    @abstractmethod
-    def process_time(self):
-        pass
-
-
-
     # ====== Properties ==========
     # ====== Events ==========
     @abstractmethod
