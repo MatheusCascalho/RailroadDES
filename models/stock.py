@@ -20,6 +20,11 @@ class StockEventPromise:
     completion_date: datetime
     volume: float
 
+    def __post_init__(self):
+        if self.completion_date <= self.promise_date:
+            raise ValueError(
+                f"Completion date ({self.completion_date}) must be after promise date ({self.promise_date})")
+
     def partial_event(self, current_date, max_volume, update=True) -> StockEvent:
         elapsed_time = current_date - self.promise_date
         complete_time = self.completion_date - self.promise_date
@@ -31,7 +36,7 @@ class StockEventPromise:
             instant=current_date,
             volume=partial_volume
         )
-        if update:
+        if update and partial_volume:
             self.volume = self.volume - partial_volume
             self.promise_date = current_date
         return event
@@ -148,7 +153,7 @@ class OwnStock(StockInterface):
         self.events.append(event)
 
     def __str__(self):
-        return f"Own Stock - Volume: {self.volume} - {round(self.volume/self.capacity, 4)*100} %"
+        return f"Own Stock - Volume: {round(self.volume,4)} - {round(self.volume/self.capacity, 4)*100} %"
 
     def save_promise(self, promises: list[StockEventPromise]):
         self.promises.extend(promises)
