@@ -200,3 +200,13 @@ def test_own_stock_str():
     representation = str(stock)
     assert "Own Stock" in representation
     assert "Volume: 250" in representation
+
+def test_invalid_promise_dates_raises_error():
+    now = datetime.now()
+    with pytest.raises(ValueError, match="Completion date"):
+        StockEventPromise(
+            event=EventName.RECEIVE_VOLUME,
+            promise_date=now,
+            completion_date=now,  # Igual: deve falhar
+            volume=100
+        )
