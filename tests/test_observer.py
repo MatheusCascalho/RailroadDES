@@ -106,7 +106,7 @@ def test_subject_meta_decorator_applies_decorator():
 
     mock_subject.some_method()
 
-    # Depois de chamar o método decorado, o observer deve ter sido notificado
+    # After calling the decorated method, the observer should have been notified
     observer.update.assert_called_once()
 
 # ============================================
