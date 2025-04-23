@@ -25,7 +25,7 @@ class ProcessorState(Enum):
     BUSY = "Busy"
 
 
-class NodeProcesState(Enum):
+class NodeProcessState(Enum):
     READY = "Ready"
     BUSY = "Busy"
     BLOCKED = "Blocked"

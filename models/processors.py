@@ -10,11 +10,9 @@ from models.exceptions import ProcessException
 from models.state_machine import State, Transition, StateMachine
 from models.states import ProcessorState
 from models.node_constraints import (
-    ProcessConstraintSystem,
-    StockConstraint,
-    StockLoadConstraint,
-    StockUnloadConstraint
+    ProcessConstraintSystem
 )
+from models.stock_constraints import StockConstraint, StockToLoadTrainConstraint, StockToUnloadTrainConstraint
 from models.stock import StockInterface, StockEventPromise
 from dataclasses import dataclass
 
@@ -134,8 +132,8 @@ class ProcessorSystemBuilder:
             train_sizes
     ):
         constraint_type = {
-            Process.LOAD: StockLoadConstraint,
-            Process.UNLOAD: StockUnloadConstraint
+            Process.LOAD: StockToLoadTrainConstraint,
+            Process.UNLOAD: StockToUnloadTrainConstraint
         }
         stock_constraints = [
             constraint_type[process_type](train_size=train_size)

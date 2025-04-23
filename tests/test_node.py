@@ -4,7 +4,8 @@ import pytest
 
 from models.des_simulator import DESSimulator
 from models.node import Node, StockNode
-from models.node_constraints import ProcessConstraintSystem, StockLoadConstraint
+from models.node_constraints import ProcessConstraintSystem
+from models.stock_constraints import StockToLoadTrainConstraint
 from datetime import timedelta, datetime
 from models.clock import Clock
 from models.train import Train
@@ -110,7 +111,7 @@ def test_stock_node_simulation(simple_train):
         ],
         clock=clk
     )
-    constraint = StockLoadConstraint(
+    constraint = StockToLoadTrainConstraint(
         train_size=train_size
     )
     stock.add_observers([constraint])
