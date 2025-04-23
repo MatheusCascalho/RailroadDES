@@ -35,6 +35,8 @@ class SimpleStockReplanisher(StockReplenisherInterface):
             stocks: list[StockInterface]
     ):
         for stock in stocks:
+            if stock.product not in self.replenish_rates:
+                raise Exception(f'Taxa do produto {stock.product} não foi cadastrada!!')
             rate = self.replenish_rates[stock.product]
             try:
                 last_event = stock.get_last_receive_event()
