@@ -1,11 +1,11 @@
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 
 from models.node_constraints import ProcessConstraintSystem
 from models.observers import AbstractObserver
 from models.stock import StockInterface
 
 
-class StockConstraint(ProcessConstraintSystem, AbstractObserver):
+class StockConstraint(ABC, ProcessConstraintSystem, AbstractObserver):
     @abstractmethod
     def update(self, *args):
         pass
