@@ -114,6 +114,18 @@ class ProcessorSystem(DiscreteEventSystem):
             return process_time
         return timedelta()
 
+    def add_constraint(self, constraint: ProcessConstraintSystem):
+        self.constraints.append(constraint)
+
+        # When process starts, constraint is updated to busy state
+        self.state_machine.states[ProcessorState.BUSY].add_observers(
+            constraint.state_machine.transitions["start"]
+        )
+        # When process finish, constraint is updated to ready state
+        self.state_machine.states[ProcessorState.IDLE].add_observers(
+            constraint.state_machine.transitions["finish"]
+        )
+
 
 
 class ProcessorSystemBuilder:
