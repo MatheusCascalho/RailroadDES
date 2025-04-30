@@ -13,7 +13,7 @@ from models.task import Task
 from models.demand import Flow, Demand
 from models.stock import OwnStock
 from models.stock_replanish import SimpleStockReplanisher, ReplenishRate
-from models.processors import ProcessorRate
+from models.data_model import ProcessorRate
 from models.constants import Process
 
 
@@ -84,52 +84,16 @@ def test_simulation(simple_train):
     node.maneuver_to_dispatch(simulator=sim)
     assert True
 
-def test_stock_node_simulation(simple_train):
-    clk = Clock(
-        start=datetime(2025,4,1),
-        discretization=timedelta(hours=1)
-    )
-    sim = FakeSimulator(clock=clk)
+def test_stock_node_simulation(simple_train, simple_stock_node, simple_clock):
+
+    sim = FakeSimulator(clock=simple_clock)
     product = "product"
     train_size = 6e3
-    train = simple_train(product, clk, train_size)
+    train = simple_train(product, simple_clock, train_size)
 
-    # Construção do NÓ
-    stock = OwnStock(
-        clock=clk,
-        capacity=60e3,
-        product=product,
-        initial_volume=5,
-    )
-    replenisher = SimpleStockReplanisher(
-        replenish_rates=[
-            ReplenishRate(
-                product=product,
-                rate=1e3,
-                discretization=timedelta(hours=1)
-            )
-        ],
-        clock=clk
-    )
-    constraint = StockToLoadTrainConstraint(
-        train_size=train_size
-    )
-    stock.add_observers([constraint])
+    node = simple_stock_node
+    clk = simple_clock
     process_time = timedelta(hours=5)
-    rates = {
-        product: [ProcessorRate(product=product, type=Process.LOAD, rate=1.2e3)]
-    }
-
-    node = StockNode(
-        queue_capacity=20,
-        name="xpto",
-        clock=clk,
-        load_constraint_system=constraint,
-        unload_constraint_system=constraint,
-        stocks=[stock],
-        replenisher=replenisher,
-        process_rates=rates
-    )
 
     # Simulacao
     train.arrive(simulator=sim, node=node)
