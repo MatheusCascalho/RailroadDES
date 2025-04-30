@@ -1,6 +1,7 @@
 from models.exceptions import ProcessException
 from models.node_constraints import ProcessConstraintSystem
-from models.processors import ProcessorSystem, ProcessorRate
+from models.processors import ProcessorSystem
+from models.data_model import ProcessorRate
 from models.des_simulator import DESSimulator
 from models.constants import (
     Process
@@ -32,16 +33,12 @@ class Node(NodeInterface):
             name: Any,
             clock: Clock,
             process_rates: dict[str, list[ProcessorRate]],
-            load_constraint_system: ProcessConstraintSystem,
-            unload_constraint_system: ProcessConstraintSystem,
+            process_constraints: list[ProcessConstraintSystem],
     ):
         self._id = name
         self.name = name
         self.clock = clock
-        self.process_constraint = {
-            Process.LOAD: load_constraint_system,
-            Process.UNLOAD: unload_constraint_system
-        }
+        self.process_constraints = process_constraints
         self.queue_to_enter = mq.Queue(capacity=queue_capacity)
         self.queue_to_leave = mq.Queue(capacity=float('inf'))
         self.load_units: list[ProcessorSystem] = self.build_load_units(process_rates)
@@ -61,12 +58,9 @@ class Node(NodeInterface):
             if rate.type == Process.LOAD
         ]
         for unit in load_units:
-            unit.state_machine.states[ProcessorState.BUSY].add_observers(
-                self.process_constraint[Process.LOAD].state_machine.transitions["start"]
-            )
-            unit.state_machine.states[ProcessorState.IDLE].add_observers(
-                self.process_constraint[Process.LOAD].state_machine.transitions["finish"]
-            )
+            for constraint in self.process_constraints:
+                if constraint.process_type() == Process.LOAD:
+                    unit.add_constraint(constraint)
         return load_units
 
     def build_unload_units(self, process_rates: dict[str, list[ProcessorRate]]) -> list[ProcessorSystem]:
@@ -82,12 +76,9 @@ class Node(NodeInterface):
             if rate.type == Process.UNLOAD
         ]
         for unit in unload_units:
-            unit.state_machine.states[ProcessorState.BUSY].add_observer(
-                self.process_constraint[Process.UNLOAD].state_machine.transitions["start"]
-            )
-            unit.state_machine.states[ProcessorState.IDLE].add_observer(
-                self.process_constraint[Process.UNLOAD].state_machine.transitions["finish"]
-            )
+            for constraint in self.process_constraints:
+                if constraint.process_type() == Process.UNLOAD:
+                    unit.add_constraint(constraint)
         return unload_units
 
     # ====== Events ==========
@@ -108,7 +99,7 @@ class Node(NodeInterface):
             if not train:
                 break
             process = train.current_process_name
-            if self.process_constraint[process].is_blocked():
+            if any(c.is_blocked() for c in self.process_constraints if c.process_type() == process):
                 self.queue_to_enter.skip_process(process)
                 break
             processors = self.load_units if process == Process.LOAD else self.unload_units
@@ -190,8 +181,7 @@ class StockNode(Node):
             name: Any,
             clock: Clock,
             process_rates: dict[str, list[ProcessorRate]],
-            load_constraint_system: ProcessConstraintSystem,
-            unload_constraint_system: ProcessConstraintSystem,
+            process_constraints: list[ProcessConstraintSystem],
             stocks: list[StockInterface],
             replenisher: StockReplenisherInterface
     ):
@@ -200,8 +190,7 @@ class StockNode(Node):
                 name=name,
                 clock=clock,
                 process_rates=process_rates,
-                load_constraint_system=load_constraint_system,
-                unload_constraint_system=unload_constraint_system,
+                process_constraints=process_constraints,
         )
         self.replenisher = replenisher
         self.stocks: dict[str, StockInterface] = {s.product: s for s in stocks}
