@@ -1,5 +1,6 @@
 from abc import abstractmethod, ABC
 
+from models.constants import Process
 from models.node_constraints import ProcessConstraintSystem
 from models.observers import AbstractObserver
 from models.stock import StockInterface
@@ -33,6 +34,9 @@ class StockToLoadTrainConstraint(StockConstraint):
         else:
             self.state_machine.update("release")
 
+    def process_type(self) -> Process:
+        return Process.LOAD
+
 
 class StockToUnloadTrainConstraint(StockConstraint):
     def __init__(self, train_size: float):
@@ -44,3 +48,6 @@ class StockToUnloadTrainConstraint(StockConstraint):
             self.state_machine.update("block")
         else:
             self.state_machine.update("release")
+
+    def process_type(self) -> Process:
+        return Process.UNLOAD
