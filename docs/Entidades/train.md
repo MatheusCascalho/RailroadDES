@@ -1,6 +1,16 @@
-# Train
+# Trem - Train
+
+**Classe**: `Train`
 
 **Responsabilidade**: Realizar a sequencia de eventos que permita aceitar o volume de cada demanda.
+
+**Colaboradores**:
+
+* [Task](../Artefatos/time_table.md): Define a tarefa que o trem deve realizar.
+* [TimeTable](../Artefatos/time_table.md): Registra os tempos do trem em cada momento.
+* [ActivitySystem](../Recursos/Sistemas/ActivitySystem.md): [sistema](../Recursos/Sistemas/index.md) que controla as atividades do trem
+* [LoadSystem](../Recursos/Sistemas/LoadSystem.md): [sistema](../Recursos/Sistemas/index.md) que controla a carga do trem
+
 
 ## Sequencia de eventos: 
   1. Receber novo fluxo - Router.new_flow();
