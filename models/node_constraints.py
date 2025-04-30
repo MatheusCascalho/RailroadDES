@@ -1,7 +1,8 @@
 from models.discrete_event_system import DiscreteEventSystem
 from models.state_machine import State, StateMachine, MultiCriteriaTransition
 from models.states import NodeProcessState
-
+from abc import abstractmethod
+from models.constants import Process
 
 class ProcessConstraintSystem(DiscreteEventSystem):
     def __init__(
@@ -43,5 +44,9 @@ class ProcessConstraintSystem(DiscreteEventSystem):
 
     def is_blocked(self):
         return self.state_machine.current_state.name == NodeProcessState.BLOCKED
+
+    @abstractmethod
+    def process_type(self) -> Process:
+        pass
 
 
