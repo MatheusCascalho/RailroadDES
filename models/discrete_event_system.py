@@ -111,11 +111,16 @@ class ActivitySystem(DiscreteEventSystem):
 
 
 
-    def build_state_machine(self):
+    def build_state_machine(self, initial_activity: ActivityState=ActivityState.MOVING):
         moving = State(name=ActivityState.MOVING, is_marked=False)
-        queue_to_enter = State(name=ActivityState.QUEUE_TO_ENTER, is_marked=True)
+        queue_to_enter = State(name=ActivityState.QUEUE_TO_ENTER, is_marked=False)
         processing = State(name=ActivityState.PROCESSING, is_marked=False)
         queue_to_leave = State(name=ActivityState.QUEUE_TO_LEAVE, is_marked=False)
+        for state in [moving, queue_to_enter, processing, queue_to_leave]:
+            if state.name == initial_activity:
+                state.is_marked = True
+                break
+            raise Exception('Initial activity is not a valid state')
 
         leave = Transition(
             name="leave",
