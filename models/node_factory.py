@@ -12,6 +12,7 @@ from models.stock import OwnStock, StockInterface
 from models.stock_replanish import SimpleStockReplanisher, ReplenishRate
 from models.stock_constraints import StockToLoadTrainConstraint, StockToUnloadTrainConstraint
 from models.node import StockNode
+from models.maneuvering_constraints import ManeuveringConstraintFactory
 
 
 class AbstractNodeFactory(ABC):
@@ -85,6 +86,14 @@ class NodeStockFactory(AbstractNodeFactory):
         )
         return replenisher
 
+    def create_maneuver_constraint_factory(self, post_operation_time: int):
+        factory = ManeuveringConstraintFactory(
+            post_operation_time=post_operation_time,
+            clock=self.clock
+        )
+        return factory
+
+
     def create_node(self):
         stocks = self.create_stock(stock_data=self.data.stocks)
         replenishment = self.create_replenisher(replenishment=self.data.replenishment)
@@ -94,6 +103,9 @@ class NodeStockFactory(AbstractNodeFactory):
             train_sizes=self.data.train_sizes,
             rates=self.data.rates
         )
+        maneuvering_constraint_factory = self.create_maneuver_constraint_factory(
+            post_operation_time=self.data.post_operation_time
+        )
         node = StockNode(
             name=self.data.name,
             clock=self.clock,
@@ -101,7 +113,8 @@ class NodeStockFactory(AbstractNodeFactory):
             process_constraints=constraints,
             stocks=stocks,
             replenisher=replenishment,
-            queue_capacity=self.data.queue_capacity
+            queue_capacity=self.data.queue_capacity,
+            maneuvering_constraint_factory=maneuvering_constraint_factory
         )
         return node
 

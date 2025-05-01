@@ -59,6 +59,7 @@ class StockNodeData:
     replenishment: list[Union[dict, RateData]]
     train_sizes: list[float]
     queue_capacity: int
+    post_operation_time: int
 
     def __post_init__(self):
         self.stocks = [StockData(**s) for s in self.stocks]

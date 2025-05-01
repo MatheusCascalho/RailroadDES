@@ -1,20 +1,34 @@
 from models.discrete_event_system import DiscreteEventSystem
 from models.state_machine import State, StateMachine, MultiCriteriaTransition
-from models.states import NodeProcessState
-from abc import abstractmethod
+from models.states import ConstraintState
+from abc import abstractmethod, ABC
 from models.constants import Process
 
-class ProcessConstraintSystem(DiscreteEventSystem):
+def constraint_id_gen():
+    i = 0
+    while True:
+        yield f"Constraint {i}"
+        i += 1
+constraint_id = constraint_id_gen()
+class ConstraintSystem(ABC, DiscreteEventSystem):
+    def __init__(self):
+        self.ID = next(constraint_id)
+        super().__init__()
+
+    def is_blocked(self):
+        return self.state_machine.current_state.name == ConstraintState.BLOCKED
+
+
+class ProcessConstraintSystem(ConstraintSystem):
     def __init__(
             self,
     ):
         super().__init__()
 
-
     def build_state_machine(self) -> StateMachine:
-        ready = State(name=NodeProcessState.READY, is_marked=True)
-        busy = State(name=NodeProcessState.BUSY, is_marked=False)
-        blocked = State(name=NodeProcessState.BLOCKED, is_marked=False)
+        ready = State(name=ConstraintState.READY, is_marked=True)
+        busy = State(name=ConstraintState.BUSY, is_marked=False)
+        blocked = State(name=ConstraintState.BLOCKED, is_marked=False)
 
         start = MultiCriteriaTransition(
             name="start",
@@ -42,11 +56,36 @@ class ProcessConstraintSystem(DiscreteEventSystem):
         ])
         return sm
 
-    def is_blocked(self):
-        return self.state_machine.current_state.name == NodeProcessState.BLOCKED
-
     @abstractmethod
     def process_type(self) -> Process:
         pass
+
+class LiberationConstraintSystem(ConstraintSystem):
+    def __init__(
+            self,
+    ):
+        super().__init__()
+
+
+    def build_state_machine(self) -> StateMachine:
+        free = State(name=ConstraintState.FREE, is_marked=False)
+        blocked = State(name=ConstraintState.BLOCKED, is_marked=True)
+
+        free_up = MultiCriteriaTransition(
+            name="free_up",
+            origin=blocked,
+            destination=free
+        )
+        block = MultiCriteriaTransition(
+            name="block",
+            origin=free,
+            destination=blocked
+        )
+
+        sm = StateMachine(transitions=[
+            block,free_up
+        ])
+        return sm
+
 
 
