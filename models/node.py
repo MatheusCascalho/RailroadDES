@@ -93,6 +93,8 @@ class Node(NodeInterface):
             raise Exception(f"The train cannot continue its journey because the node is not "
                             f"adjacent to the next station on the route. Next node: {next_node}")
         self.queue_to_enter.push(train, arrive=self.clock.current_time)
+        print(
+            f'{self.clock.current_time}:: Train {train.ID} received in node {self}!')
 
     def dispatch(self):
         for train in self.liberation_constraints:
