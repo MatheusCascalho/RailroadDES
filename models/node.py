@@ -231,3 +231,10 @@ class StockNode(Node):
                     self.stocks[product].save_promise([promise])
                 except ProcessException:
                     continue
+
+    def time_to_try_again(self, product: str, volume: float, process: Process):
+        stock = self.stocks[product]
+        current_volume = stock.volume if process == Process.LOAD else stock.space
+        needed_volume = volume - current_volume
+        time = self.replenisher.minimum_time_to_replenish_volume(product=product, volume=needed_volume)
+        return time
