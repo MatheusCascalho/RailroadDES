@@ -11,6 +11,10 @@ class StockReplenisherInterface:
     def replenish(self, stock: list[StockInterface]):
         pass
 
+    @abstractmethod
+    def minimum_time_to_replenish_volume(self, *args, **kwargs):
+        pass
+
 
 @dataclass
 class ReplenishRate:
@@ -50,4 +54,9 @@ class SimpleStockReplanisher(StockReplenisherInterface):
                 stock.receive(
                     volume=volume
                 )
+
+    def minimum_time_to_replenish_volume(self, product: str, volume: float) -> timedelta:
+        rate = self.replenish_rates[product]
+        time = volume / rate.rate
+        return timedelta(hours=time)
 
