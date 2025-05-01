@@ -88,6 +88,10 @@ class Node(NodeInterface):
 
     # ====== Events ==========
     def receive(self, train):
+        next_node = train.next_location
+        if next_node not in self.neighbors:
+            raise Exception(f"The train cannot continue its journey because the node is not "
+                            f"adjacent to the next station on the route. Next node: {next_node}")
         self.queue_to_enter.push(train, arrive=self.clock.current_time)
 
     def dispatch(self):
