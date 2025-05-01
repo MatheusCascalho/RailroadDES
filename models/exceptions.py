@@ -15,6 +15,10 @@ class FinishedTravelException(Exception):
 
 class TrainExceptions(Exception):
     @staticmethod
+    def train_is_not_in_slot():
+        raise TrainExceptions("Train is not in slot!")
+
+    @staticmethod
     def path_is_finished():
         raise TrainExceptions('Path is finished!')
 
