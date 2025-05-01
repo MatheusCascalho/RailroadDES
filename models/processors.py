@@ -16,6 +16,12 @@ from models.node_constraints import (
 from models.stock_constraints import StockConstraint, StockToLoadTrainConstraint, StockToUnloadTrainConstraint
 from models.stock import StockInterface, StockEventPromise
 
+def processor_id_gen():
+    i = 0
+    while True:
+        yield f"Processor {i}"
+        i += 1
+processor_id = processor_id_gen()
 
 class ProcessorSystem(DiscreteEventSystem):
     def __init__(
@@ -24,13 +30,14 @@ class ProcessorSystem(DiscreteEventSystem):
             queue_to_leave: mq.Queue,
             clock: Clock,
             rates: dict[str, ProcessorRate],
-            constraints: list[ProcessConstraintSystem] = []
+            constraints: tuple[ProcessConstraintSystem] = ()
     ):
+        self.ID = next(processor_id)
         self.type = processor_type
         self.current_train: Union[None, TrainInterface] = None
         self.queue_to_leave = queue_to_leave
         self.clock = clock
-        self.constraints = constraints
+        self.constraints = list(constraints)
         self.rates = rates
         self.promised = False
         super().__init__()
