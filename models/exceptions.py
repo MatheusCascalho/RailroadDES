@@ -14,13 +14,18 @@ class FinishedTravelException(Exception):
 
 
 class TrainExceptions(Exception):
-    @staticmethod
-    def train_is_not_in_slot():
-        raise TrainExceptions("Train is not in slot!")
+    def __init__(self, message, train_id: str, location:str):
+        super().__init__(message)
+        self.train_id = train_id
+        self.location = location
 
     @staticmethod
-    def path_is_finished():
-        raise TrainExceptions('Path is finished!')
+    def train_is_not_in_slot(train_id: str, location:str):
+        raise TrainExceptions("Train is not in slot!", train_id, location)
+
+    @staticmethod
+    def path_is_finished(train_id: str, location:str):
+        raise TrainExceptions('Path is finished!', train_id, location)
 
     @staticmethod
     def volume_to_unload_is_greater_than_current_volume():

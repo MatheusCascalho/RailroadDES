@@ -162,7 +162,7 @@ class Train(TrainInterface):
         **kwargs
     ):
         if not self._in_slot:
-            TrainExceptions.train_is_not_in_slot()
+            TrainExceptions.train_is_not_in_slot(train_id=self.ID, location=self.current_location)
         print(f'{self.clock.current_time}:: Train {self.ID} start load!')
         self.activity_system.start_process()
         event = TimeEvent(
