@@ -83,3 +83,9 @@ classDiagram
 
 
 ```
+
+## Propriedades
+
+* Um trem sempre deve ter o seu estado modificado após ser liberado de um nó.
+* Um trem não pode ser adicionado à fila de saída de um nó enquanto as restrições de processamento permanecerem ativadas.
+* Um trem não pode ser liberado da fila de saída de um nó enquanto as restrições de liberação permanecerem ativadas.
