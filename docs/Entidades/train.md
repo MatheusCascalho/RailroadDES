@@ -16,10 +16,14 @@
   1. Receber novo fluxo - Router.new_flow();
   1. Ir até o nó de carregamento - Train.arrive();
      2. Agendado pelo RailSegment.send()
-  1. Carregar - Train.load()
+  1. Iniciar Carregamento - Train.start_load()
      2. Agendado pelo Node.process
         3. Que por sua vez é acionado pelo Node.process_constraint (máquina de estados) quando a transição 
         start é acionada pela chegada de um trem 
+  1. Finalizar Carregamento - Train.finish_load()
+     2. Agendado pelo Train.start_load()
+  3. Ir para a fila de saída - Node.maneuver_to_dispatch()
+     4. Agendado pelo Train.finish_load()
   1. Saír do nó de carregamento - Train.leave()
      2. Agendado pelo Node.dispatch()
   1. Ir até o nó de descarregamento - Train.arrive();
@@ -50,5 +54,5 @@
 2. Um trem só pode carregar se estiver na sua estação de origem;
 3. Um trem só pode chegar em um lugar após ter saído do anterior;
 4. Um trem deve registrar o instante de cada evento que faz com que ele evolua;
-
+5. Um trem só pode ter seu estado atualizado se as condições de carga ou atividade forem modificadas;
 
