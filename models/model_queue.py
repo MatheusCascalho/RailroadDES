@@ -12,14 +12,15 @@ class QueueElement:
 
 
 class Queue:
-    def __init__(self, capacity: int):
+    def __init__(self, capacity: int, name: str):
+        self.name = name
         self.capacity: int = capacity
         self.elements: list[QueueElement] = []
         self.skipped: list[QueueElement] = []
         self.history: list[QueueElement] = []
 
     def __str__(self):
-        return f"Queue with {self.current_size} elements"
+        return f"Queue {self.name} with {self.current_size} elements"
 
     __repr__ = __str__
 
@@ -68,6 +69,9 @@ class Queue:
     @property
     def current_size(self):
         return len(self.elements) + len(self.skipped)
+
+    def now(self):
+        return [e.element for e in self.elements]
 
     def __iter__(self):
         return self.elements.__iter__()
