@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from models.demand import Demand
 from models.time_table import TimeTable, TimeEvent
 from models.constants import Process, EventName
+from models.path import Path
 from datetime import datetime
 
 
@@ -33,7 +34,7 @@ class Task:
         """
         self.ID = next(task_id)
         self.demand = demand
-        self.path = path
+        self.path = Path(path)
         self.time_table = TimeTable()
         event = TimeEvent(
             event=EventName.DEPARTURE,
@@ -82,3 +83,6 @@ class Task:
             float: The invoiced volume for the task.
         """
         return self.invoiced_volume
+
+    def is_on_load_point(self):
+        return self.path.current_location.split('-')[0] == self.demand.flow.origin

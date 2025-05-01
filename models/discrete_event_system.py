@@ -101,19 +101,15 @@ class LoadSystem(DiscreteEventSystem):
 
 
 class ActivitySystem(DiscreteEventSystem):
-    def __init__(self, path):
-        self.__path = path
-        self.current_location = path[0]
-        super().__init__()
+    def __init__(
+            self,
+            path,
+            initial_activity: ActivityState=ActivityState.MOVING
+    ):
+        self.path = path if isinstance(path, Path) else Path(path)
+        super().__init__(initial_activity=initial_activity)
 
-    @property
-    def path(self):
-        return self.__path
 
-    @path.setter
-    def path(self, new_path):
-        self.__path = new_path
-        self.current_location = self.__path[0]
 
     def build_state_machine(self):
         moving = State(name=ActivityState.MOVING, is_marked=False)
@@ -169,8 +165,9 @@ class ActivitySystem(DiscreteEventSystem):
     def leave(self):
         if self.state_machine.current_state.name == ActivityState.QUEUE_TO_LEAVE:
             self.state_machine.update()
+            self.path.walk()
 
     def arrive(self):
         if self.state_machine.current_state.name == ActivityState.MOVING:
             self.state_machine.update()
-            self.path = self.path[1:]
+            self.path.walk()
