@@ -1,3 +1,4 @@
+from models.path import Path
 from models.state_machine import State, Transition, StateMachine
 from models.states import LoadState, ActivityState
 from abc import abstractmethod
@@ -8,7 +9,7 @@ class DiscreteEventSystem:
         self.state_machine = self.build_state_machine(**kwargs)
 
     @abstractmethod
-    def build_state_machine(self, **kwargs):
+    def build_state_machine(self, **kwargs) -> StateMachine:
         pass
 
     def __str__(self):
@@ -25,6 +26,7 @@ class LoadSystem(DiscreteEventSystem):
             processing_state: State,
             queue_to_leave_state: State
     ):
+        self.ID = next(load_system_id)
         self.capacity = capacity
         self.volume = capacity if is_loaded else 0
         super().__init__(
@@ -87,6 +89,10 @@ class LoadSystem(DiscreteEventSystem):
 
     def unload(self):
         self.volume = 0
+
+    def is_ready(self):
+        ready = self.state_machine.current_state in [LoadState.LOADED, LoadState.EMPTY]
+        return ready
 
 
 class ActivitySystem(DiscreteEventSystem):
