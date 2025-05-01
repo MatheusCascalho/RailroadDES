@@ -3,6 +3,9 @@ from models.state_machine import State, StateMachine, MultiCriteriaTransition
 from models.states import ConstraintState
 from abc import abstractmethod, ABC
 from models.constants import Process
+from dataclasses import dataclass
+from datetime import timedelta
+
 
 def constraint_id_gen():
     i = 0
@@ -60,6 +63,10 @@ class ProcessConstraintSystem(ConstraintSystem):
     def process_type(self) -> Process:
         pass
 
+    @abstractmethod
+    def reason(self, *args, **kwargs):
+        pass
+
 class LiberationConstraintSystem(ConstraintSystem):
     def __init__(
             self,
@@ -88,4 +95,9 @@ class LiberationConstraintSystem(ConstraintSystem):
         return sm
 
 
-
+@dataclass
+class BlockReason:
+    constraint: str
+    constraint_type: str
+    reason: str
+    time_to_try_again: timedelta

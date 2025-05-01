@@ -1,10 +1,10 @@
 from abc import abstractmethod, ABC
 
 from models.constants import Process
-from models.node_constraints import ProcessConstraintSystem
+from models.node_constraints import ProcessConstraintSystem, BlockReason
 from models.observers import AbstractObserver
 from models.stock import StockInterface
-
+from datetime import timedelta
 
 class StockConstraint(ProcessConstraintSystem, AbstractObserver):
     @abstractmethod
@@ -36,6 +36,17 @@ class StockToLoadTrainConstraint(StockConstraint):
 
     def process_type(self) -> Process:
         return Process.LOAD
+
+    def reason(self, train_size: float, try_again: timedelta, *args, **kwargs):
+        stock_volume = sum(s.volume for s in self.subjects)
+        reason = BlockReason(
+            constraint=self.ID,
+            constraint_type=self.__class__.__name__,
+            reason=f"{train_size} > {stock_volume}",
+            time_to_try_again=try_again
+        )
+        return reason
+
 
 
 class StockToUnloadTrainConstraint(StockConstraint):
