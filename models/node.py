@@ -203,7 +203,8 @@ class StockNode(Node):
             process_rates: dict[str, list[ProcessorRate]],
             process_constraints: list[ProcessConstraintSystem],
             stocks: list[StockInterface],
-            replenisher: StockReplenisherInterface
+            replenisher: StockReplenisherInterface,
+            maneuvering_constraint_factory: ManeuveringConstraintFactory
     ):
         super().__init__(
                 queue_capacity=queue_capacity,
@@ -211,6 +212,7 @@ class StockNode(Node):
                 clock=clock,
                 process_rates=process_rates,
                 process_constraints=process_constraints,
+                maneuvering_constraint_factory=maneuvering_constraint_factory
         )
         self.replenisher = replenisher
         self.stocks: dict[str, StockInterface] = {s.product: s for s in stocks}
