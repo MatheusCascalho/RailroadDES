@@ -6,7 +6,7 @@ from models.observers import AbstractObserver
 from models.stock import StockInterface
 
 
-class StockConstraint(ABC, ProcessConstraintSystem, AbstractObserver):
+class StockConstraint(ProcessConstraintSystem, AbstractObserver):
     @abstractmethod
     def update(self, *args):
         pass
