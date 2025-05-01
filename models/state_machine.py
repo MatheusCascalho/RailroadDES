@@ -106,7 +106,7 @@ class Transition(AbstractObserver):
             self.origin.deactivate()
             self.destination.activate()
             self.trigger = False
-        self.action()
+            self.action()
 
     def update(self):
         """
