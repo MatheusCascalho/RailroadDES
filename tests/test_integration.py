@@ -1,0 +1,110 @@
+from models.des_simulator import DESSimulator
+from datetime import timedelta, datetime
+from models.clock import Clock
+from models.exceptions import TrainExceptions
+from hypothesis import given, strategies as st, assume, example
+
+
+
+# @pytest.fixture
+class FakeSimulator(DESSimulator):
+    def __init__(self, clock: Clock):
+        super().__init__(initial_date=datetime(2025,4,1), clock=clock)
+
+
+@given(
+    steps=st.lists(st.integers(min_value=1,max_value=360), min_size=3, max_size=10)
+)
+def test_stock_node_should_block_train_in_queue_to_enter_when_stock_is_empty(
+        simple_clock,
+        simple_stock_node,
+        simple_product,
+        simple_train,
+        steps
+):
+    # Arrange
+    train = simple_train(train_size=6e9)
+    process_time = timedelta(hours=5)
+
+    # Act
+    sim = FakeSimulator(clock=simple_clock)
+    simple_train.arrive(simulator=sim, node=simple_stock_node)
+    simple_stock_node.receive(simple_train)
+    simple_stock_node.process(simulator=sim)
+
+    for i in range(10):
+        try:
+            simple_train.start_load(simulator=sim, process_time=process_time)
+            simple_clock.jump(process_time)
+            simple_train.finish_load(simulator=sim, node=simple_stock_node)
+            simple_stock_node.maneuver_to_dispatch(simulator=sim)
+        except TrainExceptions as e:
+            simple_clock.jump(timedelta(hours=10))
+            simple_stock_node.process(simulator=sim)
+        assert not train._in_slot
+
+def test_simulation(simple_train, simple_stock_node, simple_product, simple_clock):
+
+    sim = FakeSimulator(clock=simple_clock)
+    train = simple_train(product=simple_product, clk=simple_clock)
+    process_time = timedelta(hours=5)
+
+    # Simulacao
+    train.arrive(simulator=sim, node=simple_stock_node)
+    simple_stock_node.receive(train)
+    simple_stock_node.process(simulator=sim)
+    train.start_load(simulator=sim, process_time=process_time)
+    simple_clock.jump(process_time)
+    train.finish_load(simulator=sim, node=simple_stock_node)
+    simple_stock_node.maneuver_to_dispatch(simulator=sim)
+    assert True
+
+def test_stock_node_simulation(simple_train, simple_connected_stock_node, simple_clock):
+
+    sim = FakeSimulator(clock=simple_clock)
+    product = "product"
+    train_size = 6e3
+    train = simple_train(product, simple_clock, train_size)
+
+    node = simple_connected_stock_node
+    clk = simple_clock
+    process_time = timedelta(hours=5)
+
+    # Simulacao
+    train.arrive(simulator=sim, node=node)
+    node.receive(train)
+    node.process(simulator=sim)
+    try:
+        train.start_load(simulator=sim, process_time=process_time)
+    except TrainExceptions as e:
+
+        ##### encapsular no EventExceptionHandler ########
+        blocked_constraints = [c for c in node.process_constraints if c.is_blocked()]
+        reasons = [
+            c.reason(
+                train_size=train.capacity,
+                try_again=node.time_to_try_again(
+                    product=train.product,
+                    volume=train.capacity,
+                    process=train.current_process_name
+                )
+            ) for c in blocked_constraints
+        ]
+        t = max([r.time_to_try_again for r in reasons])
+        print(e)
+        clk.jump(t)
+        ##### encapsular no EventExceptionHandler ########
+        node.process(simulator=sim)
+
+        train.start_load(simulator=sim, process_time=process_time)
+        clk.jump(timedelta(hours=3))
+        node.process(simulator=sim)
+
+        clk.jump(timedelta(hours=2))
+        train.finish_load(simulator=sim, node=node)
+        node.maneuver_to_dispatch(simulator=sim)
+        clk.jump(timedelta(hours=5))
+        node.dispatch()
+
+
+    assert True
