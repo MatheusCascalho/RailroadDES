@@ -60,6 +60,22 @@ class TrainInterface(ABC):
     def current_process_name(self):
         pass
 
+    @property
+    @abstractmethod
+    def state(self):
+        pass
+
+    @property
+    @abstractmethod
+    def ID(self):
+        pass
+
+    @property
+    @abstractmethod
+    def ready_to_leave(self):
+        pass
+
+
     @abstractmethod
     def add_to_slot(self):
         pass

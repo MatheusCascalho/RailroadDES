@@ -14,6 +14,8 @@ from interfaces.train_interface import TrainInterface
 from interfaces.node_interce import NodeInterface
 from models.task import Task
 from models.time_table import TimeEvent
+from models.clock import Clock
+from models.states import ActivityState
 
 
 def train_id_gen():
@@ -30,12 +32,15 @@ class Train(TrainInterface):
             self,
             capacity: float,
             task: Task,
-            is_loaded: bool
+            is_loaded: bool,
+            clock: Clock,
+            initial_activity: ActivityState = ActivityState.MOVING
     ):
         self.ID = next(train_id)
-
+        self.clock = clock
         self.activity_system = ActivitySystem(
-            path=task.path
+            path=task.path,
+            initial_activity=initial_activity
         )
         self.load_system = LoadSystem(
             capacity=capacity,
@@ -49,6 +54,14 @@ class Train(TrainInterface):
 
     # ====== Properties ==========
     @property
+    def ID(self):
+        return self._train_id
+
+    @ID.setter
+    def ID(self, value):
+        self._train_id = value
+
+    @property
     def current_task(self):
         return self.__current_task
 
@@ -59,7 +72,7 @@ class Train(TrainInterface):
     @property
     def next_location(self):
         try:
-            return self.activity_system.path[1]
+            return self.activity_system.path.next_location()
         except IndexError:
             TrainExceptions.path_is_finished()
 
@@ -81,7 +94,7 @@ class Train(TrainInterface):
 
     @property
     def current_location(self):
-        return self.activity_system.current_location
+        return self.activity_system.path.current_location
 
     @property
     def process_end(self):
@@ -95,10 +108,18 @@ class Train(TrainInterface):
     def current_process_name(self):
         return Process.LOAD if self.is_empty else Process.UNLOAD
 
+    @property
+    def state(self):
+        s = f"Atividade={self.activity_system} | Carga={self.load_system}"
+        return s
+
+    @property
+    def ready_to_leave(self):
+        return self.load_system.is_ready
+
     def __str__(self):
         name = self.ID
-        state = f"Atividade={self.activity_system} | Carga={self.load_system}"
-        return f"{name} | Capacidade: {self.capacity} | {state}"
+        return f"{name} | Capacidade: {self.capacity} | {self.state}"
 
     def add_to_slot(self):
         self._in_slot = True
@@ -117,11 +138,11 @@ class Train(TrainInterface):
         node: NodeInterface,
         **kwargs
     ):
-        print(f'{simulator.current_date}:: Train {self.ID} finish load!')
+        print(f'{self.clock.current_time}:: Train {self.ID} finish load!')
         self.activity_system.finish_process()
         event = TimeEvent(
             event=EventName.FINISH_PROCESS,
-            instant=simulator.current_date
+            instant=self.clock.current_time
         )
         self.current_task.update(
             event=event,
@@ -141,12 +162,12 @@ class Train(TrainInterface):
         **kwargs
     ):
         if not self._in_slot:
-            raise Exception("Train is not in slot!")
-        print(f'{simulator.current_date}:: Train {self.ID} start load!')
+            TrainExceptions.train_is_not_in_slot()
+        print(f'{self.clock.current_time}:: Train {self.ID} start load!')
         self.activity_system.start_process()
         event = TimeEvent(
             event=EventName.START_PROCESS,
-            instant=simulator.current_date
+            instant=self.clock.current_time
         )
         self.current_task.update(
             event=event,
@@ -169,12 +190,12 @@ class Train(TrainInterface):
    ):
         if not self._in_slot:
             raise Exception("Train is not in slot!")
-        print(f'{simulator.current_date}:: Train unloading!')
+        print(f'{self.clock.current_time}:: Train unloading!')
         # Changing State
         self.activity_system.start_process()
         event = TimeEvent(
             event=EventName.START_PROCESS,
-            instant=simulator.current_date
+            instant=self.clock.current_time
         )
         self.current_task.update(
             event=event,
@@ -194,11 +215,11 @@ class Train(TrainInterface):
         slot: Slot,
         **kwargs
     ):
-        print(f'{simulator.current_date}:: Train {self.ID} finish load!')
+        print(f'{self.clock.current_time}:: Train {self.ID} finish load!')
         self.activity_system.finish_process()
         event = TimeEvent(
             event=EventName.FINISH_PROCESS,
-            instant=simulator.current_date
+            instant=self.clock.current_time
         )
         self.current_task.update(
             event=event,
@@ -215,7 +236,7 @@ class Train(TrainInterface):
     def maneuvering_to_enter(self, simulator: DESSimulator, node: NodeInterface):
         self.state.action = TrainActions.MANEUVERING_TO_ENTER
 
-        time = simulator.current_date + node.time_to_call
+        time = self.clock.current_time + node.time_to_call
         simulator.add_event(
             time=time,
             callback=None#node.
@@ -225,41 +246,39 @@ class Train(TrainInterface):
         self.state.action = TrainActions.MANEUVERING_TO_LEAVE
 
     def arrive(self, simulator: DESSimulator, node: NodeInterface):
-        print(f'{simulator.current_date}:: train {self.ID} arrive at node {node}!!')
+        print(f'{self.clock.current_time}:: train {self.ID} arrive at node {node}!!')
         # Changing State
         self.activity_system.arrive()
         event = TimeEvent(
             EventName.ARRIVE,
-            instant=simulator.current_date
+            instant=self.clock.current_time
         )
-        on_load_point = self.activity_system.current_location == self.current_task.demand.flow.origin
-        process = Process.LOAD if on_load_point else Process.UNLOAD
+        process = Process.LOAD if self.current_task.is_on_load_point() else Process.UNLOAD
         self.current_task.update(event=event,process=process)
 
-    def leave(self, simulator: DESSimulator, node: NodeInterface):
-        print(f'{simulator.current_date}:: Train {self.ID} leaving node {node}!')
+    def leave(self, node: NodeInterface):
+        print(f'{self.clock.current_time}:: Train {self.ID} leaving node {node}!')
         self.activity_system.leave()
         event = TimeEvent(
             EventName.DEPARTURE,
-            instant=simulator.current_date
+            instant=self.clock.current_time
         )
-        on_load_point = self.activity_system.current_location == self.current_task.demand.flow.origin
-        process = Process.LOAD if on_load_point else Process.UNLOAD
+        process = Process.LOAD if self.current_task.is_on_load_point() else Process.UNLOAD
         self.current_task.update(event=event, process=process)
 
-        try:
-
-            simulator.add_event(
-                time=node.neighbors[self.next_location].transit_time,
-                callback=self.arrive,
-                simulator=simulator,
-                node=node.neighbors[self.next_location].neighbor
-            )
-        except IndexError:
-            raise FinishedTravelException.path_is_finished(train=self, current_time=simulator.current_date)
-        except TrainExceptions as error:
-            if error.args[0].lower() == 'path is finished!':
-                raise FinishedTravelException.path_is_finished(train=self, current_time=simulator.current_date)
+        # try:
+        # 
+        #     simulator.add_event(
+        #         time=node.neighbors[self.next_location].transit_time,
+        #         callback=self.arrive,
+        #         simulator=simulator,
+        #         node=node.neighbors[self.next_location].neighbor
+        #     )
+        # except IndexError:
+        #     raise FinishedTravelException.path_is_finished(train=self, current_time=self.clock.current_time)
+        # except TrainExceptions as error:
+        #     if error.args[0].lower() == 'path is finished!':
+        #         raise FinishedTravelException.path_is_finished(train=self, current_time=self.clock.current_time)
     # ====== Events ==========
 
     # ====== Statistics ==========
