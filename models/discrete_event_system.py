@@ -17,7 +17,12 @@ class DiscreteEventSystem:
 
     __repr__ = __str__
 
-
+def load_system_id_gen():
+    i = 0
+    while True:
+        yield f"Load System {i}"
+        i += 1
+load_system_id = load_system_id_gen()
 class LoadSystem(DiscreteEventSystem):
     def __init__(
             self,
