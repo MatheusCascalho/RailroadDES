@@ -14,10 +14,12 @@ from models.states import (
 )
 from models.railroad import RailSegment
 from interfaces.node_interce import NodeInterface
-import models.model_queue as mq
+from models.model_queue import Queue
 from models.clock import Clock
 from models.stock_replanish import StockReplenisherInterface
 from models.stock import StockInterface
+from models.maneuvering_constraints import ManeuveringConstraintFactory
+from collections import defaultdict
 
 
 @dataclass
@@ -34,15 +36,18 @@ class Node(NodeInterface):
             clock: Clock,
             process_rates: dict[str, list[ProcessorRate]],
             process_constraints: list[ProcessConstraintSystem],
+            maneuvering_constraint_factory: ManeuveringConstraintFactory
     ):
         self._id = name
         self.name = name
         self.clock = clock
         self.process_constraints = process_constraints
-        self.queue_to_enter = mq.Queue(capacity=queue_capacity)
-        self.queue_to_leave = mq.Queue(capacity=float('inf'))
+        self.queue_to_enter = Queue(capacity=queue_capacity, name="input")
+        self.queue_to_leave = Queue(capacity=float('inf'), name="output")
         self.load_units: list[ProcessorSystem] = self.build_load_units(process_rates)
         self.unload_units: list[ProcessorSystem] = self.build_unload_units(process_rates)
+        self.maneuvering_constraint_factory = maneuvering_constraint_factory
+        self.liberation_constraints = defaultdict(list)
         self.neighbors: dict[int, RailSegment] = {}
 
     def build_load_units(self, process_rates: dict[str, list[ProcessorRate]]) -> list[ProcessorSystem]:
@@ -86,10 +91,20 @@ class Node(NodeInterface):
         self.queue_to_enter.push(train, arrive=self.clock.current_time)
 
     def dispatch(self):
-        while self.queue_to_leave.is_busy:
-            train = self.queue_to_leave.pop(self.clock.current_time)
-            next_node = train.next_location
-            self.neighbors[next_node].send(train)
+        for train in self.liberation_constraints:
+            for constraint in self.liberation_constraints[train]:
+                constraint.update()
+        for train in self.queue_to_leave.now():
+            none_constraint_are_blocked = all(not c.is_blocked() for c in self.liberation_constraints[train.ID])
+            if none_constraint_are_blocked:
+                self.queue_to_leave.pop(current_time=self.clock.current_time)
+                self.liberation_constraints.pop(train.ID)
+                train.leave(node=self)
+                next_node = train.next_location
+                self.neighbors[next_node].send(train)
+
+                # train.leave()
+
 
     def process(self, simulator: DESSimulator):
         self.pre_processing()
@@ -139,15 +154,16 @@ class Node(NodeInterface):
     def maneuver_to_dispatch(self, simulator: DESSimulator):
         self.pre_processing()
         for slot in self.load_units + self.unload_units:
-            if slot.current_train:
+            if slot.current_train and slot.current_train.ready_to_leave:
                 print(f'{simulator.current_date}:: Train {slot.current_train.ID} entering on leaving queue!')
                 train = slot.clear()
+                constraint = self.maneuvering_constraint_factory.create(train_id=train.ID)
+                self.liberation_constraints[train.ID].append(constraint)
                 simulator.add_event(
-                    time=timedelta(),
-                    callback=train.leave,
-                    simulator=simulator,
-                    node=self
+                    time=constraint.post_operation_time,
+                    callback=self.dispatch
                 )
+
         self.pos_processing()
     # ====== Events ==========
     # ====== Methods ==========
