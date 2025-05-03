@@ -42,11 +42,10 @@ class StockToLoadTrainConstraint(StockConstraint):
         reason = BlockReason(
             constraint=self.ID,
             constraint_type=self.__class__.__name__,
-            reason=f"{train_size} > {stock_volume}",
+            reason=f"{train_size} [train size] > {stock_volume} [stock volume]",
             time_to_try_again=try_again
         )
         return reason
-
 
 
 class StockToUnloadTrainConstraint(StockConstraint):
@@ -62,3 +61,13 @@ class StockToUnloadTrainConstraint(StockConstraint):
 
     def process_type(self) -> Process:
         return Process.UNLOAD
+
+    def reason(self, train_size: float, try_again: timedelta, *args, **kwargs):
+        stock_space = sum(s.space for s in self.subjects)
+        reason = BlockReason(
+            constraint=self.ID,
+            constraint_type=self.__class__.__name__,
+            reason=f"{train_size} [train size] > {stock_space} [Space]",
+            time_to_try_again=try_again
+        )
+        return reason
