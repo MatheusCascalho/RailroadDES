@@ -9,9 +9,6 @@ from models.constants import (
 from dataclasses import dataclass
 from typing import Any
 from datetime import timedelta, datetime
-from models.states import (
-    ProcessorState
-)
 from models.railroad import RailSegment
 from interfaces.node_interce import NodeInterface
 from models.model_queue import Queue
@@ -46,7 +43,6 @@ class Node(NodeInterface):
         self.process_units = process_units
         self.maneuvering_constraint_factory = maneuvering_constraint_factory
         self.liberation_constraints = defaultdict(list)
-        self.neighbors: dict[int, RailSegment] = {}
 
     @property
     def state(self):
@@ -60,15 +56,10 @@ class Node(NodeInterface):
 
     # ====== Events ==========
     def receive(self, train):
-        next_node = train.next_location
-        if next_node not in self.neighbors:
-            raise Exception(f"The train cannot continue its journey because the node is not "
-                            f"adjacent to the next station on the route. Next node: {next_node}")
         self.queue_to_enter.push(train, arrive=self.clock.current_time)
-        print(
-            f'{self.clock.current_time}:: Train {train.ID} received in node {self}!')
+        print(f'{self.clock.current_time}:: Train {train.ID} received in node {self}!')
 
-    def dispatch(self):
+    def dispatch(self, train_picker: list):
         for train in self.liberation_constraints:
             for constraint in self.liberation_constraints[train]:
                 constraint.update()
@@ -78,11 +69,9 @@ class Node(NodeInterface):
                 self.queue_to_leave.pop(current_time=self.clock.current_time)
                 self.liberation_constraints.pop(train.ID)
                 train.leave(node=self)
-                next_node = train.next_location
-                self.neighbors[next_node].send(train)
+                train_picker.append(train)
 
                 # train.leave()
-
 
     def process(self, simulator: DESSimulator):
         self.pre_processing()
@@ -143,29 +132,6 @@ class Node(NodeInterface):
                 )
 
         self.pos_processing()
-    # ====== Events ==========
-    # ====== Methods ==========
-
-    def __repr__(self):
-        return self.name
-
-    __str__ = __repr__
-
-    def connect_neighbor(self, rail_segment: RailSegment):
-        self.neighbors[rail_segment.destination.identifier] = rail_segment
-
-    # ====== Methods ==========
-    # ====== Properties ==========
-    @property
-    def identifier(self):
-        return self._id
-
-    @identifier.setter
-    def identifier(self, new_identifier: int):
-        self._id = new_identifier
-
-
-    # ====== Properties ==========
 
 
 class StockNode(Node):

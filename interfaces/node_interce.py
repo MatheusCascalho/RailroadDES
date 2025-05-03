@@ -18,9 +18,4 @@ class NodeInterface(Entity, ABC):
     def maneuver_to_dispatch(self, **kwargs):
         pass
 
-    # ====== Events ==========
-    # ====== Methods ==========
 
-    @abstractmethod
-    def connect_neighbor(self, **kwargs):
-        pass
