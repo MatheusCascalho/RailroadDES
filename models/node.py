@@ -1,3 +1,4 @@
+from interfaces.train_interface import TrainInterface
 from models.exceptions import ProcessException
 from models.node_constraints import ProcessConstraintSystem
 from models.processors import ProcessorSystem
@@ -55,11 +56,21 @@ class Node(NodeInterface):
         return s
 
     # ====== Events ==========
-    def receive(self, train):
+    def receive(self, train: TrainInterface):
+        """
+        Adiciona trem à fila de entrada e registra o log de chegada
+        :param train:
+        :return:
+        """
         self.queue_to_enter.push(train, arrive=self.clock.current_time)
         print(f'{self.clock.current_time}:: Train {train.ID} received in node {self}!')
 
     def dispatch(self, train_picker: list):
+        """
+        Percorre a fila de saída e remove todos os trens que não estiverem com a saída bloqueada por alguma restrição
+        :param train_picker:
+        :return:
+        """
         for train in self.liberation_constraints:
             for constraint in self.liberation_constraints[train]:
                 constraint.update()
@@ -74,6 +85,11 @@ class Node(NodeInterface):
                 # train.leave()
 
     def process(self, simulator: DESSimulator):
+        """
+        Percorre a fila de entrada e processa todos os trens que não estiverem com processamento bloqueada
+        por alguma restrição
+        :return:
+        """
         self.pre_processing()
         while True:
             # Update resources
