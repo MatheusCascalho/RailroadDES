@@ -31,19 +31,19 @@ class Neighbor:
 class Node(NodeInterface):
     def __init__(
             self,
-            queue_capacity: int,
             name: Any,
             clock: Clock,
-            process_rates: dict[str, list[ProcessorRate]],
             process_constraints: list[ProcessConstraintSystem],
-            maneuvering_constraint_factory: ManeuveringConstraintFactory
+            maneuvering_constraint_factory: ManeuveringConstraintFactory,
+            queue_to_enter: Queue,
+            queue_to_leave: Queue,
+            process_units: list[ProcessorSystem],
     ):
         super().__init__(name=name,clock=clock)
         self.process_constraints = process_constraints
-        self.queue_to_enter = Queue(capacity=queue_capacity, name="input")
-        self.queue_to_leave = Queue(capacity=float('inf'), name="output")
-        self.load_units: list[ProcessorSystem] = self.build_load_units(process_rates)
-        self.unload_units: list[ProcessorSystem] = self.build_unload_units(process_rates)
+        self.queue_to_enter = queue_to_enter
+        self.queue_to_leave = queue_to_leave
+        self.process_units = process_units
         self.maneuvering_constraint_factory = maneuvering_constraint_factory
         self.liberation_constraints = defaultdict(list)
         self.neighbors: dict[int, RailSegment] = {}
@@ -95,7 +95,7 @@ class Node(NodeInterface):
             if any(c.is_blocked() for c in self.process_constraints if c.process_type() == process):
                 self.queue_to_enter.skip_process(process)
                 break
-            processors = self.load_units if process == Process.LOAD else self.unload_units
+            processors = [p for p in self.process_units if p.type == process]
             slot = next((p for p in processors if p.is_idle), None)
             if slot is not None:
                 print(f'{simulator.current_date}:: Train {self.queue_to_enter.elements[0].element.ID} starts process at node {self}!')
@@ -131,7 +131,7 @@ class Node(NodeInterface):
 
     def maneuver_to_dispatch(self, simulator: DESSimulator):
         self.pre_processing()
-        for slot in self.load_units + self.unload_units:
+        for slot in self.process_units:
             if slot.current_train and slot.current_train.ready_to_leave:
                 print(f'{simulator.current_date}:: Train {slot.current_train.ID} entering on leaving queue!')
                 train = slot.clear()
@@ -171,22 +171,24 @@ class Node(NodeInterface):
 class StockNode(Node):
     def __init__(
             self,
-            queue_capacity: int,
             name: Any,
             clock: Clock,
-            process_rates: dict[str, list[ProcessorRate]],
             process_constraints: list[ProcessConstraintSystem],
             stocks: list[StockInterface],
             replenisher: StockReplenisherInterface,
-            maneuvering_constraint_factory: ManeuveringConstraintFactory
+            maneuvering_constraint_factory: ManeuveringConstraintFactory,
+            queue_to_enter: Queue,
+            queue_to_leave: Queue,
+            process_units: list[ProcessorSystem],
     ):
         super().__init__(
-                queue_capacity=queue_capacity,
                 name=name,
                 clock=clock,
-                process_rates=process_rates,
                 process_constraints=process_constraints,
-                maneuvering_constraint_factory=maneuvering_constraint_factory
+                maneuvering_constraint_factory=maneuvering_constraint_factory,
+                queue_to_enter=queue_to_enter,
+                queue_to_leave=queue_to_leave,
+                process_units=process_units,
         )
         self.replenisher = replenisher
         self.stocks: dict[str, StockInterface] = {s.product: s for s in stocks}
@@ -197,7 +199,7 @@ class StockNode(Node):
         self.replenisher.replenish(list(self.stocks.values()))
 
     def pos_processing(self):
-        for slot in self.load_units + self.unload_units:
+        for slot in self.process_units:
             if not slot.is_idle:
                 try:
                     promise = slot.promise()

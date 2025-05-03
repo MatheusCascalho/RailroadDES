@@ -8,11 +8,14 @@ from models.data_model import (
     ProcessorRate
 )
 from models.constants import Process
+from models.model_queue import Queue
+from models.node_constraints import ProcessConstraintSystem
 from models.stock import OwnStock, StockInterface
 from models.stock_replanish import SimpleStockReplanisher, ReplenishRate
 from models.stock_constraints import StockToLoadTrainConstraint, StockToUnloadTrainConstraint
 from models.node import StockNode
 from models.maneuvering_constraints import ManeuveringConstraintFactory
+from models.processors import ProcessorSystem
 
 
 class AbstractNodeFactory(ABC):
@@ -22,6 +25,14 @@ class AbstractNodeFactory(ABC):
 
     @abstractmethod
     def create_constraints(self, *args, **kwargs):
+        pass
+
+    @abstractmethod
+    def create_queues(self, *args, **kwargs):
+        pass
+
+    @abstractmethod
+    def create_process_units(self, *args, **kwargs):
         pass
 
     @abstractmethod
@@ -93,11 +104,39 @@ class NodeStockFactory(AbstractNodeFactory):
         )
         return factory
 
+    def create_process_units(
+            self,
+            process_rates: dict[str, list[ProcessorRate]],
+            queue_to_leave: Queue,
+            process_constraints: list[ProcessConstraintSystem],
+            process: Process
+    ) -> list[ProcessorSystem]:
+        process_units = [
+            ProcessorSystem(
+                processor_type=Process.UNLOAD,
+                queue_to_leave=queue_to_leave,
+                clock=self.clock,
+                rates={p: rate}
+            )
+            for p, rates in process_rates.items()
+            for rate in rates
+            if rate.type == process
+        ]
+        for unit in process_units:
+            for constraint in process_constraints:
+                if constraint.process_type() == process:
+                    unit.add_constraint(constraint)
+        return process_units
+
+    @staticmethod
+    def create_queues(queue_capacity):
+        queue_to_enter = Queue(capacity=queue_capacity, name="input")
+        queue_to_leave = Queue(capacity=10_000, name="output")
+        return queue_to_enter, queue_to_leave
 
     def create_node(self):
         stocks = self.create_stock(stock_data=self.data.stocks)
         replenishment = self.create_replenisher(replenishment=self.data.replenishment)
-        rates = self.create_rates(rates=self.data.rates)
         constraints = self.create_constraints(
             stocks=stocks,
             train_sizes=self.data.train_sizes,
@@ -106,15 +145,33 @@ class NodeStockFactory(AbstractNodeFactory):
         maneuvering_constraint_factory = self.create_maneuver_constraint_factory(
             post_operation_time=self.data.post_operation_time
         )
+        queue_to_enter, queue_to_leave = self.create_queues(self.data.queue_capacity)
+        rates = self.create_rates(rates=self.data.rates)
+
+        load_units = self.create_process_units(
+            process_rates=rates,
+            queue_to_leave=queue_to_leave,
+            process_constraints=constraints,
+            process=Process.LOAD
+        )
+        unload_units = self.create_process_units(
+            process_rates=rates,
+            queue_to_leave=queue_to_leave,
+            process_constraints=constraints,
+            process=Process.UNLOAD
+        )
+
         node = StockNode(
             name=self.data.name,
             clock=self.clock,
-            process_rates=rates,
             process_constraints=constraints,
             stocks=stocks,
             replenisher=replenishment,
-            queue_capacity=self.data.queue_capacity,
-            maneuvering_constraint_factory=maneuvering_constraint_factory
+            maneuvering_constraint_factory=maneuvering_constraint_factory,
+            queue_to_enter=queue_to_enter,
+            queue_to_leave=queue_to_leave,
+            load_units=load_units,
+            unload_units=unload_units
         )
         return node
 
