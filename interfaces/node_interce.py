@@ -1,18 +1,12 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from models.entity import Entity
+from models.clock import Clock
 
 
-class NodeInterface(ABC):
-    # ====== Properties ==========
-    @property
-    @abstractmethod
-    def identifier(self):
-        pass
-
-    @identifier.setter
-    @abstractmethod
-    def identifier(self, **kwargs):
-        pass
+class NodeInterface(Entity, ABC):
+    def __init__(self, name, clock):
+        super().__init__(name=name,clock=clock)
 
     # ====== Properties ==========
     # ====== Events ==========

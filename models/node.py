@@ -20,7 +20,7 @@ from models.stock_replanish import StockReplenisherInterface
 from models.stock import StockInterface
 from models.maneuvering_constraints import ManeuveringConstraintFactory
 from collections import defaultdict
-
+from models.entity import Entity
 
 @dataclass
 class Neighbor:
@@ -38,9 +38,7 @@ class Node(NodeInterface):
             process_constraints: list[ProcessConstraintSystem],
             maneuvering_constraint_factory: ManeuveringConstraintFactory
     ):
-        self._id = name
-        self.name = name
-        self.clock = clock
+        super().__init__(name=name,clock=clock)
         self.process_constraints = process_constraints
         self.queue_to_enter = Queue(capacity=queue_capacity, name="input")
         self.queue_to_leave = Queue(capacity=float('inf'), name="output")
@@ -50,41 +48,15 @@ class Node(NodeInterface):
         self.liberation_constraints = defaultdict(list)
         self.neighbors: dict[int, RailSegment] = {}
 
-    def build_load_units(self, process_rates: dict[str, list[ProcessorRate]]) -> list[ProcessorSystem]:
-        load_units = [
-            ProcessorSystem(
-                processor_type=Process.LOAD,
-                queue_to_leave=self.queue_to_leave,
-                clock=self.clock,
-                rates={p: rate}
-            )
-            for p, rates in process_rates.items()
-            for rate in rates
-            if rate.type == Process.LOAD
-        ]
-        for unit in load_units:
-            for constraint in self.process_constraints:
-                if constraint.process_type() == Process.LOAD:
-                    unit.add_constraint(constraint)
-        return load_units
-
-    def build_unload_units(self, process_rates: dict[str, list[ProcessorRate]]) -> list[ProcessorSystem]:
-        unload_units = [
-            ProcessorSystem(
-                processor_type=Process.UNLOAD,
-                queue_to_leave=self.queue_to_leave,
-                clock=self.clock,
-                rates={p: rate}
-            )
-            for p, rates in process_rates.items()
-            for rate in rates
-            if rate.type == Process.UNLOAD
-        ]
-        for unit in unload_units:
-            for constraint in self.process_constraints:
-                if constraint.process_type() == Process.UNLOAD:
-                    unit.add_constraint(constraint)
-        return unload_units
+    @property
+    def state(self):
+        input_queue = f"Queue to enter: {self.queue_to_enter.current_size}"
+        idle_process = sum(p.is_idle for p in self.process_units)
+        busy = len(self.process_units) - idle_process
+        load_units = f"Process Units: {idle_process} idle | {busy} busy"
+        output_queue = f"Queue to leave: {self.queue_to_leave.current_size}"
+        s = f"{input_queue} | {load_units} | {output_queue}"
+        return s
 
     # ====== Events ==========
     def receive(self, train):
