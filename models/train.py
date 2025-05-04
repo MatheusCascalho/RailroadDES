@@ -155,11 +155,7 @@ class Train(TrainInterface):
             process=Process.LOAD
         )
         # Add next event to calendar
-        simulator.add_event(
-            time=timedelta(),
-            callback=node.maneuver_to_dispatch,
-            simulator=simulator,
-        )
+        node.maneuver_to_dispatch(simulator)
 
     def start_load(
         self,
