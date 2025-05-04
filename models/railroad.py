@@ -17,10 +17,22 @@ class RailSegment:
         self.to_destination = []
         self.time_to_destination = time_to_destination
 
+    def reversed(self):
+        segment = RailSegment(
+            origin=self.destination,
+            time_to_origin=self.time_to_destination,
+            destination=self.origin,
+            time_to_destination=self.time_to_origin
+        )
+        return segment
+
     def send(self, train: TrainInterface):
         next_location = train.next_location
         if next_location == self.origin:
             self.to_origin.append(train)
         else:
             self.to_destination.append(train)
+
+    def __repr__(self):
+        return f"{self.origin} to {self.destination}"
 
