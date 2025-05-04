@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from models.constants import Process, EventName
+from models.observers import AbstractSubject, to_notify
 import numpy as np
 from models.exceptions import EventSequenceError, TimeSequenceErro, RepeatedProcessError, AlreadyRegisteredError
 
@@ -183,7 +184,7 @@ class TimeRegister:
         return changes > 1
 
 
-class TimeTable:
+class TimeTable(AbstractSubject):
     """
     The main class that manages time registers (`TimeRegister`) during the simulation.
     Each event (arrival, process start, finish, and departure) is recorded and used to calculate
@@ -205,12 +206,14 @@ class TimeTable:
         if registers is None:
             registers = []
         self.registers = registers
+        super().__init__()
 
     def __str__(self):
         return f"Table with {len(self.registers)} registers"
 
     __repr__ = __str__
 
+    @to_notify()
     def update(self, event: TimeEvent, process: Process = Process.UNLOAD):
         """
         Updates the last TimeRegister with the provided event, or creates a new TimeRegister if necessary.
