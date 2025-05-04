@@ -1,4 +1,4 @@
-from clock import Clock
+from models.clock import Clock
 from abc import abstractmethod
 
 def entity_id_gen():
@@ -20,8 +20,8 @@ class Entity:
     def identifier(self):
         return self._id
 
-    @abstractmethod
     @property
+    @abstractmethod
     def state(self):
         pass
 
