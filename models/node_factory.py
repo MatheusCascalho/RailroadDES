@@ -113,7 +113,7 @@ class NodeStockFactory(AbstractNodeFactory):
     ) -> list[ProcessorSystem]:
         process_units = [
             ProcessorSystem(
-                processor_type=Process.UNLOAD,
+                processor_type=process,
                 queue_to_leave=queue_to_leave,
                 clock=self.clock,
                 rates={p: rate}
@@ -170,8 +170,7 @@ class NodeStockFactory(AbstractNodeFactory):
             maneuvering_constraint_factory=maneuvering_constraint_factory,
             queue_to_enter=queue_to_enter,
             queue_to_leave=queue_to_leave,
-            load_units=load_units,
-            unload_units=unload_units
+            process_units=load_units+unload_units
         )
         return node
 
