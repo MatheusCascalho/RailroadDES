@@ -86,6 +86,7 @@ def test_process_skips_when_slot_unavailable(basic_node, mock_train, mock_simula
 
     # Assert
     mock_queue.skip_process.assert_called_once_with(Process.LOAD)
+    mock_queue.recover.assert_called_once()
     basic_node._start_process.assert_not_called()
 
 
@@ -107,6 +108,7 @@ def test_process_skips_when_blocked(basic_node, mock_train, mock_slot, mock_simu
 
     # Assert
     mock_queue.skip_process.assert_called_once_with(Process.LOAD)
+    mock_queue.recover.assert_called_once()
     basic_node._start_process.assert_not_called()
 
 
