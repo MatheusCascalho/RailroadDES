@@ -65,6 +65,10 @@ class Train(TrainInterface):
     def current_task(self):
         return self.__current_task
 
+    @current_task.setter
+    def current_task(self, task: Task):
+        self.__current_task = task
+
     @property
     def is_empty(self):
         return self.load_system.volume <= EPSILON
