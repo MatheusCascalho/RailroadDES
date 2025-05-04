@@ -1,9 +1,13 @@
 from dataclasses import dataclass
+
+from interfaces.des_simulator_interface import DESSimulatorInterface
 from models.demand import Demand
+from models.des_simulator import DESSimulator
 from models.time_table import TimeTable, TimeEvent
 from models.constants import Process, EventName
 from models.path import Path
 from datetime import datetime
+from models.arrive_scheduler import ArriveScheduler
 
 
 def task_id_gen():
@@ -21,8 +25,9 @@ class Task:
             self,
             demand: Demand,
             path: list[str],
+            scheduler: ArriveScheduler,
             task_volume: float,
-            current_time: datetime
+            current_time: datetime,
     ):
         """
         Initializes a Task object that represents a routing decision for a train at a specific point in the simulation.
@@ -34,8 +39,10 @@ class Task:
         """
         self.ID = next(task_id)
         self.demand = demand
+        self.scheduler = scheduler
         self.path = Path(path)
         self.time_table = TimeTable()
+        self.time_table.add_observers([self.scheduler])
         event = TimeEvent(
             event=EventName.DEPARTURE,
             instant=current_time
