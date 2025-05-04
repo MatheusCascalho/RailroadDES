@@ -10,6 +10,10 @@ class QueueElement:
     arrive: datetime
     departure: datetime = field(init=False, default=None)
 
+    def __str__(self):
+        return self.element.ID
+    __repr__=__str__
+
 
 class Queue:
     def __init__(self, capacity: int, name: str):
@@ -23,6 +27,14 @@ class Queue:
         return f"Queue {self.name} with {self.current_size} elements"
 
     __repr__ = __str__
+
+    def has_next(self):
+        return len(self.elements)>0
+
+    def running_queue(self):
+        while self.has_next():
+            yield self.elements[0]
+        raise StopIteration
 
     @property
     def first(self):
