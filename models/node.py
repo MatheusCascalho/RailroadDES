@@ -65,7 +65,7 @@ class Node(NodeInterface):
         self.queue_to_enter.push(train, arrive=self.clock.current_time)
         print(f'{self.clock.current_time}:: Train {train.ID} received in node {self}!')
 
-    def dispatch(self, train_picker: list):
+    def dispatch(self):
         """
         Percorre a fila de saída e remove todos os trens que não estiverem com a saída bloqueada por alguma restrição
         :param train_picker:
@@ -80,7 +80,6 @@ class Node(NodeInterface):
                 self.queue_to_leave.pop(current_time=self.clock.current_time)
                 self.liberation_constraints.pop(train.ID)
                 train.leave(node=self)
-                train_picker.append(train)
 
                 # train.leave()
 
