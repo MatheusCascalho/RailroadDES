@@ -48,7 +48,7 @@ def basic_node_factory(mocker):
         clock = mocker.Mock()
         clock.current_time = "12:00"
         return Node(
-            name="N1",
+            name=name,
             clock=clock,
             process_constraints=[],
             maneuvering_constraint_factory=mocker.Mock(),
