@@ -33,8 +33,7 @@ class Queue:
 
     def running_queue(self):
         while self.has_next():
-            yield self.elements[0]
-        raise StopIteration
+            yield self.elements[0].element
 
     @property
     def first(self):
