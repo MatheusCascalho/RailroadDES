@@ -284,4 +284,19 @@ class TimeTable:
 
     @property
     def process_end(self):
-        return self.registers[-1].finish_process.instant
+        if self.registers:
+            return self.registers[-1].finish_process.instant
+
+    @property
+    def dispatched_just_now(self):
+        if self.registers:
+            return self.registers[-1].departure.instant is not None
+        return False
+
+    @property
+    def arrived_right_now(self):
+        if self.registers:
+            arrived = self.registers[-1].arrive.instant is not None
+            dont_start_anything = self.registers[-1].start_process.instant is None
+            return arrived and dont_start_anything
+        return False
