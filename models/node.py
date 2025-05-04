@@ -91,42 +91,47 @@ class Node(NodeInterface):
         :return:
         """
         self.pre_processing()
-        while True:
-            # Update resources
-            train = self.queue_to_enter.first
-            if not train:
-                break
+        for train in self.queue_to_enter.running_queue():
             process = train.current_process_name
-            if any(c.is_blocked() for c in self.process_constraints if c.process_type() == process):
+            slot = self._find_idle_slot(process)
+            if (
+                    slot is None or
+                    self._is_blocked_by_constraints(process)
+            ):
                 self.queue_to_enter.skip_process(process)
-                break
-            processors = [p for p in self.process_units if p.type == process]
-            slot = next((p for p in processors if p.is_idle), None)
-            if slot is not None:
-                print(f'{simulator.current_date}:: Train {self.queue_to_enter.elements[0].element.ID} starts process at node {self}!')
-                train = self.queue_to_enter.pop(
-                    current_time=simulator.current_date
-                )
-
-                slot.put_in(train=train)
-
-                # Update state
-                time = timedelta()
-                # Add next event
-                simulator.add_event(
-                    time=time,
-                    callback=train.process,
-                    simulator=simulator,
-                    start=simulator.current_date,
-                    process_time=slot.get_process_time(),
-                    node=self,
-                    slot=slot
-                )
-            else:
-                self.queue_to_enter.skip_process(process)
+                continue
+            self._start_process(train,slot,simulator)
 
         self.queue_to_enter.recover()
         self.pos_processing()
+
+    def _is_blocked_by_constraints(self, process: Process):
+        return any(c.is_blocked() for c in self.process_constraints if c.process_type() == process)
+
+    def _find_idle_slot(self, process: Process):
+        processors = [p for p in self.process_units if p.type == process]
+        return next((p for p in processors if p.is_idle), None)
+
+    def _start_process(self, train, slot, simulator):
+        print(f'{simulator.current_date}:: Train {self.queue_to_enter.first} starts process at node {self}!')
+        train = self.queue_to_enter.pop(
+            current_time=simulator.current_date
+        )
+
+        slot.put_in(train=train)
+
+        # Update state
+        time = timedelta()
+        # Add next event
+        simulator.add_event(
+            time=time,
+            callback=train.process,
+            simulator=simulator,
+            start=simulator.current_date,
+            process_time=slot.get_process_time(),
+            node=self,
+            slot=slot
+        )
 
     def pos_processing(self):
         pass
