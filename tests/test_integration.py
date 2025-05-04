@@ -59,14 +59,14 @@ def test_simulation(simple_train, simple_stock_node, simple_product, simple_cloc
     simple_stock_node.maneuver_to_dispatch(simulator=sim)
     assert True
 
-def test_stock_node_simulation(simple_train, simple_connected_stock_node, simple_clock):
+def test_stock_node_simulation(simple_train, simple_stock_node, simple_clock):
 
     sim = FakeSimulator(clock=simple_clock)
     product = "product"
     train_size = 6e3
-    train = simple_train(product, simple_clock, train_size)
+    train = simple_train(product, simple_clock, train_size=train_size, simulator=sim)
 
-    node = simple_connected_stock_node
+    node = simple_stock_node
     clk = simple_clock
     process_time = timedelta(hours=5)
 
@@ -102,7 +102,7 @@ def test_stock_node_simulation(simple_train, simple_connected_stock_node, simple
 
         clk.jump(timedelta(hours=2))
         train.finish_load(simulator=sim, node=node)
-        node.maneuver_to_dispatch(simulator=sim)
+        # node.maneuver_to_dispatch(simulator=sim)
         clk.jump(timedelta(hours=5))
         node.dispatch()
 
