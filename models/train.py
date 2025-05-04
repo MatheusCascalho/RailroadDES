@@ -48,7 +48,7 @@ class Train(TrainInterface):
             processing_state=self.activity_system.processing_state,
             queue_to_leave_state=self.activity_system.queue_to_leave_state
         )
-        self.__current_task = task
+        self.current_task = task
         self._in_slot = False
 
 
@@ -67,7 +67,9 @@ class Train(TrainInterface):
 
     @current_task.setter
     def current_task(self, task: Task):
+        task.scheduler.train = self
         self.__current_task = task
+
 
     @property
     def is_empty(self):
