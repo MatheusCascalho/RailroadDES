@@ -80,9 +80,6 @@ def simple_stock_node_factory(simple_clock, simple_stock_node_data_factory):
         return node
     return make
 
-@fixture
-def simple_connected_stock_node(simple_stock_node, simple_rail_segment):
-    simple_stock_node.connect_neighbor(rail_segment=simple_rail_segment)
-    return simple_stock_node
+
 
 
