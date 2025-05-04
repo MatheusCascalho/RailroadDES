@@ -1,44 +1,5 @@
-import pytest
-from models.node import Node
 from models.constants import Process
-
-
-
-# ========== FIXTURES ==========
-@pytest.fixture
-def mock_train(mocker):
-    train = mocker.Mock()
-    train.ID = "T1"
-    train.current_process_name = Process.LOAD
-    return train
-
-@pytest.fixture
-def mock_simulator(mocker):
-    simulator = mocker.Mock()
-    simulator.current_date = "2025-01-01"
-    return simulator
-
-@pytest.fixture
-def mock_slot(mocker):
-    slot = mocker.Mock()
-    slot.type = Process.LOAD
-    slot.is_idle = True
-    slot.get_process_time.return_value = 5
-    return slot
-
-@pytest.fixture
-def basic_node(mocker):
-    clock = mocker.Mock()
-    clock.current_time = "12:00"
-    return Node(
-        name="N1",
-        clock=clock,
-        process_constraints=[],
-        maneuvering_constraint_factory=mocker.Mock(),
-        queue_to_enter=mocker.Mock(),
-        queue_to_leave=mocker.Mock(),
-        process_units=[]
-    )
+from tests.artifacts.node_artifacts import mock_train, mock_simulator, mock_slot, basic_node
 
 
 # ========== TESTES ==========
