@@ -11,6 +11,10 @@ class NodeInterface(Entity, ABC):
     # ====== Properties ==========
     # ====== Events ==========
     @abstractmethod
+    def arrive(self, **kwargs):
+        pass
+
+    @abstractmethod
     def process(self, **kwargs):
         pass
 
