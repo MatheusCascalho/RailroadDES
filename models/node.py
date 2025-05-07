@@ -56,14 +56,20 @@ class Node(NodeInterface):
         return s
 
     # ====== Events ==========
-    def receive(self, train: TrainInterface):
+    def receive(self, train: TrainInterface, simulator: DESSimulator):
         """
         Adiciona trem à fila de entrada e registra o log de chegada
         :param train:
         :return:
         """
+        train.arrive(node=self)
         self.queue_to_enter.push(train, arrive=self.clock.current_time)
         print(f'{self.clock.current_time}:: Train {train.ID} received in node {self}!')
+        simulator.add_event(
+            time=timedelta(),
+            callback=self.process,
+            simulator=simulator
+        )
 
     def dispatch(self):
         """
