@@ -133,6 +133,11 @@ class ProcessorSystem(DiscreteEventSystem):
             constraint.state_machine.transitions["finish"]
         )
 
+    def __repr__(self):
+        s = super().__repr__()
+        s += f" {self.type.value}"
+        return s
+
 
 
 class ProcessorSystemBuilder:
