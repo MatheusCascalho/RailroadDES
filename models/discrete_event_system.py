@@ -13,7 +13,7 @@ class DiscreteEventSystem:
         pass
 
     def __str__(self):
-        return str(self.state_machine.current_state)
+        return str(self.state_machine.current_state.name)
 
     __repr__ = __str__
 
