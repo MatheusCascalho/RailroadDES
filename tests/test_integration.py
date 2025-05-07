@@ -1,10 +1,15 @@
+import pytest
+
 from models.des_simulator import DESSimulator
 from datetime import timedelta, datetime
 from models.clock import Clock
 from models.exceptions import TrainExceptions
 from hypothesis import given, strategies as st, assume, example
-
-
+from models.conditions import TransitTime, RailroadMesh
+# from tests.artifacts.train_artifacts import simple_train
+from models.demand import Demand, Flow
+from models.des_model import Railroad
+from models.des_simulator import DESSimulator
 
 # @pytest.fixture
 class FakeSimulator(DESSimulator):
@@ -108,3 +113,73 @@ def test_stock_node_simulation(simple_train, simple_stock_node, simple_clock):
 
 
     assert True
+
+@pytest.fixture
+def simple_model(simple_stock_node_factory, simple_train, simple_clock):
+    def create_model(
+            sim,
+            demand=[3500, 0],
+            n_trains=1,
+            terminal_times = [7],
+            port_times=[6, 10],
+            queue_capacity=50):
+        load_points = (
+            simple_stock_node_factory('origin', clock=simple_clock, process='load'),
+        )
+
+        unload_points = (
+            simple_stock_node_factory('destination', clock=simple_clock, process='unload'),
+        )
+
+        transit_times = [
+            TransitTime(
+                load_origin=load_points[0].name,
+                load_destination=unload_points[0].name,
+                empty_time=timedelta(hours=17),
+                loaded_time=timedelta(hours=20)
+            ),
+            # TransitTime(
+            #     load_origin=load_points[0].name,
+            #     load_destination=unload_points[1].name,
+            #     empty_time=timedelta(hours=17),
+            #     loaded_time=timedelta(hours=20)
+            # ),
+        ]
+
+        mesh = RailroadMesh(
+            load_points=load_points,
+            unload_points=unload_points,
+            transit_times=transit_times
+        )
+        product = "product"
+        train_size = 6e3
+
+        trains = [
+            simple_train(
+                product,
+                simple_clock,
+                train_size=train_size,
+                simulator=sim
+            )
+
+            for _ in range(n_trains)
+        ]
+
+        demands = [
+            Demand(
+                flow=Flow('origin', 'destination', product),
+                volume=demand[0],
+            )
+        ]
+
+        model = Railroad(mesh=mesh, trains=trains, demands=demands)
+        return model
+    return create_model
+
+def test_model(simple_model, simple_clock):
+    sim = DESSimulator(clock=simple_clock)
+
+    m = simple_model(sim=sim)
+    sim.simulate(model=m, time_horizon=timedelta(days=10))
+    ...
+    # m.starting_events(simulator=sim)

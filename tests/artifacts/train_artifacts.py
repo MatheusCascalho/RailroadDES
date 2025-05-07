@@ -11,7 +11,7 @@ from tests.test_integration import FakeSimulator
 
 @fixture
 def simple_train(basic_node_factory):
-    def make(product, clk, simulator, train_size=6e3):
+    def make(product, clk, simulator, train_size=6e3, add_scheduler=False):
         flow = Flow(
             origin="origin",
             destination="destination",
@@ -22,22 +22,18 @@ def simple_train(basic_node_factory):
             volume=103e3
         )
         segment1 = RailSegment(
-            origin=basic_node_factory("origin"),
-            destination=basic_node_factory("destination"),
+            destination=basic_node_factory("origin"),
+            origin=basic_node_factory("destination"),
             time_to_origin=timedelta(hours=10),
             time_to_destination=timedelta(hours=10)
         )
         segment2 = segment1.reversed()
-        scheduler = ArriveScheduler(
-            rail_segments=[segment1, segment2],
-            simulator=simulator
-        )
+
         task = Task(
             demand=demand,
             path=["origin", "destination"],
             task_volume=train_size,
             current_time=clk.current_time,
-            scheduler=scheduler
         )
         train = Train(
             capacity=train_size,
@@ -45,6 +41,12 @@ def simple_train(basic_node_factory):
             is_loaded=False,
             clock=clk
         )
+        if add_scheduler:
+            scheduler = ArriveScheduler(
+                rail_segments=[segment1, segment2],
+                simulator=simulator
+            )
+            train.add_observers([scheduler])
         return train
 
     return make
