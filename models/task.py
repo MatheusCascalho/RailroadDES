@@ -1,13 +1,8 @@
-from dataclasses import dataclass
-
-from interfaces.des_simulator_interface import DESSimulatorInterface
 from models.demand import Demand
-from models.des_simulator import DESSimulator
 from models.time_table import TimeTable, TimeEvent
 from models.constants import Process, EventName
 from models.path import Path
 from datetime import datetime
-from models.arrive_scheduler import ArriveScheduler
 
 
 def task_id_gen():
@@ -25,7 +20,6 @@ class Task:
             self,
             demand: Demand,
             path: list[str],
-            scheduler: ArriveScheduler,
             task_volume: float,
             current_time: datetime,
     ):
@@ -39,10 +33,8 @@ class Task:
         """
         self.ID = next(task_id)
         self.demand = demand
-        self.scheduler = scheduler
         self.path = Path(path)
         self.time_table = TimeTable()
-        self.time_table.add_observers([self.scheduler])
         event = TimeEvent(
             event=EventName.DEPARTURE,
             instant=current_time
@@ -50,6 +42,7 @@ class Task:
         self.time_table.update(event=event, process=Process.UNLOAD)
         self.task_volume = task_volume
         self.invoiced_volume = 0
+        self.train_id = None
 
     def update(self, event: TimeEvent, process: Process):
         """
@@ -70,6 +63,9 @@ class Task:
         if update_invoiced_volume:
             self.invoiced_volume = self.task_volume
             self.demand.operated += self.invoiced_volume
+
+    def assign(self, train_id: str):
+        self.train_id = train_id
 
     def penalty(self):
         """
