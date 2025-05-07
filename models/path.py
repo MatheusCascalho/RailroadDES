@@ -28,6 +28,8 @@ class Path:
 
     @property
     def current_location(self):
+        if len(self.__path)==0:
+            return '' # Means that train finish travel, therefore, is not in load point
         return self.__path[0]
 
     def next_location(self):
