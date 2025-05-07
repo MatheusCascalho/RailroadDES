@@ -16,6 +16,7 @@ from models.task import Task
 from models.time_table import TimeEvent
 from models.clock import Clock
 from models.states import ActivityState
+from models.observers import to_notify
 
 
 def train_id_gen():
@@ -28,6 +29,7 @@ def train_id_gen():
 train_id = train_id_gen()
 
 class Train(TrainInterface):
+
     def __init__(
             self,
             capacity: float,
@@ -50,6 +52,7 @@ class Train(TrainInterface):
         )
         self.current_task = task
         self._in_slot = False
+        super().__init__()
 
 
     # ====== Properties ==========
@@ -67,7 +70,8 @@ class Train(TrainInterface):
 
     @current_task.setter
     def current_task(self, task: Task):
-        task.scheduler.train = self
+        # task.scheduler.train = self
+        task.assign(self.ID)
         self.__current_task = task
 
 
@@ -123,6 +127,14 @@ class Train(TrainInterface):
     def ready_to_leave(self):
         return self.load_system.is_ready
 
+    @property
+    def dispatched_just_now(self):
+        return self.current_task.time_table.dispatched_just_now
+
+    @property
+    def arrived_right_now(self):
+        return self.current_task.time_table.arrived_right_now
+
     def __str__(self):
         name = self.ID
         return f"{name} | Capacidade: {self.capacity} | {self.state}"
@@ -144,7 +156,7 @@ class Train(TrainInterface):
         node: NodeInterface,
         **kwargs
     ):
-        print(f'{self.clock.current_time}:: Train {self.ID} finish load!')
+        print(f'{self.clock.current_time}:: Train {self} finish load!')
         self.activity_system.finish_process()
         event = TimeEvent(
             event=EventName.FINISH_PROCESS,
@@ -180,6 +192,7 @@ class Train(TrainInterface):
             time=process_time,
             callback=self.finish_load,
             simulator=simulator,
+            node=kwargs.get('node')
         )
 
     def start_unload(
@@ -208,6 +221,8 @@ class Train(TrainInterface):
             time=process_time,
             callback=self.finish_unload,
             simulator=simulator,
+            node=node,
+            slot=slot
         )
 
     def finish_unload(
@@ -217,7 +232,6 @@ class Train(TrainInterface):
         slot: Slot,
         **kwargs
     ):
-        print(f'{self.clock.current_time}:: Train {self.ID} finish load!')
         self.activity_system.finish_process()
         event = TimeEvent(
             event=EventName.FINISH_PROCESS,
@@ -227,12 +241,14 @@ class Train(TrainInterface):
             event=event,
             process=Process.UNLOAD
         )
+        print(f'{self.clock.current_time}:: Train {self} finish unload!')
+
         # Add next event to calendar
         simulator.add_event(
             time=timedelta(),
             callback=node.maneuver_to_dispatch,
             simulator=simulator,
-            slot=slot,
+            # slot=slot,
         )
 
     def maneuvering_to_enter(self, simulator: DESSimulator, node: NodeInterface):
@@ -247,7 +263,8 @@ class Train(TrainInterface):
     def maneuvering_to_leave(self):
         self.state.action = TrainActions.MANEUVERING_TO_LEAVE
 
-    def arrive(self, simulator: DESSimulator, node: NodeInterface):
+    @to_notify()
+    def arrive(self, node: NodeInterface):
         print(f'{self.clock.current_time}:: train {self.ID} arrive at node {node}!!')
         # Changing State
         self.activity_system.arrive()
@@ -258,6 +275,7 @@ class Train(TrainInterface):
         process = Process.LOAD if self.current_task.is_on_load_point() else Process.UNLOAD
         self.current_task.update(event=event,process=process)
 
+    @to_notify()
     def leave(self, node: NodeInterface):
         print(f'{self.clock.current_time}:: Train {self.ID} leaving node {node}!')
         self.activity_system.leave()
