@@ -5,12 +5,15 @@ from interfaces.train_interface import TrainInterface
 from models.event_calendar import Event
 from models.conditions import RailroadMesh
 from models.states import RailroadState
-from models.inputs import Demand
+from models.demand import Demand
 from models.exceptions import TrainExceptions, FinishedTravelException
 from models.constants import TrainActions
 from datetime import datetime
 from petri_nets.petri_components import Place, Transition, Arc
 from petri_nets.net import PetriNet
+from models.arrive_scheduler import ArriveScheduler
+from models.path import Path
+from models.task import Task
 
 
 class DESModel(abc.ABC):
@@ -52,32 +55,59 @@ class Railroad(DESModel):
             target_volume=sum(demand.volume for demand in demands)
         )
         self.demands = demands
-        self.petri_model = self.build_petri_model()
+        # self.petri_model = self.build_petri_model()
 
     # ===== Events =========
     def starting_events(self, simulator: DESSimulatorInterface):
         for train in self.trains:
-            if train.action == TrainActions.MOVING:
-                origin = train.current_location[0]
-                destination = train.current_location[1]
-            else:
-                origin = train.current_location
-                try:
-                    destination = train.next_location
-                except TrainExceptions:
-                    train.path, train.target_demand = self.create_new_path(
-                        current_time=simulator.current_date, current_location=train.current_location
-                    )
-                    destination = train.next_location
+            # if train.action == TrainActions.MOVING:
+            #     origin = train.current_location[0]
+            #     destination = train.current_location[1]
+            # else:
+            #     origin = train.current_location
+            #     try:
+            #         destination = train.next_location
+            #     except TrainExceptions:
+            #         train.path, train.target_demand = self.create_new_path(
+            #             current_time=simulator.current_date, current_location=train.current_location
+            #         )
+            #         destination = train.next_location
 
-            time = self.mesh.transit_time(origin_id=origin, destination_id=destination)
+            # time = self.mesh.transit_time(origin_id=origin, destination_id=destination)
 
-            simulator.add_event(
-                time=time,
-                callback=train.arrive,
-                simulator=simulator,
-                node=self.mesh.load_points[0],
+            # simulator.add_event(
+            #     time=time,
+            #     callback=train.arrive,
+            #     simulator=simulator,
+            #     node=self.mesh.load_points[0],
+            # )
+            task = self.choose_task(current_time=simulator.current_date)
+            segments = []
+            last = ''
+            for n in task.path.path:
+                if '-' not in n:
+                    continue
+                o, d = n.split('-')
+                if o in self.mesh.graph:
+                    s = self.mesh.graph[o][0]
+                else:
+                    s = self.mesh.graph[d][0].reversed()
+                segments.append(s)
+            scheduler = ArriveScheduler(
+                rail_segments=segments,
+                simulator=simulator
             )
+            train.add_observers([scheduler])
+            scheduler.update()
+
+    def choose_task(self, current_time):
+        d = self.demands[0]
+        return Task(
+            demand=d,
+            path=[d.flow.origin, d.flow.destination],
+            task_volume=6e3,
+            current_time=current_time
+        )
 
     def solver_exceptions(self, exception: Exception, event: Event):
         if isinstance(exception, FinishedTravelException):
@@ -85,10 +115,12 @@ class Railroad(DESModel):
             self.state.operated_volume += train.capacity
             self.state.completed_travels += 1
 
-            if self.state.is_incomplete:
-                train.path, train.target_demand = self.create_new_path(current_time=exception.current_time, current_location=train.current_location)
-            else:
-                event.callback = self.stop_train
+            # if self.state.is_incomplete:
+            # train.path, train.target_demand = self.create_new_path(current_time=exception.current_time, current_location=train.current_location)
+            task = self.choose_task(current_time=exception.current_time)
+            train.current_task = task
+            # else:
+            #     event.callback = self.stop_train
 
     def stop_train(self, **kwargs):
         pass
@@ -128,8 +160,8 @@ class Railroad(DESModel):
         transitions = []
 
         for demand in self.demands:
-            origin = self.mesh.name_to_node[demand.origin]
-            destination = self.mesh.name_to_node[demand.destination]
+            origin = self.mesh.name_to_node[demand.flow.origin]
+            destination = self.mesh.name_to_node[demand.flow.destination]
 
             demand_to_be_attended = Place(
                 tokens=demand.volume / self.trains[0].capacity,
