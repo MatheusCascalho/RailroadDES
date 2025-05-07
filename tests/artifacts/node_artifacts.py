@@ -1,5 +1,5 @@
 import pytest
-
+from models.model_queue import Queue
 from models.constants import Process
 from models.node import Node
 
@@ -44,16 +44,34 @@ def basic_node(mocker):
 
 @pytest.fixture
 def basic_node_factory(mocker):
-    def make(name):
-        clock = mocker.Mock()
-        clock.current_time = "12:00"
+    def make(name, clock=None):
+        clk = mocker.Mock() if not clock else clock
+        if not clock:
+            clk.current_time = "12:00"
         return Node(
             name=name,
-            clock=clock,
+            clock=clk,
             process_constraints=[],
             maneuvering_constraint_factory=mocker.Mock(),
             queue_to_enter=mocker.Mock(),
             queue_to_leave=mocker.Mock(),
+            process_units=[]
+        )
+    return make
+
+@pytest.fixture
+def real_node_factory(mocker):
+    def make(name, clock=None):
+        clk = mocker.Mock() if not clock else clock
+        if not clock:
+            clk.current_time = "12:00"
+        return Node(
+            name=name,
+            clock=clk,
+            process_constraints=[],
+            maneuvering_constraint_factory=mocker.Mock(),
+            queue_to_enter=Queue(capacity=20, name='input'),
+            queue_to_leave=Queue(capacity=20, name='output'),
             process_units=[]
         )
     return make
