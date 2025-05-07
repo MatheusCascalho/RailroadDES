@@ -58,6 +58,9 @@ class EventCalendar:
         for event in self.calendar:
             event.time_until_happen -= time_step
 
+    def __repr__(self):
+        return f"Calendar with {len(self.calendar)} events"
+
 
 if __name__ == '__main__':
     print("="*50)
