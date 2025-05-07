@@ -36,7 +36,8 @@ def simple_stock_node_data(simple_stock, simple_process_rates, simple_rates):
 
 @fixture
 def simple_stock_node_data_factory(simple_stock, simple_process_rates, simple_rates):
-    def make():
+    def make(process='load'):
+        simple_process_rates[0]['type']=process
         data = {
             "name": "xpto",
             "stocks": simple_stock,
@@ -46,6 +47,7 @@ def simple_stock_node_data_factory(simple_stock, simple_process_rates, simple_ra
             "queue_capacity": 20,
             "post_operation_time": 5
         }
+
         data = StockNodeData(**data)
         return data
     return make
@@ -69,11 +71,15 @@ def simple_stock_node(simple_clock, simple_stock_node_data):
 
 @fixture
 def simple_stock_node_factory(simple_clock, simple_stock_node_data_factory):
-    def make(name):
-        data=simple_stock_node_data_factory()
+    def make(name, process,clock=None):
+        data=simple_stock_node_data_factory(process)
         data.name = name
+        if clock:
+            clk = clock
+        else:
+            clk = simple_clock
         factory = NodeStockFactory(
-            clock=simple_clock,
+            clock=clk,
             data=data
         )
         node = factory.create_node()
