@@ -1,7 +1,10 @@
 from abc import ABC, abstractmethod
+from models.observers import AbstractSubject
 
 
-class TrainInterface(ABC):
+class TrainInterface(AbstractSubject):
+    def __init__(self):
+        super().__init__()
     # ====== Properties ==========
 
     @property
@@ -82,6 +85,14 @@ class TrainInterface(ABC):
 
     @abstractmethod
     def removed_from_slot(self):
+        pass
+
+    @abstractmethod
+    def dispatched_just_now(self):
+        pass
+
+    @abstractmethod
+    def arrived_right_now(self):
         pass
 
     # ====== Properties ==========
