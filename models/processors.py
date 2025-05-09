@@ -71,16 +71,16 @@ class ProcessorSystem(DiscreteEventSystem):
             raise ProcessException.process_is_blocked()
 
     def free_up(self):
-        if self.state_machine.current_state.name == ProcessorState.BUSY:
-            self.current_train = None
-            self.promised = False
-            self.state_machine.update()
-        else:
+        train = self.current_train
+        if self.state_machine.current_state.name != ProcessorState.BUSY:
             raise Exception("Processor is Idle")
+        self.state_machine.update()
+        return train
 
     def clear(self):
         train = self.current_train
         train.removed_from_slot()
+        self.promised = False
         self.queue_to_leave.push(
             train,
             arrive=self.clock.current_time
