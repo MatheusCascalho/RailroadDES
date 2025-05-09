@@ -91,6 +91,6 @@ class RepeatedProcessError(Exception):
 class AlreadyRegisteredError(Exception):
     """Exceção customizada para erro na sequência de eventos."""
 
-    def __init__(self, message="Event already registered"):
+    def __init__(self, message="Event already registered with another instant"):
         self.message = message
         super().__init__(self.message)
