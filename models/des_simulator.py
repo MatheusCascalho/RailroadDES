@@ -40,6 +40,7 @@ class DESSimulator(Entity, DESSimulatorInterface):
             except FinishedTravelException as error:
                 self.model.solver_exceptions(exception=error, event=event, simulator=self)
                 event.callback(**event.data)
+        print(f"Finish simulation")
 
     def solve_exceptions(self, *args, **kwargs):
         error = kwargs.get('error')
