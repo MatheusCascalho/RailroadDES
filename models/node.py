@@ -83,9 +83,9 @@ class Node(NodeInterface):
         for train in self.queue_to_leave.now():
             none_constraint_are_blocked = all(not c.is_blocked() for c in self.liberation_constraints[train.ID])
             if none_constraint_are_blocked:
+                train.leave(node=self)
                 self.queue_to_leave.pop(current_time=self.clock.current_time)
                 self.liberation_constraints.pop(train.ID)
-                train.leave(node=self)
 
                 # train.leave()
 
