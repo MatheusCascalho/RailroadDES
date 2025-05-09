@@ -149,7 +149,7 @@ class Node(NodeInterface):
         for slot in self.process_units:
             if slot.current_train and slot.current_train.ready_to_leave:
                 print(f'{simulator.current_date}:: Train {slot.current_train.ID} entering on leaving queue!')
-                train = slot.clear()
+                train = slot.free_up()
                 constraint = self.maneuvering_constraint_factory.create(train_id=train.ID)
                 self.liberation_constraints[train.ID].append(constraint)
                 simulator.add_event(
