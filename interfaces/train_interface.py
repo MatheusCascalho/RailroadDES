@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
-from models.observers import AbstractSubject
+from models.observers import SubjectWithOnlyOneObserver
 
 
-class TrainInterface(AbstractSubject):
+class TrainInterface(SubjectWithOnlyOneObserver):
     def __init__(self):
         super().__init__()
     # ====== Properties ==========
