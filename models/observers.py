@@ -116,6 +116,26 @@ class AbstractSubject(metaclass=SubjectMetaDecorator):
             if self not in obs.subjects:
                 obs.append_subject(self)
 
+class SubjectWithOnlyOneObserver(metaclass=SubjectMetaDecorator):
+    def __init__(self):
+        self.observers: list[AbstractObserver] = []
+
+    def add_observers(self, observers: list[AbstractObserver]):
+        """
+        Adds an observer to the subject and the subject itself to the observer.
+        :param observers:
+        :return:
+        """
+        if isinstance(observers, AbstractObserver):
+            observers = [observers]
+        if len(observers)> 1:
+            raise Exception("This subject should be observed by only one object")
+        self.observers.extend(observers)
+        while len(self.observers)>1:
+            self.observers.pop(0)
+        if self not in observers[0].subjects:
+            observers[0].append_subject(self)
+
 
 def id_gen():
     i = 0
