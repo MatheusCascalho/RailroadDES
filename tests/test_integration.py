@@ -128,7 +128,7 @@ def simple_model(simple_stock_node_factory, simple_train, simple_clock):
         )
 
         unload_points = (
-            simple_stock_node_factory('destination', clock=simple_clock, process='unload'),
+            simple_stock_node_factory('destination', clock=simple_clock, process='unload', has_replanisher=False),
         )
 
         transit_times = [
