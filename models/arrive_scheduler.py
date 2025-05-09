@@ -26,11 +26,7 @@ class ArriveScheduler(AbstractObserver):
             self.update()
 
     def send(self):
-        try:
-            current_segment = self.current_segment()
-        except FinishedTravelException as error:
-            self.simulator.solve_exceptions(train=self.subjects[0], error=error)
-            current_segment = self.current_segment()
+        current_segment = self.current_segment()
 
         self.simulator.add_event(
             time=current_segment.time_to_destination,
