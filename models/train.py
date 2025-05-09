@@ -72,6 +72,7 @@ class Train(TrainInterface):
     def current_task(self, task: Task):
         # task.scheduler.train = self
         task.assign(self.ID)
+        self.activity_system.path = task.path
         self.__current_task = task
 
 
