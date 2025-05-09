@@ -75,7 +75,7 @@ class StockNodeData:
             raise Exception(f"{products_without_rate} has not rates")
         products_in_replenishment = [r.product for r in self.replenishment]
         products_without_replenishment = [p for p in products if p not in products_in_replenishment]
-        if products_without_replenishment:
+        if self.replenishment and products_without_replenishment:
             raise Exception(f"{products_without_replenishment} has not replenishment")
 
 
