@@ -82,23 +82,27 @@ class Railroad(DESModel):
             #     node=self.mesh.load_points[0],
             # )
             task = self.choose_task(current_time=simulator.current_date)
-            segments = []
-            last = ''
-            for n in task.path.path:
-                if '-' not in n:
-                    continue
-                o, d = n.split('-')
-                if o in self.mesh.graph:
-                    s = self.mesh.graph[o][0]
-                else:
-                    s = self.mesh.graph[d][0].reversed()
-                segments.append(s)
+            segments = self.get_segments(task)
             scheduler = ArriveScheduler(
                 rail_segments=segments,
                 simulator=simulator
             )
             train.add_observers([scheduler])
             scheduler.update()
+
+    def get_segments(self, task):
+        segments = []
+        last = ''
+        for n in task.path.path:
+            if '-' not in n:
+                continue
+            o, d = n.split('-')
+            if o in self.mesh.graph:
+                s = self.mesh.graph[o][0]
+            else:
+                s = self.mesh.graph[d][0].reversed()
+            segments.append(s)
+        return segments
 
     def choose_task(self, current_time):
         d = self.demands[0]
