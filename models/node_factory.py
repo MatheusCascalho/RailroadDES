@@ -85,17 +85,18 @@ class NodeStockFactory(AbstractNodeFactory):
         return stocks
 
     def create_replenisher(self, replenishment: list[RateData]):
-        replenisher = SimpleStockReplanisher(
-            replenish_rates=[
-                ReplenishRate(
-                    product=r.product,
-                    rate=r.rate,
-                    discretization=self.discretization
-                ) for r in replenishment
-            ],
-            clock=self.clock
-        )
-        return replenisher
+        if replenishment:
+            replenisher = SimpleStockReplanisher(
+                replenish_rates=[
+                    ReplenishRate(
+                        product=r.product,
+                        rate=r.rate,
+                        discretization=self.discretization
+                    ) for r in replenishment
+                ],
+                clock=self.clock
+            )
+            return replenisher
 
     def create_maneuver_constraint_factory(self, post_operation_time: int):
         factory = ManeuveringConstraintFactory(

@@ -188,7 +188,8 @@ class StockNode(Node):
     def pre_processing(self):
         for stock in self.stocks.values():
             stock.update_promises()
-        self.replenisher.replenish(list(self.stocks.values()))
+        if self.replenisher:
+            self.replenisher.replenish(list(self.stocks.values()))
 
     def pos_processing(self):
         for slot in self.process_units:
