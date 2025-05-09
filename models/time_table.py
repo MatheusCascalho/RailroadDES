@@ -153,7 +153,7 @@ class TimeRegister:
         Raises:
         Exception: If the event has already been registered in the current register.
         """
-        if self.event_attr[event.event].instant is not None:
+        if self.event_attr[event.event].instant is not None and self.event_attr[event.event].instant != event.instant:
             raise AlreadyRegisteredError()
         event_index = self.sequence.index(event.event)
         predecessors = self.sequence[:event_index]
@@ -206,6 +206,7 @@ class TimeTable(AbstractSubject):
         if registers is None:
             registers = []
         self.registers = registers
+        self.__last_event = None
         super().__init__()
 
     def __str__(self):
@@ -221,13 +222,16 @@ class TimeTable(AbstractSubject):
         Args:
         event (TimeEvent): The event to be recorded in the TimeTable.
         """
+        if event == self.__last_event:
+            print("Evento já registrado") # TODO: Migrar para log.warning
+            return
         if self.current_process is not None and self.current_process != process:
             if event.event != EventName.ARRIVE:
                 raise TimeSequenceErro()
             elif self.current_process and self.registers[-1].departure.instant is None:
                 raise TimeSequenceErro()
         if self.registers and event.event == EventName.ARRIVE:
-            if self.current_process == process:
+            if self.current_process == process and self.registers[-1].arrive != event.instant:
                 raise RepeatedProcessError()
             if self.registers[-1].departure.instant is None:
                 raise EventSequenceError()
@@ -236,6 +240,7 @@ class TimeTable(AbstractSubject):
         if not self.registers or event.event == EventName.ARRIVE:
             self.registers.append(TimeRegister(process=process))
         self.registers[-1].update(event)
+        self.__last_event = event
 
     @property
     def queue_time(self) -> timedelta:
@@ -303,3 +308,6 @@ class TimeTable(AbstractSubject):
             dont_start_anything = self.registers[-1].start_process.instant is None
             return arrived and dont_start_anything
         return False
+
+    def last_event(self):
+        return self.__last_event
