@@ -113,7 +113,7 @@ class Railroad(DESModel):
             current_time=current_time
         )
 
-    def solver_exceptions(self, exception: Exception, event: Event):
+    def solver_exceptions(self, exception: Exception, event: Event, simulator: DESSimulatorInterface):
         if isinstance(exception, FinishedTravelException):
             train: TrainInterface = exception.train
             self.state.operated_volume += train.capacity
@@ -122,9 +122,13 @@ class Railroad(DESModel):
             # if self.state.is_incomplete:
             # train.path, train.target_demand = self.create_new_path(current_time=exception.current_time, current_location=train.current_location)
             task = self.choose_task(current_time=exception.current_time)
+            segments = self.get_segments(task)
             train.current_task = task
-            # else:
-            #     event.callback = self.stop_train
+            scheduler = ArriveScheduler(
+                rail_segments=segments,
+                simulator=simulator
+            )
+            train.add_observers([scheduler])
 
     def stop_train(self, **kwargs):
         pass
