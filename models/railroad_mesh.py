@@ -96,3 +96,6 @@ class RailroadMesh:
     def complete_path(self, origin_name, destination_name):
         # Improvement: Dijkstra algorithm to complex mesh
         return [self.name_to_node[origin_name].identifier, self.name_to_node[destination_name].identifier]
+
+    def __len__(self):
+        return len(self.load_points) + len(self.unload_points)
