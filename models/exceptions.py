@@ -1,6 +1,9 @@
 from interfaces.train_interface import TrainInterface
 from datetime import datetime
 
+class NotCompletedEvent(Exception):
+    def __init__(self, event=None, message='Event not completed'):
+        super().__init__(message)
 
 class FinishedTravelException(Exception):
     def __init__(self, value, train: TrainInterface, current_time: datetime):

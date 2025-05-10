@@ -1,5 +1,5 @@
 from interfaces.train_interface import TrainInterface
-from models.exceptions import ProcessException
+from models.exceptions import ProcessException, NotCompletedEvent
 from models.node_constraints import ProcessConstraintSystem
 from models.processors import ProcessorSystem
 from models.data_model import ProcessorRate
@@ -109,6 +109,8 @@ class Node(NodeInterface):
 
         self.queue_to_enter.recover()
         self.pos_processing()
+        if self.queue_to_enter.current_size > 0:
+            raise NotCompletedEvent()
 
     def _is_blocked_by_constraints(self, process: Process):
         return any(c.is_blocked() for c in self.process_constraints if c.process_type() == process)
