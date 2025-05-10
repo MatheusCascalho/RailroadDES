@@ -6,7 +6,7 @@ from models.clock import Clock
 
 class NodeInterface(Entity, ABC):
     def __init__(self, name, clock):
-        super().__init__(name=name,clock=clock)
+        super().__init__(name=name,clock=clock, prefix='Node')
 
     # ====== Properties ==========
     # ====== Events ==========

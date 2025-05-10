@@ -11,8 +11,8 @@ def entity_id_gen():
 entity_id = entity_id_gen()
 
 class Entity:
-    def __init__(self, name, clock: Clock):
-        self._id = next(entity_id)
+    def __init__(self, name, clock: Clock, prefix='entity'):
+        self._id = next(entity_id).replace('entity', prefix) + f": {name}"
         self.name = name
         self.clock = clock
 
