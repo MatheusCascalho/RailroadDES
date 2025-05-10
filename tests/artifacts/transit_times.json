@@ -1,0 +1,32 @@
+[
+  {
+    "load_origin": "Souza",
+    "load_destination": "Campos da Serra",
+    "loaded_time": 21.33,
+    "empty_time": 10.0
+  },
+  {
+    "load_origin": "Mendes",
+    "load_destination": "Santos",
+    "loaded_time": 68.51,
+    "empty_time": 99.44
+  },
+  {
+    "load_origin": "Camargo de Abreu",
+    "load_destination": "Ferreira de Pereira",
+    "loaded_time": 30.32,
+    "empty_time": 85.1
+  },
+  {
+    "load_origin": "Leão",
+    "load_destination": "Caldeira Alegre",
+    "loaded_time": 51.95,
+    "empty_time": 15.16
+  },
+  {
+    "load_origin": "Cavalcanti da Prata",
+    "load_destination": "Ramos do Campo",
+    "loaded_time": 10.0,
+    "empty_time": 46.42
+  }
+]
