@@ -52,7 +52,8 @@ def create_model(
     def create(
             sim,
             n_trains,
-            train_size = 6e3
+            train_size = 6e3,
+            process_times = [5,6,10,7,15,8.9,30,18,4,6]
     ):
         with open('artifacts/transit_times.json', 'r') as f:
             data = json.load(f)
@@ -61,19 +62,22 @@ def create_model(
         unload_points = []
         transit_times = []
         demands = []
+        p_times = iter(process_times)
         for tt in data:
             d = simple_stock_node_factory(
                 tt['load_destination'],
                 clock=simple_clock,
                 process='unload',
-                has_replanisher=False
+                has_replanisher=False,
+                process_rate=train_size/next(p_times),
             )
             unload_points.append(d)
             o = simple_stock_node_factory(
                 tt['load_origin'],
                 clock=simple_clock,
                 process='load',
-                has_replanisher=True
+                has_replanisher=True,
+                process_rate=train_size / next(p_times),
             )
             load_points.append(o)
             transit_time = TransitTime(**tt)
