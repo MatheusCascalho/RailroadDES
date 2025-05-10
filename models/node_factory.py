@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from datetime import timedelta
 from models.clock import Clock
-from models.data_model import (
+from models.node_data_model import (
     StockNodeData,
     StockData,
     RateData,

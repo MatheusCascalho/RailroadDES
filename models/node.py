@@ -2,7 +2,7 @@ from interfaces.train_interface import TrainInterface
 from models.exceptions import ProcessException, NotCompletedEvent
 from models.node_constraints import ProcessConstraintSystem
 from models.processors import ProcessorSystem
-from models.data_model import ProcessorRate
+from models.node_data_model import ProcessorRate
 from models.des_simulator import DESSimulator
 from models.constants import (
     Process
