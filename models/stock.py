@@ -28,6 +28,8 @@ class StockEventPromise:
     def partial_event(self, current_date, max_volume, update=True) -> StockEvent:
         elapsed_time = current_date - self.promise_date
         complete_time = self.completion_date - self.promise_date
+        if complete_time.total_seconds() == 0:
+            complete_time = timedelta(hours=EPSILON) ## TODO: Melhorar essa lógica!
         reason = min(elapsed_time/complete_time, 1)
         partial_volume = self.volume * reason
         partial_volume = min(partial_volume, max_volume)
