@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, InitVar
 from datetime import datetime, timedelta
 from models.constants import Process, EventName
 from models.observers import AbstractSubject, to_notify
@@ -66,6 +66,7 @@ class TimeRegister:
     start_process: TimeEvent = field(default=None)
     finish_process: TimeEvent = field(default=None)
     departure: TimeEvent = field(default=None)
+    location: InitVar[str] = None
     sequence: tuple[EventName] = (
         EventName.ARRIVE,
         EventName.START_PROCESS,
@@ -78,11 +79,12 @@ class TimeRegister:
     def __str__(self):
         times = (f"ARRIVE: {self.arrive.instant} | START: {self.start_process.instant} "
                  f"| FINISH: {self.finish_process.instant} | DEPARTURE: {self.departure.instant}.instant")
-        return f"{self.ID} | {self.process} | {times}"
+        return f"{self.ID} | {self.register_location} | {self.process} | {times}"
 
     __repr__ = __str__
 
-    def __post_init__(self):
+    def __post_init__(self, location=None):
+        self.__location: str = location
         self.ID = next(register_id)
         self.arrive = TimeEvent(EventName.ARRIVE) if self.arrive is None else self.arrive
         self.start_process = TimeEvent(EventName.START_PROCESS) if self.start_process is None else self.start_process
@@ -94,6 +96,19 @@ class TimeRegister:
             EventName.FINISH_PROCESS: self.finish_process,
             EventName.DEPARTURE: self.departure
         }
+
+    @property
+    def register_location(self):
+        return self.__location
+
+    @register_location.setter
+    def register_location(self, value: str):
+        if value is None:
+            return
+        if self.__location is not None and self.__location != value:
+            raise Exception('Location already defined')
+        assert isinstance(value, str)
+        self.__location = value
 
     def get_queue(self) -> timedelta:
         """
@@ -143,7 +158,7 @@ class TimeRegister:
             return True
         return False
 
-    def update(self, event: TimeEvent):
+    def update(self, event: TimeEvent, location: str = None):
         """
         Updates the time register with the event's timestamp.
 
@@ -153,6 +168,7 @@ class TimeRegister:
         Raises:
         Exception: If the event has already been registered in the current register.
         """
+        self.register_location = location
         if self.event_attr[event.event].instant is not None and self.event_attr[event.event].instant != event.instant:
             raise AlreadyRegisteredError()
         event_index = self.sequence.index(event.event)
@@ -215,7 +231,7 @@ class TimeTable(AbstractSubject):
     __repr__ = __str__
 
     @to_notify()
-    def update(self, event: TimeEvent, process: Process = Process.UNLOAD):
+    def update(self, event: TimeEvent, process: Process = Process.UNLOAD, location: str = None):
         """
         Updates the last TimeRegister with the provided event, or creates a new TimeRegister if necessary.
 
@@ -239,7 +255,7 @@ class TimeTable(AbstractSubject):
                 raise TimeSequenceErro()
         if not self.registers or event.event == EventName.ARRIVE:
             self.registers.append(TimeRegister(process=process))
-        self.registers[-1].update(event)
+        self.registers[-1].update(event, location=location)
         self.__last_event = event
 
     @property

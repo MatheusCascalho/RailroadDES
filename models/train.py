@@ -6,7 +6,7 @@ from models.constants import (
 )
 from typing import Callable
 from datetime import timedelta, datetime
-
+from models.time_table import TimeTable
 from models.discrete_event_system import LoadSystem, ActivitySystem
 from models.exceptions import TrainExceptions, FinishedTravelException
 from models.resources import Slot
@@ -50,6 +50,7 @@ class Train(TrainInterface):
             processing_state=self.activity_system.processing_state,
             queue_to_leave_state=self.activity_system.queue_to_leave_state
         )
+        self.time_table = TimeTable()
         self.current_task = task
         self._in_slot = False
         super().__init__()
@@ -172,8 +173,10 @@ class Train(TrainInterface):
         )
         self.current_task.update(
             event=event,
-            process=Process.LOAD
+            process=Process.LOAD,
+            location=None
         )
+        self.time_table.update(event, process=Process.LOAD, location=None)
         # Add next event to calendar
         node.maneuver_to_dispatch(simulator)
 
@@ -193,8 +196,11 @@ class Train(TrainInterface):
         )
         self.current_task.update(
             event=event,
-            process=Process.LOAD
+            process=Process.LOAD,
+            location=None
         )
+        self.time_table.update(event, process=Process.LOAD)
+
         # Add next event to calendar
         simulator.add_event(
             time=process_time,
@@ -222,8 +228,11 @@ class Train(TrainInterface):
         )
         self.current_task.update(
             event=event,
-            process=Process.UNLOAD
+            process=Process.UNLOAD,
+            location=None
         )
+        self.time_table.update(event, process=Process.UNLOAD, location=None)
+
         # Add next event to calendar
         simulator.add_event(
             time=process_time,
@@ -247,8 +256,11 @@ class Train(TrainInterface):
         )
         self.current_task.update(
             event=event,
-            process=Process.UNLOAD
+            process=Process.UNLOAD,
+            location=None
         )
+        self.time_table.update(event, process=Process.UNLOAD, location=None)
+
         print(f'{self.clock.current_time}:: Train {self} finish unload!')
 
         # Add next event to calendar
@@ -281,7 +293,8 @@ class Train(TrainInterface):
             instant=self.clock.current_time
         )
         process = Process.LOAD if self.current_task.is_on_load_point() else Process.UNLOAD
-        self.current_task.update(event=event,process=process)
+        self.current_task.update(event=event,process=process, location=node.identifier)
+        self.time_table.update(event, process=process, location=node.identifier)
 
     @to_notify()
     def leave(self, node: NodeInterface):
@@ -292,4 +305,6 @@ class Train(TrainInterface):
             instant=self.clock.current_time
         )
         process = Process.LOAD if self.current_task.is_on_load_point() else Process.UNLOAD
-        self.current_task.update(event=event, process=process)
+        self.current_task.update(event=event, process=process, location=None)
+        self.time_table.update(event, process=process, location=node.identifier)
+

@@ -44,7 +44,7 @@ class Task:
         self.invoiced_volume = 0
         self.train_id = None
 
-    def update(self, event: TimeEvent, process: Process):
+    def update(self, event: TimeEvent, process: Process, location: str=None):
         """
         Updates the task's timetable and the invoiced volume based on the event.
 
@@ -55,7 +55,7 @@ class Task:
             event (TimeEvent): The event to be updated in the task's timetable.
             process (Process): The process related to the event.
         """
-        self.time_table.update(event, process=process)
+        self.time_table.update(event, process=process, location=location)
         update_invoiced_volume = (
                 event.event == EventName.FINISH_PROCESS and
                 self.time_table.current_process == Process.LOAD
