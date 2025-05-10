@@ -49,18 +49,18 @@ class Railroad(DESModel):
         )
         self.mesh = mesh
         self.trains = trains
-        self.state: RailroadState = RailroadState(
-            operated_volume=0,
-            completed_travels=0,
-            loaded_trains=len([t for t in trains if not t.is_empty]),
-            empty_trains=len([t for t in trains if t.is_empty]),
-            target_volume=sum(demand.volume for demand in demands)
-        )
         self.demands = demands
         self.router = router
         # self.petri_model = self.build_petri_model()
 
     # ===== Events =========
+    @property
+    def state(self):
+        nodes = '\n'.join([f"{n} - {n.state}" for n in self.mesh])
+        trains = '\n'.join([f"{t} - {t.state}" for t in self.trains])
+        return f"{nodes}\n{trains}"
+
+
     def starting_events(self, simulator: DESSimulatorInterface):
         for train in self.trains:
             self.router.route(current_time=simulator.current_date, train=train)
