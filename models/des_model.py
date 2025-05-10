@@ -124,7 +124,7 @@ class Railroad(DESModel):
 
     def statistics(self):
         operated_volume = [
-            {"Origin": demand.origin, "Destination": demand.destination, "Demand": demand.volume,
+            {"Origin": demand.flow.origin, "Destination": demand.flow.destination, "Demand": demand.volume,
              "Operated": demand.operated, "Cut": demand.cut}
             for demand in self.demands
         ]
