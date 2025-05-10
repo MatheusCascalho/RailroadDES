@@ -1,15 +1,29 @@
-from dataclasses import dataclass, field, InitVar
+from dataclasses import dataclass, field, InitVar, asdict
 from datetime import timedelta, datetime
 from interfaces.node_interce import NodeInterface
 from models.railroad import RailSegment
 from collections import defaultdict
+from typing import Union
 
 @dataclass
 class TransitTime:
     load_origin: str
     load_destination: str
-    loaded_time: timedelta
-    empty_time: timedelta
+    loaded_time: Union[float, timedelta]
+    empty_time: Union[float, timedelta]
+
+    def __post_init__(self):
+        if isinstance(self.loaded_time, (float, int)):
+            self.loaded_time = timedelta(hours=self.loaded_time)
+        if isinstance(self.empty_time, (float, int)):
+            self.empty_time = timedelta(hours=self.empty_time)
+
+    def to_dict(self):
+        data = asdict(self)
+        data['loaded_time'] = data['loaded_time'].total_seconds() / (60 * 60)
+        data['empty_time'] = data['empty_time'].total_seconds() / (60*60)
+        return data
+
 
 
 @dataclass
