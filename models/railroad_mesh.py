@@ -34,7 +34,7 @@ class RailroadMesh:
     name_to_node: dict[str, NodeInterface] = field(init=False, default_factory=dict)
     id_to_name: dict[int, str] = field(init=False, default_factory=dict)
     segments: list[RailSegment] = field(init=False, default_factory=list)
-    graph: dict[NodeInterface, RailSegment] = field(default_factory=lambda : defaultdict(list), init=False)
+    graph: dict[NodeInterface, list[RailSegment]] = field(default_factory=lambda : defaultdict(list), init=False)
 
 
     def __post_init__(self):
