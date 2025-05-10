@@ -183,3 +183,9 @@ def test_model(simple_model, simple_clock):
     sim.simulate(model=m, time_horizon=timedelta(days=10))
     ...
     # m.starting_events(simulator=sim)
+
+def test_stock_based_model(create_model, simple_clock):
+    sim = DESSimulator(clock=simple_clock)
+    model = create_model(sim=sim, n_trains=10)
+    sim.simulate(model=model, time_horizon=timedelta(days=10))
+    print(model.statistics())
