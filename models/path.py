@@ -14,6 +14,8 @@ class Path:
 
     @staticmethod
     def path_aumentado(path, starts_moving):
+        if not path:
+            return path
         resultado = []
         for i in range(len(path) - 1):
             resultado.append(path[i])

@@ -41,7 +41,7 @@ class Train(TrainInterface):
         self.ID = next(train_id)
         self.clock = clock
         self.activity_system = ActivitySystem(
-            path=task.path,
+            path=[],
             initial_activity=initial_activity
         )
         self.load_system = LoadSystem(
@@ -70,10 +70,13 @@ class Train(TrainInterface):
 
     @current_task.setter
     def current_task(self, task: Task):
-        # task.scheduler.train = self
-        task.assign(self.ID)
-        self.activity_system.path = task.path
-        self.__current_task = task
+        if task:
+            # task.scheduler.train = self
+            task.assign(self.ID)
+            self.activity_system.path = task.path
+            self.__current_task = task
+        else:
+            self.__current_task = task
 
 
     @property
@@ -130,10 +133,14 @@ class Train(TrainInterface):
 
     @property
     def dispatched_just_now(self):
+        if not self.current_task:
+            return False
         return self.current_task.time_table.dispatched_just_now
 
     @property
     def arrived_right_now(self):
+        if not self.current_task:
+            return False
         return self.current_task.time_table.arrived_right_now
 
     def __str__(self):
