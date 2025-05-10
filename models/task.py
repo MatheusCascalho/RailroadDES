@@ -89,3 +89,6 @@ class Task:
 
     def is_on_load_point(self):
         return self.path.current_location.split('-')[0] == self.demand.flow.origin
+
+    def __repr__(self):
+        return f"{self.ID} - {self.demand.flow}"
