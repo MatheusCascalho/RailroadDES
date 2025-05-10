@@ -14,6 +14,7 @@ from petri_nets.net import PetriNet
 from models.arrive_scheduler import ArriveScheduler
 from models.path import Path
 from models.task import Task
+from models.router import Router
 
 
 class DESModel(abc.ABC):
@@ -39,7 +40,8 @@ class Railroad(DESModel):
             self,
             mesh: RailroadMesh,
             trains: list[TrainInterface],
-            demands: list[Demand]
+            demands: list[Demand],
+            router: Router
     ):
         super().__init__(
             controllable_events=[],
@@ -55,34 +57,15 @@ class Railroad(DESModel):
             target_volume=sum(demand.volume for demand in demands)
         )
         self.demands = demands
+        self.router = router
         # self.petri_model = self.build_petri_model()
 
     # ===== Events =========
     def starting_events(self, simulator: DESSimulatorInterface):
         for train in self.trains:
-            # if train.action == TrainActions.MOVING:
-            #     origin = train.current_location[0]
-            #     destination = train.current_location[1]
-            # else:
-            #     origin = train.current_location
-            #     try:
-            #         destination = train.next_location
-            #     except TrainExceptions:
-            #         train.path, train.target_demand = self.create_new_path(
-            #             current_time=simulator.current_date, current_location=train.current_location
-            #         )
-            #         destination = train.next_location
+            self.router.route(current_time=simulator.current_date, train=train)
 
-            # time = self.mesh.transit_time(origin_id=origin, destination_id=destination)
-
-            # simulator.add_event(
-            #     time=time,
-            #     callback=train.arrive,
-            #     simulator=simulator,
-            #     node=self.mesh.load_points[0],
-            # )
-            task = self.choose_task(current_time=simulator.current_date)
-            segments = self.get_segments(task)
+            segments = self.get_segments(train.current_task)
             scheduler = ArriveScheduler(
                 rail_segments=segments,
                 simulator=simulator
@@ -104,26 +87,12 @@ class Railroad(DESModel):
             segments.append(s)
         return segments
 
-    def choose_task(self, current_time):
-        d = self.demands[0]
-        return Task(
-            demand=d,
-            path=[d.flow.origin, d.flow.destination],
-            task_volume=6e3,
-            current_time=current_time
-        )
 
     def solver_exceptions(self, exception: Exception, event: Event, simulator: DESSimulatorInterface):
         if isinstance(exception, FinishedTravelException):
             train: TrainInterface = exception.train
-            self.state.operated_volume += train.capacity
-            self.state.completed_travels += 1
-
-            # if self.state.is_incomplete:
-            # train.path, train.target_demand = self.create_new_path(current_time=exception.current_time, current_location=train.current_location)
-            task = self.choose_task(current_time=exception.current_time)
-            segments = self.get_segments(task)
-            train.current_task = task
+            self.router.route(train=train,current_time=exception.current_time)
+            segments = self.get_segments(train.current_task)
             scheduler = ArriveScheduler(
                 rail_segments=segments,
                 simulator=simulator
