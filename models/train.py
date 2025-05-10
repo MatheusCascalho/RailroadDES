@@ -88,7 +88,7 @@ class Train(TrainInterface):
         try:
             return self.activity_system.path.next_location()
         except IndexError:
-            TrainExceptions.path_is_finished()
+            TrainExceptions.path_is_finished(train_id=self.ID, location=self.current_location)
 
     @property
     def volume(self):
