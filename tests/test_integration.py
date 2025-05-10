@@ -5,7 +5,7 @@ from datetime import timedelta, datetime
 from models.clock import Clock
 from models.exceptions import TrainExceptions
 from hypothesis import given, strategies as st, assume, example
-from models.conditions import TransitTime, RailroadMesh
+from models.railroad_mesh import TransitTime, RailroadMesh
 # from tests.artifacts.train_artifacts import simple_train
 from models.demand import Demand, Flow
 from models.des_model import Railroad

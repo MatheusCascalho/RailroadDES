@@ -3,7 +3,7 @@ import pandas as pd
 from interfaces.des_simulator_interface import DESSimulatorInterface
 from interfaces.train_interface import TrainInterface
 from models.event_calendar import Event
-from models.conditions import RailroadMesh
+from models.railroad_mesh import RailroadMesh
 from models.states import RailroadState
 from models.demand import Demand
 from models.exceptions import TrainExceptions, FinishedTravelException

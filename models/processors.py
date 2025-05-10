@@ -5,7 +5,7 @@ from interfaces.train_interface import TrainInterface
 from models import model_queue as mq
 from models.clock import Clock
 from models.constants import Process, EventName
-from models.data_model import ProcessorRate
+from models.node_data_model import ProcessorRate
 from models.discrete_event_system import DiscreteEventSystem
 from models.exceptions import ProcessException
 from models.state_machine import State, Transition, StateMachine
