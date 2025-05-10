@@ -194,4 +194,5 @@ def test_stock_based_model(create_model, simple_clock):
     # for task in model.router.completed_tasks:
     #     t += task.time_table
     Gantt().build_gantt_with_all_trains(model.trains)
+    Gantt().build_gantt_by_trains(model.trains)
     print(model.statistics())

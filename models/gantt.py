@@ -66,6 +66,32 @@ class Gantt:
 
         fig.show()
 
+    def build_gantt_by_trains(self, trains):
+        dfs = []
+        for train in trains:
+            time_table = train.time_table
+            df = self.to_dataframe(time_table)
+            # df['Location'] += f" Trem {train.ID}"
+            df['Train'] = train.ID
+            dfs.append(df)
+        df = pd.concat(dfs, ignore_index=True).sort_values('Location')
+        # Criando o gráfico de Gantt
+        fig = px.timeline(df, x_start="Start", x_end="Finish", y="Train", color="Location", title="Diagrama de Gantt")
+        # fig.update_yaxes(categoryorder="total ascending")  # Organiza as tarefas pela ordem total
+        # Definindo os ticks do eixo Y
+        loc = {}
+        for location in df['Location'].unique():
+            loc[location[:-len("Trem train_xx")]] = location
+
+        # fig.update_layout(
+        #     yaxis=dict(
+        #         tickvals=list(loc.values()),  # Definindo as tarefas específicas para aparecer no eixo Y
+        #         ticktext=list(loc.keys())  # Alterando os rótulos dessas tarefas
+        #     )
+        # )
+
+        fig.show()
+
 
 if __name__ == '__main__':
     # import plotly.express as px
