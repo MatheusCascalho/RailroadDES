@@ -10,6 +10,8 @@ from models.railroad_mesh import TransitTime, RailroadMesh
 from models.demand import Demand, Flow
 from models.des_model import Railroad
 from models.des_simulator import DESSimulator
+from models.gantt import Gantt
+
 
 # @pytest.fixture
 class FakeSimulator(DESSimulator):
@@ -187,5 +189,9 @@ def test_model(simple_model, simple_clock):
 def test_stock_based_model(create_model, simple_clock):
     sim = DESSimulator(clock=simple_clock)
     model = create_model(sim=sim, n_trains=10)
-    sim.simulate(model=model, time_horizon=timedelta(days=10))
+    sim.simulate(model=model, time_horizon=timedelta(days=20))
+    # t = model.router.completed_tasks[0].time_table.copy()
+    # for task in model.router.completed_tasks:
+    #     t += task.time_table
+    Gantt().build_gantt_with_all_trains(model.trains)
     print(model.statistics())
