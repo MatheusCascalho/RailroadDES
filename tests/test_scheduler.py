@@ -1,4 +1,4 @@
-from models.railroad import RailSegment
+from models.railroad_mesh import RailSegment
 from models.time_table import EventName, TimeEvent
 from datetime import datetime, timedelta
 from models.arrive_scheduler import ArriveScheduler

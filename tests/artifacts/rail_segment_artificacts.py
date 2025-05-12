@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from models.railroad import RailSegment
+from models.railroad_mesh import RailSegment
 from pytest import fixture
 
 @fixture

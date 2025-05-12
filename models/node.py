@@ -10,7 +10,7 @@ from models.constants import (
 from dataclasses import dataclass
 from typing import Any
 from datetime import timedelta, datetime
-from models.railroad import RailSegment
+from models.railroad_mesh import RailSegment
 from interfaces.node_interce import NodeInterface
 from models.model_queue import Queue
 from models.clock import Clock

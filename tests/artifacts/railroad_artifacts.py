@@ -1,5 +1,5 @@
 from models.railroad_mesh import TransitTime, RailroadMesh
-from models.des_model import Railroad
+from models.railroad import Railroad
 from faker import Faker
 from factory import Factory, LazyAttribute
 import json

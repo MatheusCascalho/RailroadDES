@@ -1,5 +1,5 @@
 from models.des_simulator import DESSimulator
-from models.des_model import Railroad
+from models.railroad import Railroad
 from models.railroad_mesh import RailroadMesh, TransitTime
 from models.node import Node
 from models.train import Train

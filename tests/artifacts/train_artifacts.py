@@ -2,7 +2,7 @@ from datetime import timedelta
 
 from pytest import fixture
 from models.demand import Flow, Demand
-from models.railroad import RailSegment
+from models.railroad_mesh import RailSegment
 from models.task import Task
 from models.train import Train
 from models.arrive_scheduler import ArriveScheduler

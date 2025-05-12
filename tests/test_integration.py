@@ -8,7 +8,7 @@ from hypothesis import given, strategies as st, assume, example
 from models.railroad_mesh import TransitTime, RailroadMesh
 # from tests.artifacts.train_artifacts import simple_train
 from models.demand import Demand, Flow
-from models.des_model import Railroad
+from models.railroad import Railroad
 from models.des_simulator import DESSimulator
 from models.gantt import Gantt
 
