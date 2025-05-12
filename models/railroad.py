@@ -50,9 +50,6 @@ class Railroad(DESModel):
             train.add_observers([scheduler])
             scheduler.update()
 
-
-
-
     def solver_exceptions(self, exception: Exception, event: Event, simulator: DESSimulatorInterface):
         if isinstance(exception, FinishedTravelException):
             train: TrainInterface = exception.train
@@ -64,28 +61,8 @@ class Railroad(DESModel):
             )
             train.add_observers([scheduler])
 
-    def stop_train(self, **kwargs):
-        pass
     # ===== Events =========
     # ===== Decision Methods =========
-    def create_new_path(self, current_time: datetime, current_location):
-        path, demand = self.choose_path(current_time=current_time, current_location=current_location)
-        return path, demand
-
-    def choose_path(self, current_time, current_location):
-        paths = []
-        for demand in self.demands:
-            if not demand.is_completed:
-                path = self.mesh.complete_path(
-                    origin_name=demand.origin, destination_name=demand.destination
-                )
-                predicted_time = self.mesh.predicted_time_for_path(path=path, current_time=current_time)
-                paths.append((predicted_time, path, demand))
-
-        paths = sorted(paths, key=lambda x: x[0])
-        choosed_path = paths[0][1]
-        demand = paths[0][2]
-        return choosed_path, demand
 
     def statistics(self):
         operated_volume = [
