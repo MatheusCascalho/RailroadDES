@@ -40,7 +40,7 @@ class Railroad(DESModel):
 
     def starting_events(self, simulator: DESSimulatorInterface):
         for train in self.trains:
-            self.router.route(current_time=simulator.current_date, train=train)
+            self.router.route(current_time=simulator.current_date, train=train, state=self.state)
 
             segments = self.mesh.get_segments(train.current_task)
             scheduler = ArriveScheduler(
@@ -53,7 +53,7 @@ class Railroad(DESModel):
     def solver_exceptions(self, exception: Exception, event: Event, simulator: DESSimulatorInterface):
         if isinstance(exception, FinishedTravelException):
             train: TrainInterface = exception.train
-            self.router.route(train=train,current_time=exception.current_time)
+            self.router.route(train=train,current_time=exception.current_time, state=self.state)
             segments = self.mesh.get_segments(train.current_task)
             scheduler = ArriveScheduler(
                 rail_segments=segments,

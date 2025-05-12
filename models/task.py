@@ -3,6 +3,7 @@ from models.time_table import TimeTable, TimeEvent
 from models.constants import Process, EventName
 from models.path import Path
 from datetime import datetime
+from typing import Any
 
 
 def task_id_gen():
@@ -22,6 +23,7 @@ class Task:
             path: list[str],
             task_volume: float,
             current_time: datetime,
+            state: Any
     ):
         """
         Initializes a Task object that represents a routing decision for a train at a specific point in the simulation.
@@ -43,6 +45,7 @@ class Task:
         self.task_volume = task_volume
         self.invoiced_volume = 0
         self.train_id = None
+        self.model_state = state
 
     def update(self, event: TimeEvent, process: Process, location: str=None):
         """

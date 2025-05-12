@@ -34,6 +34,7 @@ def simple_train(basic_node_factory):
             path=["origin", "destination"],
             task_volume=train_size,
             current_time=clk.current_time,
+            state=""
         )
         train = Train(
             capacity=train_size,

@@ -188,11 +188,14 @@ def test_model(simple_model, simple_clock):
 
 def test_stock_based_model(create_model, simple_clock):
     sim = DESSimulator(clock=simple_clock)
-    model = create_model(sim=sim, n_trains=10)
+    model = create_model(sim=sim, n_trains=3)
     sim.simulate(model=model, time_horizon=timedelta(days=20))
     # t = model.router.completed_tasks[0].time_table.copy()
     # for task in model.router.completed_tasks:
     #     t += task.time_table
+    decision_map = {s: [{'penalty': t.penalty().total_seconds()/(60*60), 'reward': t.reward()} for t in model.router.decision_map[s]] for s in model.router.decision_map}
+
     Gantt().build_gantt_with_all_trains(model.trains)
     Gantt().build_gantt_by_trains(model.trains)
     print(model.statistics())
+
