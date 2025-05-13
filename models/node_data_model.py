@@ -62,9 +62,9 @@ class StockNodeData:
     post_operation_time: int
 
     def __post_init__(self):
-        self.stocks = [StockData(**s) for s in self.stocks]
-        self.rates = [ProcessorRate(**s) for s in self.rates]
-        self.replenishment = [RateData(**s) for s in self.replenishment]
+        self.stocks = [s if isinstance(s, StockData) else StockData(**s) for s in self.stocks]
+        self.rates = [s if isinstance(s, ProcessorRate) else ProcessorRate(**s) for s in self.rates]
+        self.replenishment = [s if isinstance(RateData) else RateData(**s) for s in self.replenishment]
         self.validate_products()
 
     def validate_products(self):
