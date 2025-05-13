@@ -9,8 +9,8 @@ class ManeuveringConstraintFactory:
             post_operation_time: int,
             clock: Clock
     ):
-        if not isinstance(post_operation_time, int):
-            raise Exception(f"Post operation should be int, not {type(post_operation_time)}")
+        if not isinstance(post_operation_time, (int, float)):
+            raise Exception(f"Post operation should be int or float, not {type(post_operation_time)}")
         self.post_operation_time = timedelta(hours=post_operation_time)
         self.clock = clock
 
