@@ -51,13 +51,6 @@ class RailSegment:
         )
         return segment
 
-    def send(self, train: TrainInterface):
-        next_location = train.next_location
-        if next_location == self.origin:
-            self.to_origin.append(train)
-        else:
-            self.to_destination.append(train)
-
     def __repr__(self):
         return f"{self.origin} to {self.destination}"
 
