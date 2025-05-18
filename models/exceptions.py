@@ -6,14 +6,20 @@ class NotCompletedEvent(Exception):
         super().__init__(message)
 
 class FinishedTravelException(Exception):
-    def __init__(self, value, train: TrainInterface, current_time: datetime):
+    def __init__(self, value, train: TrainInterface, current_location, current_time: datetime):
         self.current_time = current_time
         self.value = value
         self.train = train
+        self.current_location = current_location
 
     @staticmethod
     def path_is_finished(train: TrainInterface, current_time):
-        raise FinishedTravelException('Travel is finished!', train=train, current_time=current_time)
+        raise FinishedTravelException(
+            'Travel is finished!',
+            train=train,
+            current_time=current_time,
+            current_location=train.current_location
+        )
 
 
 class TrainExceptions(Exception):
