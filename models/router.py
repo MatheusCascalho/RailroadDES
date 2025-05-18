@@ -34,9 +34,6 @@ class RandomRouter(Router):
         train.current_task = task
         self.running_tasks[task] = train
 
-
-
-
     def choose_task(self, current_time, train_size, model_state) -> Task:
         random_index = randint(0, len(self.demands)-1)
         random_demand = self.demands[random_index]
