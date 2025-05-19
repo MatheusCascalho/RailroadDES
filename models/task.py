@@ -44,6 +44,7 @@ class Task:
         self.time_table.update(event=event, process=Process.UNLOAD)
         self.task_volume = task_volume
         self.invoiced_volume = 0
+        self.invoiced_volume_time = None
         self.train_id = None
         self.model_state = state
 
@@ -66,6 +67,7 @@ class Task:
         if update_invoiced_volume:
             self.invoiced_volume = self.task_volume
             self.demand.operated += self.invoiced_volume
+            self.invoiced_volume_time = event.instant
 
     def assign(self, train_id: str):
         self.train_id = train_id
