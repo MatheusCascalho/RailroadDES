@@ -64,13 +64,5 @@ class Railroad(DESModel):
     # ===== Events =========
     # ===== Decision Methods =========
 
-    def statistics(self):
-        operated_volume = [
-            {"Origin": demand.flow.origin, "Destination": demand.flow.destination, "Demand": demand.volume,
-             "Operated": demand.operated, "Cut": demand.cut}
-            for demand in self.demands
-        ]
-        return pd.DataFrame(operated_volume)
-
     def __repr__(self):
         return f"Railroad with {len(self.mesh)} nodes and {len(self.trains)} trains"
