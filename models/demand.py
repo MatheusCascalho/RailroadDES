@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from models.constants import EPSILON
 
 
@@ -15,6 +15,10 @@ class Demand:
     volume: float
     operated: float = 0.0
 
+    def __post_init__(self):
+        if isinstance(self.flow, dict):
+            self.flow = Flow(**self.flow)
+
     @property
     def is_completed(self):
         return self.volume - self.operated < EPSILON
@@ -22,3 +26,9 @@ class Demand:
     @property
     def cut(self):
         return self.volume - self.operated
+
+    def to_json(self):
+        return {
+            "flow": asdict(self.flow),
+            "volume": self.volume
+        }

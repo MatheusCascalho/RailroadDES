@@ -61,6 +61,13 @@ class Railroad(DESModel):
             )
             train.add_observers([scheduler])
 
+    def to_json(self):
+        return dict(
+            mesh=self.mesh.to_json(),
+            trains=len(self.trains),
+            demands=[d.to_json() for d in self.demands],
+        )
+
     # ===== Events =========
     # ===== Decision Methods =========
 
