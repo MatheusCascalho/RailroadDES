@@ -23,9 +23,12 @@ class OperatedVolume:
         history = history.sort_values('instant').dropna().groupby('instant')['operated'].sum().cumsum().reset_index()
         return history
 
-    def plot_operated_volume(self):
+    def plot_operated_volume(self, color='blue'):
         history = self.cumulated_volume_history()
+        history['color'] = color
         fig = px.line(history, x="instant", y="operated", title="Volume Operado")
+        fig.update_traces(line_color=color)
+
         # fig.show()
         return fig
 
