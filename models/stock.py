@@ -99,6 +99,10 @@ class StockInterface(AbstractSubject):
     def save_promise(self, promises):
         pass
 
+    @abstractmethod
+    def to_json(self):
+        pass
+
 class OwnStock(StockInterface):
     def __init__(
             self,
@@ -171,6 +175,13 @@ class OwnStock(StockInterface):
             method = self.receive if is_receive else self.dispatch
             method(event.volume)
         self.promises = [p for p in self.promises if not p.is_done]
+
+    def to_json(self):
+        return {
+            "initial_volume": self.volume,
+            "capacity": self.capacity,
+            "product": self.product
+        }
 
 
 if __name__=="__main__":

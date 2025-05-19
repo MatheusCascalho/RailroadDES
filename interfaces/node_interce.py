@@ -22,4 +22,8 @@ class NodeInterface(Entity, ABC):
     def maneuver_to_dispatch(self, **kwargs):
         pass
 
+    @abstractmethod
+    def to_json(self):
+        pass
+
 

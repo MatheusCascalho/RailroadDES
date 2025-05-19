@@ -15,6 +15,10 @@ class StockReplenisherInterface:
     def minimum_time_to_replenish_volume(self, *args, **kwargs):
         pass
 
+    @abstractmethod
+    def to_json(self):
+        pass
+
 
 @dataclass
 class ReplenishRate:
@@ -59,4 +63,9 @@ class SimpleStockReplanisher(StockReplenisherInterface):
         rate = self.replenish_rates[product]
         time = volume / rate.rate
         return timedelta(hours=time)
+
+    def to_json(self):
+        return dict(
+            replenish_rates=[r for r in self.replenish_rates.values()]
+        )
 

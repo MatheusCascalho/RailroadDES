@@ -143,4 +143,10 @@ class RailroadMesh:
             segments.append(s)
         return segments
 
+    def to_json(self):
+        return {
+            'load_points': [node.to_json() for node in self.load_points],
+            'unload_points': [node.to_json() for node in self.unload_points],
+            'transit_times': [transit.to_dict() for transit in self.transit_times]
+        }
 

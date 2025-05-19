@@ -71,6 +71,9 @@ class Node(NodeInterface):
             simulator=simulator
         )
 
+    def to_json(self):
+        return {}
+
     def dispatch(self):
         """
         Percorre a fila de saída e remove todos os trens que não estiverem com a saída bloqueada por alguma restrição
@@ -209,3 +212,15 @@ class StockNode(Node):
         needed_volume = volume - current_volume
         time = self.replenisher.minimum_time_to_replenish_volume(product=product, volume=needed_volume)
         return time
+
+    def to_json(self):
+        return dict(
+            name=self.name,
+            stocks=[s.to_json() for s in self.stocks.values()],
+            rates=[r.to_json() for p in self.process_units for r in p.rates.values()],
+            replenishment={} if self.replenisher is None else self.replenisher.to_json(),
+            train_sizes=[],
+            queue_capacity=self.queue_to_enter.capacity,
+            post_operation_time=self.maneuvering_constraint_factory.post_operation_time.total_seconds()/(60*60),
+        )
+
