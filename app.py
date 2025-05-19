@@ -27,19 +27,40 @@ def simulate():
 
     return model
 
+r = st.number_input("Qtd. de repetições", step=1, min_value=1)
+# st.metric(label='repeticoes', value=r)
+colors = ['red', 'green', 'blue', 'orange', 'purple']
+def col_gen():
+    while True:
+        yield 'red'
+        yield 'blue'
+        yield 'green'
+        yield 'orange'
+        yield 'purple'
 
+color = col_gen()
 # Botão de simulação
 if st.button("SIMULAR"):
+    simulations = []
+    volumes = []
+    for i in range(r):
+        model = simulate()
 
-    model = simulate()
+        gantt = Gantt().build_gantt_with_all_trains(model.trains)
+        # st.plotly_chart(gantt)
 
-    gantt = Gantt().build_gantt_with_all_trains(model.trains)
-    # st.plotly_chart(gantt)
+        # Gantt().build_gantt_by_trains(model.trains)
+        op_vol = OperatedVolume(model.router.completed_tasks)
+        op_vol_graph = op_vol.plot_operated_volume(color=next(color))
+        simulations.append(op_vol_graph)
+        opvol_table = op_vol.operated_volume_by_flow()
+        volumes.append({'vol':opvol_table['operated'].sum(), 'df': opvol_table})
 
-    # Gantt().build_gantt_by_trains(model.trains)
-    op_vol = OperatedVolume(model.router.completed_tasks)
-    op_vol_graph = op_vol.plot_operated_volume()
-    opvol_table = op_vol.operated_volume_by_flow()
+
+    for graphic in simulations[1:]:
+        for trace in graphic.data:
+            simulations[0].add_trace(trace)
+    opvol_table = sorted(volumes, key=lambda x: x['vol'], reverse=True)[0]['df']
     st.metric(label="Volume Operado", value=f"{opvol_table['operated'].sum():,.0f} t".replace(",", "."))
 
 
@@ -51,7 +72,7 @@ if st.button("SIMULAR"):
         st.plotly_chart(gantt, use_container_width=True)
 
     with col2:
-        st.plotly_chart(op_vol_graph, use_container_width=True)
+        st.plotly_chart(simulations[0], use_container_width=True)
 
     st.subheader("📊 Aceite Ferroviário")
     st.dataframe(opvol_table)
