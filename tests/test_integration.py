@@ -1,10 +1,12 @@
 import pytest
-
+import json
 from models.des_simulator import DESSimulator
 from datetime import timedelta, datetime
 from models.clock import Clock
 from models.exceptions import TrainExceptions
 from hypothesis import given, strategies as st, assume, example
+
+from models.operated_volume import OperatedVolume
 from models.railroad_mesh import TransitTime, RailroadMesh
 # from tests.artifacts.train_artifacts import simple_train
 from models.demand import Demand, Flow
@@ -194,5 +196,6 @@ def test_stock_based_model(create_model, simple_clock):
 
     Gantt().build_gantt_with_all_trains(model.trains)
     Gantt().build_gantt_by_trains(model.trains)
-    print(model.statistics())
-
+    op_vol = OperatedVolume(model.router.completed_tasks)
+    op_vol.plot_operated_volume().show()
+    print(op_vol.operated_volume_by_flow())
