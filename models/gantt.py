@@ -64,7 +64,8 @@ class Gantt:
             )
         )
 
-        fig.show()
+        # fig.show()
+        return fig
 
     def build_gantt_by_trains(self, trains):
         dfs = []
