@@ -2,9 +2,10 @@ from abc import abstractmethod
 from models.clock import Clock
 from models.exceptions import StockException
 from models.constants import EventName, EPSILON
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from datetime import datetime, timedelta
 from models.observers import AbstractSubject, Gossiper, SubjectNotifier, to_notify
+import pandas as pd
 
 
 @dataclass
@@ -51,6 +52,17 @@ class StockHistory:
     def __init__(self, events):
         self.events = events
 
+    def to_dataframe(self):
+        data = [asdict(e) for e in self.events]
+        if not data or all(e['event'] == EventName.RECEIVE_VOLUME for e in data):
+            return
+        df = pd.DataFrame(data)
+        df['event'] = df['event'].apply(lambda x: x.value)
+        df = df.groupby(['instant', 'event']).sum().unstack(1).fillna(0)
+        df.columns = df.columns.droplevel()
+        df['volume'] = (df['Receive Volume in Stock'] - df['Dispatch Volume in Stock']).cumsum()
+
+        return df
 
 class StockInterface(AbstractSubject):
     def __init__(self):
@@ -114,9 +126,10 @@ class OwnStock(StockInterface):
         self.clock = clock
         self.capacity = capacity
         self._product = product
-        self._volume = initial_volume
+        self._volume = 0# initial_volume
         self.promises: list[StockEventPromise] = []
         super().__init__()
+        self.receive(volume=initial_volume)
 
     @property
     def product(self):
