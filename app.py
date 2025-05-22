@@ -2,6 +2,8 @@ import dill
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+
+from models.stock_graphic import StockGraphic
 from tests.artifacts.railroad_artifacts import create_model
 from models.des_simulator import DESSimulator
 from tests.artifacts.stock_node_artifacts import simple_clock
@@ -19,7 +21,7 @@ st.title("Simulação Ferroviária")
 def simulate():
     sim = DESSimulator(clock=Clock(start=datetime(2025,4,1), discretization=timedelta(hours=1)))
     # model = create_model(sim=sim, n_trains=3)
-    with open('tests/artifacts/model.dill', 'rb') as f:
+    with open('tests/artifacts/model_2.dill', 'rb') as f:
         model = dill.load(f)
         sim.clock = model.mesh.load_points[0].clock
     sim.simulate(model=model, time_horizon=timedelta(days=20))
@@ -76,3 +78,9 @@ if st.button("SIMULAR"):
 
     st.subheader("📊 Aceite Ferroviário")
     st.dataframe(opvol_table)
+
+    st.subheader("Estoque")
+    sg = StockGraphic(list(model.mesh.load_points) + list(model.mesh.unload_points))
+    stocks = sg.get_figures()
+    for stock in stocks:
+        st.plotly_chart(stock, use_container_width=True)
