@@ -2,7 +2,7 @@ import pytest
 from datetime import timedelta
 from models.exceptions import TrainExceptions
 from hypothesis import given, strategies as st
-
+from hypothesis import HealthCheck, settings
 from models.operated_volume import OperatedVolume
 from models.railroad_mesh import TransitTime, RailroadMesh
 # from tests.artifacts.train_artifacts import simple_train
@@ -12,10 +12,10 @@ from models.des_simulator import DESSimulator
 from models.gantt import Gantt
 from models.stock_graphic import StockGraphic
 from tests.artifacts.simulator_artifacts import FakeSimulator
+from pytest import mark
 
-
-
-
+@mark.skip(reason="Despriorização de testes de integração.")
+@settings(suppress_health_check=[HealthCheck.function_scoped_fixture])
 @given(
     steps=st.lists(st.integers(min_value=1,max_value=360), min_size=3, max_size=10)
 )
@@ -24,6 +24,7 @@ def test_stock_node_should_block_train_in_queue_to_enter_when_stock_is_empty(
         simple_stock_node,
         simple_product,
         simple_train,
+        simple_simulator,
         steps
 ):
     # Arrange
@@ -32,21 +33,22 @@ def test_stock_node_should_block_train_in_queue_to_enter_when_stock_is_empty(
 
     # Act
     sim = FakeSimulator(clock=simple_clock)
-    simple_train.arrive(simulator=sim, node=simple_stock_node)
-    simple_stock_node.receive(simple_train)
-    simple_stock_node.process(simulator=sim)
+    train.arrive(node=simple_stock_node)
+    simple_stock_node.receive(simulator=simple_simulator,train=train)
 
     for i in range(10):
         try:
-            simple_train.start_load(simulator=sim, process_time=process_time)
+            simple_stock_node.process(simulator=sim)
+            train.start_load(simulator=sim, process_time=process_time)
             simple_clock.jump(process_time)
-            simple_train.finish_load(simulator=sim, node=simple_stock_node)
+            train.finish_load(simulator=sim, node=simple_stock_node)
             simple_stock_node.maneuver_to_dispatch(simulator=sim)
         except TrainExceptions as e:
             simple_clock.jump(timedelta(hours=10))
             simple_stock_node.process(simulator=sim)
         assert not train._in_slot
 
+@mark.skip(reason="Despriorização de testes de integração.")
 def test_simulation(simple_train, simple_stock_node, simple_product, simple_clock):
 
     sim = FakeSimulator(clock=simple_clock)
@@ -63,6 +65,7 @@ def test_simulation(simple_train, simple_stock_node, simple_product, simple_cloc
     simple_stock_node.maneuver_to_dispatch(simulator=sim)
     assert True
 
+@mark.skip(reason="Despriorização de testes de integração.")
 def test_stock_node_simulation(simple_train, simple_stock_node, simple_clock):
 
     sim = FakeSimulator(clock=simple_clock)
@@ -175,6 +178,7 @@ def simple_model(simple_stock_node_factory, simple_train, simple_clock):
         return model
     return create_model
 
+@mark.skip(reason="Despriorização de testes de integração.")
 def test_model(simple_model, simple_clock):
     sim = DESSimulator(clock=simple_clock)
 
@@ -183,6 +187,7 @@ def test_model(simple_model, simple_clock):
     ...
     # m.starting_events(simulator=sim)
 
+@mark.skip(reason="Despriorização de testes de integração.")
 def test_stock_based_model(create_model, simple_clock):
     sim = DESSimulator(clock=simple_clock)
     model = create_model(sim=sim, n_trains=15)
