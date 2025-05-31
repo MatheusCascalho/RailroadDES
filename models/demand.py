@@ -2,7 +2,7 @@ from dataclasses import dataclass, asdict
 from models.constants import EPSILON
 
 
-@dataclass
+@dataclass(frozen=True)
 class Flow:
     origin: str
     destination: str
