@@ -143,12 +143,6 @@ class Node(NodeInterface):
             slot=slot
         )
 
-    def pos_processing(self):
-        pass
-
-    def pre_processing(self):
-        pass
-
     def maneuver_to_dispatch(self, simulator: DESSimulator):
         self.pre_processing()
         for slot in self.process_units:

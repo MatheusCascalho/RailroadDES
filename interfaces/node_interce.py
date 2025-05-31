@@ -26,4 +26,10 @@ class NodeInterface(Entity, ABC):
     def to_json(self):
         pass
 
+    def pos_processing(self):
+        pass
+
+    def pre_processing(self):
+        pass
+
 

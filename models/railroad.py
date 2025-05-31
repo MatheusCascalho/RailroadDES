@@ -1,7 +1,7 @@
 from datetime import datetime
 
 import pandas as pd
-
+from datetime import timedelta
 from interfaces.des_simulator_interface import DESSimulatorInterface
 from interfaces.train_interface import TrainInterface
 from models.arrive_scheduler import ArriveScheduler
@@ -38,7 +38,7 @@ class Railroad(DESModel):
         trains = '\n'.join([f"{t} - {t.state}" for t in self.trains])
         return f"{nodes}\n{trains}"
 
-    def starting_events(self, simulator: DESSimulatorInterface):
+    def starting_events(self, simulator: DESSimulatorInterface, time_horizon: timedelta):
         for train in self.trains:
             self.router.route(current_time=simulator.current_date, train=train, state=self.state)
 
@@ -49,6 +49,14 @@ class Railroad(DESModel):
             )
             train.add_observers([scheduler])
             scheduler.update()
+
+        for node in self.mesh:
+            for i in range(1, int(time_horizon.total_seconds()/(60*60*24))+1):
+                simulator.add_event(
+                    time=i*timedelta(days=1),
+                    callback=node.pre_processing,
+                )
+                node.process(simulator=simulator)
 
     def solver_exceptions(self, exception: Exception, event: Event, simulator: DESSimulatorInterface):
         if isinstance(exception, FinishedTravelException):

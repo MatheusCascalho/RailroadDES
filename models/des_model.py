@@ -1,6 +1,7 @@
 import abc
 from interfaces.des_simulator_interface import DESSimulatorInterface
 from models.event_calendar import Event
+from datetime import timedelta
 
 
 class DESModel(abc.ABC):
@@ -13,7 +14,7 @@ class DESModel(abc.ABC):
         self.uncontrollable_events = []
 
     @abc.abstractmethod
-    def starting_events(self, simulator: DESSimulatorInterface):
+    def starting_events(self, simulator: DESSimulatorInterface, time_horizon: timedelta):
         pass
 
     @abc.abstractmethod
