@@ -6,6 +6,7 @@ import json
 from pytest import fixture
 from models.demand import Demand, Flow
 from models.router import RandomRouter
+from random import randint
 
 # Inicializando o Faker fora da Factory
 fake = Faker('pt_BR')  # Definindo o locale para português do Brasil
@@ -70,6 +71,7 @@ def create_model(
                 process='unload',
                 has_replanisher=False,
                 process_rate=train_size/next(p_times),
+                initial_stock=randint(0,int(60e3))
             )
             unload_points.append(d)
             o = simple_stock_node_factory(
@@ -78,6 +80,7 @@ def create_model(
                 process='load',
                 has_replanisher=True,
                 process_rate=train_size / next(p_times),
+                initial_stock=randint(0,int(2*train_size))
             )
             load_points.append(o)
             transit_time = TransitTime(**tt)

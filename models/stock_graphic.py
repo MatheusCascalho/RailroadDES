@@ -10,13 +10,13 @@ class StockGraphic:
         return history
 
     def get_figures(self):
-        figures = []
+        figures = {}
         for node in self.nodes:
             for product in node.stocks:
                 history = self.get_history(node, product)
                 if history is not None and 'Dispatch Volume in Stock' in history.columns:
                     # history['']
                     fig = px.line(history.reset_index(), x="instant", y="volume", title=f"Estoque de {product} no nó {node.name}")
-                    figures.append(fig)
+                    figures[node.name] = fig
         # fig.show()
         return figures
