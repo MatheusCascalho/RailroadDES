@@ -18,7 +18,13 @@ def task(demand):
     """Fixture para criar uma instância de Task com valores padrões."""
     current_time = datetime(2025, 4, 10, 12, 0)
     task_volume = 100.0  # Defina o volume da tarefa
-    return Task(demand=demand, task_volume=task_volume, current_time=current_time)
+    return Task(
+        demand=demand,
+        task_volume=task_volume,
+        current_time=current_time,
+        path=[],
+        state={}
+    )
 
 
 def test_task_initialization(task):
