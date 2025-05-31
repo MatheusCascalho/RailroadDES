@@ -55,7 +55,7 @@ class Gantt:
         # Definindo os ticks do eixo Y
         loc = {}
         for location in df['Location'].unique():
-            loc[location[:-len("Trem train_xx")]] = location
+            loc[location[:-len("Trem train_xx")].strip()] = location
 
         fig.update_layout(
             yaxis=dict(
