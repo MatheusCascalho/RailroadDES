@@ -3,12 +3,12 @@ from tests.artifacts.node_artifacts import mock_train, mock_simulator, mock_slot
 
 
 # ========== TESTES ==========
-def test_receive_pushes_train(basic_node, mock_train, mocker):
+def test_receive_pushes_train(basic_node, mock_train, mocker, mock_simulator):
     # Arrange
     basic_node.queue_to_enter = mocker.Mock()
 
     # Act
-    basic_node.receive(mock_train)
+    basic_node.receive(mock_train, mock_simulator)
 
     # Assert
     basic_node.queue_to_enter.push.assert_called_once_with(mock_train, arrive="12:00")
