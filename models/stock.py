@@ -129,7 +129,8 @@ class OwnStock(StockInterface):
         self._volume = 0# initial_volume
         self.promises: list[StockEventPromise] = []
         super().__init__()
-        self.receive(volume=initial_volume)
+        if initial_volume > 0:
+            self.receive(volume=initial_volume)
 
     @property
     def product(self):
