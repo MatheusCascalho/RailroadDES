@@ -42,6 +42,8 @@ class StockEventPromise:
         if update and partial_volume:
             self.volume = self.volume - partial_volume
             self.promise_date = current_date
+            if self.promise_date > self.completion_date:
+                self.completion_date = current_date + timedelta(hours=1)
         return event
 
     @property
@@ -150,6 +152,10 @@ class OwnStock(StockInterface):
 
     @to_notify()
     def receive(self, volume: float):
+        if volume == 0:
+            return
+        if volume < 0:
+            raise ValueError("Volume must be positive")
         if self.volume + volume > self.capacity:
             StockException.stock_is_full()
         self.volume += volume
@@ -162,6 +168,10 @@ class OwnStock(StockInterface):
 
     @to_notify()
     def dispatch(self, volume: float):
+        if volume == 0:
+            return
+        if volume < 0:
+            raise ValueError("Volume must be positive")
         if self.volume - volume < 0:
             StockException.stock_is_empty()
         self.volume -= volume
