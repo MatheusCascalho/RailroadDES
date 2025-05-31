@@ -6,7 +6,6 @@ from models.railroad_mesh import RailSegment
 from models.task import Task
 from models.train import Train
 from models.arrive_scheduler import ArriveScheduler
-from tests.test_integration import FakeSimulator
 
 
 @fixture
