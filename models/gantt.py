@@ -77,7 +77,7 @@ class Gantt:
             dfs.append(df)
         df = pd.concat(dfs, ignore_index=True).sort_values('Location')
         # Criando o gráfico de Gantt
-        fig = px.timeline(df, x_start="Start", x_end="Finish", y="Train", color="Location", title="Diagrama de Gantt")
+        fig = px.timeline(df, x_start="Start", x_end="Finish", y="Train", color="Location", title="Diagrama de Gantt Para trens")
         # fig.update_yaxes(categoryorder="total ascending")  # Organiza as tarefas pela ordem total
         # Definindo os ticks do eixo Y
         loc = {}
@@ -91,7 +91,7 @@ class Gantt:
         #     )
         # )
 
-        fig.show()
+        return fig
 
 
 if __name__ == '__main__':

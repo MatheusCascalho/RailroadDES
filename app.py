@@ -96,6 +96,8 @@ try:
         volumes = dill.load(f)
 
     gantt = Gantt().build_gantt_with_all_trains(model.trains)
+    gantt_trains = Gantt().build_gantt_by_trains(model.trains)
+
     # st.plotly_chart(gantt)
 
     # Gantt().build_gantt_by_trains(model.trains)
@@ -122,6 +124,7 @@ try:
     with col2:
         st.plotly_chart(simulations[0], use_container_width=True)
 
+    st.plotly_chart(gantt_trains, use_container_width=True)
     st.subheader("📊 Aceite Ferroviário")
     st.dataframe(opvol_table)
 
