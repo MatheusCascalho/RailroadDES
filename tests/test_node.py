@@ -20,6 +20,7 @@ def test_process_starts_train_process(basic_node, mock_train, mock_slot, mock_si
     mock_queue.running_queue.return_value = [mock_train]
     mock_queue.pop.return_value = mock_train
     mock_queue.first = mock_train
+    mock_queue.current_size = 0 # This attribute is checked after pop first train
     basic_node.queue_to_enter = mock_queue
     basic_node.process_units = [mock_slot]
 
@@ -37,6 +38,7 @@ def test_process_skips_when_slot_unavailable(basic_node, mock_train, mock_simula
     # Arrange
     mock_queue = mocker.Mock()
     mock_queue.running_queue.return_value = [mock_train]
+    mock_queue.current_size = 0 # This attribute is checked after pop first train
     basic_node.queue_to_enter = mock_queue
     basic_node.process_units = []  # nenhum slot disponível
 
@@ -56,11 +58,14 @@ def test_process_skips_when_blocked(basic_node, mock_train, mock_slot, mock_simu
     mock_constraint = mocker.Mock()
     mock_constraint.process_type.return_value = Process.LOAD
     mock_constraint.is_blocked.return_value = True
+
     basic_node.process_constraints = [mock_constraint]
     basic_node.process_units = [mock_slot]
 
     mock_queue = mocker.Mock()
     mock_queue.running_queue.return_value = [mock_train]
+    mock_queue.current_size = 0 # This attribute is checked after pop first train
+
     basic_node.queue_to_enter = mock_queue
     basic_node._start_process = mocker.Mock(wraps=basic_node._start_process)
 
@@ -81,17 +86,18 @@ def test_dispatch_removes_train_when_not_blocked(basic_node, mock_train, mocker)
     mock_queue = mocker.Mock()
     mock_queue.now.return_value = [mock_train]
     mock_queue.pop.return_value = mock_train
+    mock_queue.current_size = 0 # This attribute is checked after pop first train
+
     basic_node.queue_to_leave = mock_queue
 
     train_picker = []
     mock_train.leave = mocker.Mock()
 
-    basic_node.dispatch(train_picker)
+    basic_node.dispatch()
 
     mock_queue.pop.assert_called_once_with(current_time="12:00")
     mock_train.leave.assert_called_once_with(node=basic_node)
     assert mock_train.ID not in basic_node.liberation_constraints
-    assert train_picker == [mock_train]
 
 
 def test_dispatch_does_nothing_when_blocked(basic_node, mock_train, mocker):
@@ -101,13 +107,14 @@ def test_dispatch_does_nothing_when_blocked(basic_node, mock_train, mocker):
 
     mock_queue = mocker.Mock()
     mock_queue.now.return_value = [mock_train]
+    mock_queue.current_size = 0 # This attribute is checked after pop first train
+
     basic_node.queue_to_leave = mock_queue
 
     mock_train.leave = mocker.Mock()
     train_picker = []
 
-    basic_node.dispatch(train_picker)
+    basic_node.dispatch()
 
     mock_queue.pop.assert_not_called()
     mock_train.leave.assert_not_called()
-    assert train_picker == []
