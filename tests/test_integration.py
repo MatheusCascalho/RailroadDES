@@ -1,3 +1,4 @@
+import dill
 import pytest
 import json
 from models.des_simulator import DESSimulator
@@ -13,6 +14,7 @@ from models.demand import Demand, Flow
 from models.railroad import Railroad
 from models.des_simulator import DESSimulator
 from models.gantt import Gantt
+from models.stock_graphic import StockGraphic
 
 
 # @pytest.fixture
@@ -190,10 +192,13 @@ def test_model(simple_model, simple_clock):
 
 def test_stock_based_model(create_model, simple_clock):
     sim = DESSimulator(clock=simple_clock)
-    model = create_model(sim=sim, n_trains=3)
+    model = create_model(sim=sim, n_trains=15)
+    # with open('artifacts/model_2.dill', 'wb') as f:
+    #     dill.dump(model, f)
     sim.simulate(model=model, time_horizon=timedelta(days=20))
     decision_map = {s: [{'penalty': t.penalty().total_seconds()/(60*60), 'reward': t.reward()} for t in model.router.decision_map[s]] for s in model.router.decision_map}
-
+    sg = StockGraphic(list(model.mesh.load_points) + list(model.mesh.unload_points))
+    sg.get_figures()[0].show()
     Gantt().build_gantt_with_all_trains(model.trains)
     Gantt().build_gantt_by_trains(model.trains)
     op_vol = OperatedVolume(model.router.completed_tasks)
