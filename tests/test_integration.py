@@ -1,11 +1,7 @@
-import dill
 import pytest
-import json
-from models.des_simulator import DESSimulator
-from datetime import timedelta, datetime
-from models.clock import Clock
+from datetime import timedelta
 from models.exceptions import TrainExceptions
-from hypothesis import given, strategies as st, assume, example
+from hypothesis import given, strategies as st
 
 from models.operated_volume import OperatedVolume
 from models.railroad_mesh import TransitTime, RailroadMesh
@@ -15,12 +11,9 @@ from models.railroad import Railroad
 from models.des_simulator import DESSimulator
 from models.gantt import Gantt
 from models.stock_graphic import StockGraphic
+from tests.artifacts.simulator_artifacts import FakeSimulator
 
 
-# @pytest.fixture
-class FakeSimulator(DESSimulator):
-    def __init__(self, clock: Clock):
-        super().__init__(initial_date=datetime(2025,4,1), clock=clock)
 
 
 @given(
