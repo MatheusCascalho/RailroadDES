@@ -40,7 +40,7 @@ def test_hypothesis_receive(capacity, initial_volume, receive_amount, alpha):
         assert stock.volume == pytest.approx(receive_amount + initial_volume), "Volume inicial + recebido != volume atual"
         assert 0 <= stock.volume <= stock.capacity, "Volume fora do range do estoque"
         assert stock.get_last_receive_event().volume == r2, "Último evento registrado com valor errado"
-        assert len(stock.history().events) == 2, "Quantidade de eventos registrados incorreta!"
+        assert len(stock.history().events) == 2 if initial_volume == 0 else 3, "Quantidade de eventos registrados incorreta!"
 
 # ============================================
 # Teste de Despachos com Hypothesis
