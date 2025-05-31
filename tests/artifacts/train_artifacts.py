@@ -9,8 +9,8 @@ from models.arrive_scheduler import ArriveScheduler
 
 
 @fixture
-def simple_train(basic_node_factory):
-    def make(product, clk, simulator, train_size=6e3, add_scheduler=False):
+def simple_train(basic_node_factory, simple_clock, simple_simulator):
+    def make(product='product', clk=simple_clock, simulator=simple_simulator, train_size=6e3, add_scheduler=False):
         flow = Flow(
             origin="origin",
             destination="destination",
