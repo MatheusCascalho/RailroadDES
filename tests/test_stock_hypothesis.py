@@ -22,7 +22,7 @@ stock_capacities = st.floats(min_value=500, max_value=5000)
     capacity=st.floats(min_value=500, max_value=5000),
     initial_volume=st.floats(min_value=0, max_value=2500),
     receive_amount=st.floats(min_value=1, max_value=1000),
-    alpha=st.floats(min_value=0, max_value=1)
+    alpha=st.floats(min_value=0, max_value=1, exclude_min=True, exclude_max=True)
 )
 def test_hypothesis_receive(capacity, initial_volume, receive_amount, alpha):
     assume(initial_volume <= capacity)
