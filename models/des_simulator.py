@@ -28,7 +28,10 @@ class DESSimulator(Entity, DESSimulatorInterface):
 
     def simulate(self, model: DESModel, time_horizon=timedelta(hours=28)):
         self.model = model
-        self.model.starting_events(simulator=self)
+        self.model.starting_events(simulator=self, time_horizon=time_horizon)
+        print(
+            f"Start simulation from {self.initial_date} to {self.initial_date + time_horizon}"
+        )
         end_date = self.initial_date + time_horizon
         while not self.calendar.is_empty and self.current_date <= end_date:
             # get next event and execute callback
