@@ -178,6 +178,11 @@ class StateMachine:
         """
         Setter para o estado atual da máquina. Marca o estado como ativo, se ele não estiver ativo.
         """
+        if value in self.states:
+            value = self.states[value]
+            if not value.is_marked:
+                self.current_state.deactivate()
+                value.activate()
         if not value.is_marked:
             raise Exception("O estado deve estar marcado para ser atribuido como estado atual do sistema")
         self.__current_state = value
