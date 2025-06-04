@@ -56,13 +56,16 @@ class StockHistory:
 
     def to_dataframe(self):
         data = [asdict(e) for e in self.events]
-        if not data or all(e['event'] == EventName.RECEIVE_VOLUME for e in data):
+        if not data:
             return
         df = pd.DataFrame(data)
         df['event'] = df['event'].apply(lambda x: x.value)
         df = df.groupby(['instant', 'event']).sum().unstack(1).fillna(0)
         df.columns = df.columns.droplevel()
-        df['volume'] = (df['Receive Volume in Stock'] - df['Dispatch Volume in Stock']).cumsum()
+        if 'Dispatch Volume in Stock' in df.columns:
+            df['volume'] = (df['Receive Volume in Stock'] - df['Dispatch Volume in Stock']).cumsum()
+        else:
+            df['volume'] = df['Receive Volume in Stock'].cumsum()
 
         return df
 

@@ -14,7 +14,7 @@ class StockGraphic:
         for node in self.nodes:
             for product in node.stocks:
                 history = self.get_history(node, product)
-                if history is not None and 'Dispatch Volume in Stock' in history.columns:
+                if history is not None:
                     # history['']
                     fig = px.line(history.reset_index(), x="instant", y="volume", title=f"Estoque de {product} no nó {node.name}")
                     figures[node.name] = fig
