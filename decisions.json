@@ -80,6 +80,11 @@
     "product": "product"
   },
   {
+    "origin": "Souza",
+    "destination": "Campos da Serra",
+    "product": "product"
+  },
+  {
     "origin": "Cavalcanti da Prata",
     "destination": "Ramos do Campo",
     "product": "product"
@@ -92,6 +97,16 @@
   {
     "origin": "Leão",
     "destination": "Caldeira Alegre",
+    "product": "product"
+  },
+  {
+    "origin": "Souza",
+    "destination": "Campos da Serra",
+    "product": "product"
+  },
+  {
+    "origin": "Souza",
+    "destination": "Campos da Serra",
     "product": "product"
   },
   {
@@ -125,11 +140,6 @@
     "product": "product"
   },
   {
-    "origin": "Souza",
-    "destination": "Campos da Serra",
-    "product": "product"
-  },
-  {
     "origin": "Cavalcanti da Prata",
     "destination": "Ramos do Campo",
     "product": "product"
@@ -155,23 +165,38 @@
     "product": "product"
   },
   {
+    "origin": "Cavalcanti da Prata",
+    "destination": "Ramos do Campo",
+    "product": "product"
+  },
+  {
+    "origin": "Cavalcanti da Prata",
+    "destination": "Ramos do Campo",
+    "product": "product"
+  },
+  {
+    "origin": "Souza",
+    "destination": "Campos da Serra",
+    "product": "product"
+  },
+  {
+    "origin": "Souza",
+    "destination": "Campos da Serra",
+    "product": "product"
+  },
+  {
     "origin": "Mendes",
     "destination": "Santos",
     "product": "product"
   },
   {
-    "origin": "Cavalcanti da Prata",
-    "destination": "Ramos do Campo",
-    "product": "product"
-  },
-  {
-    "origin": "Cavalcanti da Prata",
-    "destination": "Ramos do Campo",
-    "product": "product"
-  },
-  {
     "origin": "Leão",
     "destination": "Caldeira Alegre",
+    "product": "product"
+  },
+  {
+    "origin": "Cavalcanti da Prata",
+    "destination": "Ramos do Campo",
     "product": "product"
   },
   {
