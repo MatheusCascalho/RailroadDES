@@ -41,11 +41,12 @@ class Gantt:
         fig.update_yaxes(categoryorder="total ascending")  # Organiza as tarefas pela ordem total
         fig.show()
 
-    def build_gantt_with_all_trains(self, trains):
+    def build_gantt_with_all_trains(self, trains, final_date):
         dfs = []
         for train in trains:
             time_table = train.time_table
-            df = self.to_dataframe(time_table)
+            df = self.to_dataframe(time_table).fillna(final_date)
+            df = df[df['Start'] != df['Finish']]
             df['Location'] += f" Trem {train.ID}"
             dfs.append(df)
         df = pd.concat(dfs, ignore_index=True).sort_values('Location')
@@ -67,17 +68,21 @@ class Gantt:
         # fig.show()
         return fig
 
-    def build_gantt_by_trains(self, trains):
+    def build_gantt_by_trains(self, trains, final_date):
         dfs = []
         for train in trains:
             time_table = train.time_table
-            df = self.to_dataframe(time_table)
+            df = self.to_dataframe(time_table).fillna(final_date)
+            df = df[df['Start'] != df['Finish']]
             # df['Location'] += f" Trem {train.ID}"
             df['Train'] = train.ID
             dfs.append(df)
         df = pd.concat(dfs, ignore_index=True).sort_values('Location')
         # Criando o gráfico de Gantt
-        fig = px.timeline(df, x_start="Start", x_end="Finish", y="Train", color="Location", title="Diagrama de Gantt Para trens")
+        try:
+            fig = px.timeline(df, x_start="Start", x_end="Finish", y="Train", color="Location", title="Diagrama de Gantt Para trens")
+        except Exception as e:
+            print()
         # fig.update_yaxes(categoryorder="total ascending")  # Organiza as tarefas pela ordem total
         # Definindo os ticks do eixo Y
         loc = {}

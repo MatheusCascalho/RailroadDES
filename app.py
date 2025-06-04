@@ -95,8 +95,8 @@ try:
     with open('tests/volumes.dill', 'rb') as f:
         volumes = dill.load(f)
 
-    gantt = Gantt().build_gantt_with_all_trains(model.trains)
-    gantt_trains = Gantt().build_gantt_by_trains(model.trains)
+    gantt = Gantt().build_gantt_with_all_trains(model.trains, final_date=model.mesh.load_points[0].clock.current_time)
+    gantt_trains = Gantt().build_gantt_by_trains(model.trains, final_date=model.mesh.load_points[0].clock.current_time)
 
     # st.plotly_chart(gantt)
 
