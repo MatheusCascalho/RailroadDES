@@ -67,7 +67,7 @@ if st.session_state.simulate_button:
         with open('tests/model_session.dill', 'wb') as f:
             dill.dump(model, f)
 
-        gantt = Gantt().build_gantt_with_all_trains(model.trains)
+        gantt = Gantt().build_gantt_with_all_trains(model.trains, final_date=model.mesh.load_points[0].clock.current_time)
         # st.plotly_chart(gantt)
 
         # Gantt().build_gantt_by_trains(model.trains)
