@@ -4,6 +4,7 @@ from models.constants import Process, EventName
 from models.observers import AbstractSubject, to_notify
 import numpy as np
 from models.exceptions import EventSequenceError, TimeSequenceErro, RepeatedProcessError, AlreadyRegisteredError
+from logging import warning
 
 
 @dataclass
@@ -239,7 +240,7 @@ class TimeTable(AbstractSubject):
         event (TimeEvent): The event to be recorded in the TimeTable.
         """
         if event == self.__last_event:
-            print("Evento já registrado") # TODO: Migrar para log.warning
+            warning("Evento já registrado") # TODO: Migrar para log.warning
             return
         if self.current_process is not None and self.current_process != process:
             if event.event != EventName.ARRIVE:

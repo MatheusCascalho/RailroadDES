@@ -17,6 +17,7 @@ from models.time_table import TimeEvent
 from models.clock import Clock
 from models.states import ActivityState
 from models.observers import to_notify
+from logging import debug
 
 
 def train_id_gen():
@@ -165,7 +166,7 @@ class Train(TrainInterface):
         node: NodeInterface,
         **kwargs
     ):
-        print(f'{self.clock.current_time}:: Train {self} finish load!')
+        debug(f'{self.clock.current_time}:: Train {self} finish load!')
         self.activity_system.finish_process()
         event = TimeEvent(
             event=EventName.FINISH_PROCESS,
@@ -188,7 +189,7 @@ class Train(TrainInterface):
     ):
         if not self._in_slot:
             TrainExceptions.train_is_not_in_slot(train_id=self.ID, location=self.current_location)
-        print(f'{self.clock.current_time}:: Train {self.ID} start load!')
+        debug(f'{self.clock.current_time}:: Train {self.ID} start load!')
         self.activity_system.start_process()
         event = TimeEvent(
             event=EventName.START_PROCESS,
@@ -219,7 +220,7 @@ class Train(TrainInterface):
    ):
         if not self._in_slot:
             raise Exception("Train is not in slot!")
-        print(f'{self.clock.current_time}:: Train unloading!')
+        debug(f'{self.clock.current_time}:: Train unloading!')
         # Changing State
         self.activity_system.start_process()
         event = TimeEvent(
@@ -261,7 +262,7 @@ class Train(TrainInterface):
         )
         self.time_table.update(event, process=Process.UNLOAD, location=None)
 
-        print(f'{self.clock.current_time}:: Train {self} finish unload!')
+        debug(f'{self.clock.current_time}:: Train {self} finish unload!')
 
         # Add next event to calendar
         simulator.add_event(
@@ -285,7 +286,7 @@ class Train(TrainInterface):
 
     @to_notify()
     def arrive(self, node: NodeInterface):
-        print(f'{self.clock.current_time}:: train {self.ID} arrive at node {node}!!')
+        debug(f'{self.clock.current_time}:: train {self.ID} arrive at node {node}!!')
         # Changing State
         self.activity_system.arrive()
         event = TimeEvent(
@@ -298,7 +299,7 @@ class Train(TrainInterface):
 
     @to_notify()
     def leave(self, node: NodeInterface):
-        print(f'{self.clock.current_time}:: Train {self.ID} leaving node {node}!')
+        debug(f'{self.clock.current_time}:: Train {self.ID} leaving node {node}!')
         self.activity_system.leave()
         event = TimeEvent(
             EventName.DEPARTURE,

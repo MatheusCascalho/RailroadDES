@@ -19,6 +19,7 @@ from models.stock import StockInterface
 from models.maneuvering_constraints import ManeuveringConstraintFactory
 from collections import defaultdict
 from models.entity import Entity
+from logging import debug
 
 @dataclass
 class Neighbor:
@@ -64,7 +65,7 @@ class Node(NodeInterface):
         """
         train.arrive(node=self)
         self.queue_to_enter.push(train, arrive=self.clock.current_time)
-        print(f'{self.clock.current_time}:: Train {train.ID} received in node {self}!')
+        debug(f'{self.clock.current_time}:: Train {train.ID} received in node {self}!')
         simulator.add_event(
             time=timedelta(),
             callback=self.process,
@@ -123,7 +124,7 @@ class Node(NodeInterface):
         return next((p for p in processors if p.is_idle), None)
 
     def _start_process(self, train, slot, simulator):
-        print(f'{simulator.current_date}:: Train {self.queue_to_enter.first} starts process at node {self}!')
+        debug(f'{simulator.current_date}:: Train {self.queue_to_enter.first} starts process at node {self}!')
         train = self.queue_to_enter.pop(
             current_time=simulator.current_date
         )
@@ -147,7 +148,7 @@ class Node(NodeInterface):
         self.pre_processing()
         for slot in self.process_units:
             if slot.current_train and slot.current_train.ready_to_leave:
-                print(f'{simulator.current_date}:: Train {slot.current_train.ID} entering on leaving queue!')
+                debug(f'{simulator.current_date}:: Train {slot.current_train.ID} entering on leaving queue!')
                 train = slot.free_up()
                 constraint = self.maneuvering_constraint_factory.create(train_id=train.ID)
                 self.liberation_constraints[train.ID].append(constraint)

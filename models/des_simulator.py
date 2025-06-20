@@ -5,7 +5,7 @@ from models.exceptions import FinishedTravelException, NotCompletedEvent
 from models.des_model import DESModel
 from models.clock import Clock
 from models.entity import Entity
-
+from logging import debug
 
 class DESSimulator(Entity, DESSimulatorInterface):
     """
@@ -29,7 +29,7 @@ class DESSimulator(Entity, DESSimulatorInterface):
     def simulate(self, model: DESModel, time_horizon=timedelta(hours=28)):
         self.model = model
         self.model.starting_events(simulator=self, time_horizon=time_horizon)
-        print(
+        debug(
             f"Start simulation from {self.initial_date} to {self.initial_date + time_horizon}"
         )
         end_date = self.initial_date + time_horizon
@@ -46,7 +46,7 @@ class DESSimulator(Entity, DESSimulatorInterface):
             except NotCompletedEvent as error:
                 event.reschedule(time_to_happen=timedelta(hours=1))
                 self.calendar.push(time=timedelta(hours=1), event=event, callback=None)
-        print(f"Finish simulation")
+        debug(f"Finish simulation")
 
     def solve_exceptions(self, *args, **kwargs):
         error = kwargs.get('error')
