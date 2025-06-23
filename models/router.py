@@ -2,6 +2,8 @@ from collections import defaultdict
 from dataclasses import asdict
 from models.task import Task
 from models.demand import Demand, Flow
+from models.state_machine import ExpandableStateMachine, Transition, State
+from models.observers import AbstractObserver
 from abc import ABC, abstractmethod
 from random import randint
 from interfaces.train_interface import TrainInterface
@@ -51,6 +53,44 @@ class RandomRouter(Router):
         decisions = [asdict(t.demand.flow) for t in self.completed_tasks]
         with open(file, 'w') as f:
             json.dump(decisions, f, indent=2, ensure_ascii=False)
+
+class TaskSpy(AbstractObserver):
+    def __init__(self, recorder, phisical_state, valuable_state, previous_flow):
+        super().__init__()
+        self.recorder = recorder
+        self.phisical_state = phisical_state
+        self.valuable_state = valuable_state
+        self.previous_flow = previous_flow
+
+    def update(self):
+        self.recorder.update(self)
+
+    def get_task(self):
+        return self.subjects[0]
+
+class ChainedHistoryRouter(RandomRouter):
+    def __init__(self, demands: list[Demand]):
+        s = State('o', is_marked=True)
+        s1 = State('d', is_marked=False)
+        ghost = Transition('', s, s1)
+        self.chained_decision_map = ExpandableStateMachine([ghost])
+        super().__init__(demands)
+        AbstractObserver().__init__()
+
+
+    def route(self, train: TrainInterface, current_time, state):
+        previous_flow = train.current_task.demand.flow
+        super().route(train, current_time, state)
+        valuable_state = '\n'.join([str(d) for d in self.demands])
+        spy = TaskSpy(self, phisical_state=state, valuable_state=valuable_state, previous_flow=previous_flow)
+        train.current_task.add_observers(spy)
+
+    def update(self, spy: TaskSpy):
+        origin = (spy.phisical_state, spy.valuable_state, spy.previous_flow)
+        destination = '\n'.join([str(d) for d in self.demands])
+        trigger = spy.get_task()
+        self.chained_decision_map.expand_machine(origin=origin, destination=destination, trigger=trigger)
+
 
 
 class RepeatedRouter(Router):
