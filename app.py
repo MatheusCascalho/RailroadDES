@@ -4,7 +4,7 @@ import dill
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-from models.router import RepeatedRouter
+from models.router import RepeatedRouter, ChainedHistoryRouter
 from models.demand import Flow
 from models.stock_graphic import StockGraphic
 from tests.artifacts.railroad_artifacts import create_model
@@ -26,6 +26,7 @@ def simulate(to_repeat: bool):
     # model = create_model(sim=sim, n_trains=3)
     with open('tests/artifacts/model_2.dill', 'rb') as f:
         model = dill.load(f)
+        model.router = ChainedHistoryRouter(model.router.demands)
         sim.clock = model.mesh.load_points[0].clock
 
     if to_repeat:
@@ -38,7 +39,7 @@ def simulate(to_repeat: bool):
 
     return model
 
-r = st.number_input("Qtd. de repetições", step=1, min_value=1)
+r = st.number_input("Qtd. de repetições", step=1, min_value=50)
 # st.metric(label='repeticoes', value=r)
 colors = ['red', 'green', 'blue', 'orange', 'purple']
 def col_gen():
@@ -58,12 +59,16 @@ if 'repeat_button' not in st.session_state:
     st.session_state.repeat_button = False
 
 st.session_state.simulate_button = st.button("SIMULAR")
+decision_maps = []
+complete_map = {}
+
 if st.button("REPETIR"):
     st.session_state.repeat_button = not st.session_state.repeat_button
 if st.session_state.simulate_button:
     for i in range(r):
         model = simulate(to_repeat=False)
         model.router.save('decisions.json')
+        decision_maps.append(model.router.decision_map)
         with open('tests/model_session.dill', 'wb') as f:
             dill.dump(model, f)
 
@@ -76,6 +81,18 @@ if st.session_state.simulate_button:
         simulations.append(op_vol_graph)
         opvol_table = op_vol.operated_volume_by_flow()
         volumes.append({'vol':opvol_table['operated'].sum(), 'df': opvol_table})
+
+        if not complete_map:
+            complete_map = decision_maps[0]
+        else:
+            for key, value in decision_maps[-1].items():
+                if key in complete_map:
+                    complete_map[key].extend(value)
+                else:
+                    complete_map[key] = value
+
+    with open('tests/decision_map_trained.dill', 'wb') as f:
+        dill.dump(complete_map, f)
 
     with open('tests/simulations.dill', 'wb') as f:
         dill.dump(simulations, f)
