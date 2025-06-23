@@ -216,3 +216,24 @@ class StateMachine:
             self.transitions[transition].force_trigger()
 
 
+class ExpandableStateMachine(StateMachine):
+    def __init__(
+            self,
+            transitions: list[Transition],
+    ):
+        super().__init__(transitions)
+
+    def expand_machine(self, origin: Any, trigger: Any, destination: Any):
+        o = State(origin, is_marked=False)
+        d = State(destination, is_marked=False)
+        t = Transition(trigger, origin=o, destination=d)
+        self.transitions[t.origin.name] = t
+        self.states[t.origin.name] = t.origin
+        self.states[t.destination.name] = t.destination
+
+        if t.origin not in self.machine:
+            self.machine[t.origin] = [t]
+        else:
+            self.machine[t.origin].append(t)
+        if t.destination not in self.machine:
+            self.machine[t.destination] = []
