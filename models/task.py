@@ -35,6 +35,7 @@ class Task:
         """
         self.ID = next(task_id)
         self.demand = demand
+        demand.promised += task_volume
         self.path = Path(path)
         self.time_table = TimeTable()
         event = TimeEvent(

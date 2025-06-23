@@ -14,6 +14,7 @@ class Demand:
     flow: Flow
     volume: float
     operated: float = 0.0
+    promised: float = 0.0
 
     def __post_init__(self):
         if isinstance(self.flow, dict):
