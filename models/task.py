@@ -1,4 +1,5 @@
 from models.demand import Demand
+from models.observers import AbstractSubject, to_notify
 from models.time_table import TimeTable, TimeEvent
 from models.constants import Process, EventName
 from models.path import Path
@@ -16,7 +17,7 @@ def task_id_gen():
 task_id = task_id_gen()
 
 
-class Task:
+class Task(AbstractSubject):
     def __init__(
             self,
             demand: Demand,
@@ -33,6 +34,7 @@ class Task:
             task_volume (float): The total volume of the task.
             current_time (datetime): The current time of the simulation at which the task is registered.
         """
+        super().__init__()
         self.ID = next(task_id)
         self.demand = demand
         demand.promised += task_volume
