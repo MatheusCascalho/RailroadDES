@@ -135,8 +135,10 @@ class ProcessorSystem(DiscreteEventSystem):
 
     def __repr__(self):
         s = super().__repr__()
-        s += f" {self.type.value}"
+        s = f"{self.ID}: type {self.type.value} - state {self.state_machine.current_state}"
         return s
+
+    __str__ = __repr__
 
 
 

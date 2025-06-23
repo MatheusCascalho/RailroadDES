@@ -36,7 +36,13 @@ class Railroad(DESModel):
     def state(self):
         nodes = '\n'.join([f"{n} - {n.state}" for n in self.mesh])
         trains = '\n'.join([f"{t} - {t.state}" for t in self.trains])
-        return f"{nodes}\n{trains}"
+        demand_trains = [(k.demand.flow, t, t.load_system.state_machine.current_state.name.name) for k, t in self.router.running_tasks.items()]
+        trains_distribution = {d.flow: {s.name: 0 for s in self.trains[0].load_system.state_machine.states} for d in self.router.demands}
+        for dt in demand_trains:
+            trains_distribution[dt[0]][dt[2]] += 1
+
+        trains_distribution = '====\n' + '\n'.join(f'{k}: {v}' for k, v in trains_distribution.items()) + '\n===='
+        return f"{nodes}\n{str(trains_distribution)}\n{trains}"
 
     def starting_events(self, simulator: DESSimulatorInterface, time_horizon: timedelta):
         for train in self.trains:

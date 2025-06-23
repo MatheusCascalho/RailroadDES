@@ -48,11 +48,11 @@ class Node(NodeInterface):
 
     @property
     def state(self):
-        input_queue = f"Queue to enter: {self.queue_to_enter.current_size}"
+        input_queue = f"Queue to enter: {100*self.queue_to_enter.current_size / self.queue_to_enter.capacity} %"
         idle_process = sum(p.is_idle for p in self.process_units)
         busy = len(self.process_units) - idle_process
-        load_units = f"Process Units: {idle_process} idle | {busy} busy"
-        output_queue = f"Queue to leave: {self.queue_to_leave.current_size}"
+        load_units = f"Process Units: {self.process_units}"#{idle_process} idle | {busy} busy"
+        output_queue = f"Queue to leave: {100*self.queue_to_leave.current_size / self.queue_to_leave.capacity} %"
         s = f"{input_queue} | {load_units} | {output_queue}"
         return s
 
