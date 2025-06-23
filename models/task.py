@@ -61,14 +61,18 @@ class Task:
             process (Process): The process related to the event.
         """
         self.time_table.update(event, process=process, location=location)
-        update_invoiced_volume = (
+        should_update_invoiced_volume = (
                 event.event == EventName.FINISH_PROCESS and
                 self.time_table.current_process == Process.LOAD
         )
-        if update_invoiced_volume:
-            self.invoiced_volume = self.task_volume
-            self.demand.operated += self.invoiced_volume
-            self.invoiced_volume_time = event.instant
+        if should_update_invoiced_volume:
+            self.update_invoiced_volume(event)
+
+    @to_notify()
+    def update_invoiced_volume(self, event: TimeEvent):
+        self.invoiced_volume = self.task_volume
+        self.demand.operated += self.invoiced_volume
+        self.invoiced_volume_time = event.instant
 
     def assign(self, train_id: str):
         self.train_id = train_id
