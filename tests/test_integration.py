@@ -1,6 +1,7 @@
 import pytest
 from datetime import timedelta
 
+from models.DQNRouter import DQNRouter
 from models.event import DecoratedEventFactory
 from models.event_calendar import EventCalendar
 from models.exceptions import TrainExceptions
@@ -15,8 +16,10 @@ from models.des_simulator import DESSimulator
 from models.gantt import Gantt
 from models.stock_graphic import StockGraphic
 from models.system_evolution_memory import RailroadEvolutionMemory
+from models.tfr_state_factory import TFRStateSpaceFactory
 from tests.artifacts.simulator_artifacts import FakeSimulator
 from pytest import mark
+import dill
 
 @mark.skip(reason="Despriorização de testes de integração.")
 @settings(suppress_health_check=[HealthCheck.function_scoped_fixture])
@@ -207,6 +210,7 @@ def test_stock_based_model(create_model, simple_clock):
     op_vol.plot_operated_volume().show()
     print(op_vol.operated_volume_by_flow())
 
+@mark.skip(reason="Despriorização de testes de integração.")
 def test_simulation_with_snapshot(create_model, simple_clock):
     memory = RailroadEvolutionMemory()
     event_factory = DecoratedEventFactory(
@@ -215,10 +219,27 @@ def test_simulation_with_snapshot(create_model, simple_clock):
     )
     calendar = EventCalendar(event_factory=event_factory)
     sim = DESSimulator(clock=simple_clock, calendar=calendar)
-    model = create_model(sim=sim, n_trains=15)
+    model = create_model(sim=sim, n_trains=3)
+    with open('artifacts/model_to_train.dill', 'wb') as f:
+        dill.dump(model, f)
+    state_space = TFRStateSpaceFactory(model)
+    router = DQNRouter(state_space=state_space, demands=model.demands)
+
+    model.router = router
     memory.railroad = model
-    sim.simulate(model=model, time_horizon=timedelta(days=60))
+    memory.add_observers([router])
+    with router:
+        sim.simulate(model=model, time_horizon=timedelta(days=60))
 
     from collections import Counter
     print(memory)
     print(Counter([s.reward for s in memory.memory]))
+
+    # sg = StockGraphic(list(model.mesh.load_points) + list(model.mesh.unload_points))
+    # sg.get_figures()[0].show()
+    # Gantt().build_gantt_with_all_trains(model.trains, final_date=model.mesh.load_points[0].clock.current_time)
+    # Gantt().build_gantt_by_trains(model.trains)
+    op_vol = OperatedVolume(model.router.completed_tasks)
+    op_vol.plot_operated_volume().show()
+    print(op_vol.operated_volume_by_flow())
+
