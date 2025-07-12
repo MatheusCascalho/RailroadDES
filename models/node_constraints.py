@@ -15,7 +15,7 @@ def constraint_id_gen():
 constraint_id = constraint_id_gen()
 class ConstraintSystem(ABC, DiscreteEventSystem):
     def __init__(self):
-        self.ID = next(constraint_id)
+        self.ID = next(constraint_id) + " " + self.__class__.__name__
         super().__init__()
 
     def is_blocked(self):

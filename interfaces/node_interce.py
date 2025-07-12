@@ -8,6 +8,11 @@ class NodeInterface(Entity, ABC):
     def __init__(self, name, clock):
         super().__init__(name=name,clock=clock, prefix='Node')
 
+    @property
+    @abstractmethod
+    def constraints(self):
+        pass
+
     # ====== Properties ==========
     # ====== Events ==========
     @abstractmethod

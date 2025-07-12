@@ -47,6 +47,11 @@ class Node(NodeInterface):
         self.liberation_constraints = defaultdict(list)
 
     @property
+    def constraints(self):
+        for constraint in self.process_constraints:
+            yield constraint
+
+    @property
     def state(self):
         input_queue = f"Queue to enter: {100*self.queue_to_enter.current_size / self.queue_to_enter.capacity} %"
         idle_process = sum(p.is_idle for p in self.process_units)
