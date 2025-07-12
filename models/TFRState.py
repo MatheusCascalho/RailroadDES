@@ -124,7 +124,7 @@ class TFRStateSpace:
 
         # cardinalidade das atividades
         acitivities = len(self.activities)
-        n += trains ** acitivities
+        n += trains * acitivities
 
         # cardinalidade dos fluxos
         flows = len(self.flows)
