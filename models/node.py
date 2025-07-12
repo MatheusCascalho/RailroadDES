@@ -62,7 +62,7 @@ class Node(NodeInterface):
         return s
 
     # ====== Events ==========
-    def receive(self, train: TrainInterface, simulator: DESSimulator):
+    def receive(self, train: TrainInterface, simulator: DESSimulator, **kwargs):
         """
         Adiciona trem à fila de entrada e registra o log de chegada
         :param train:
@@ -114,7 +114,7 @@ class Node(NodeInterface):
             ):
                 self.queue_to_enter.skip_process(process)
                 continue
-            self._start_process(train,slot,simulator)
+            self._start_process(train=train,slot=slot,simulator=simulator)
 
         self.queue_to_enter.recover()
         self.pos_processing()
@@ -128,7 +128,7 @@ class Node(NodeInterface):
         processors = [p for p in self.process_units if p.type == process]
         return next((p for p in processors if p.is_idle), None)
 
-    def _start_process(self, train, slot, simulator):
+    def _start_process(self, slot, simulator, *args, **kwargs):
         debug(f'{simulator.current_date}:: Train {self.queue_to_enter.first} starts process at node {self}!')
         train = self.queue_to_enter.pop(
             current_time=simulator.current_date
@@ -149,7 +149,7 @@ class Node(NodeInterface):
             slot=slot
         )
 
-    def maneuver_to_dispatch(self, simulator: DESSimulator):
+    def maneuver_to_dispatch(self, simulator: DESSimulator, **kwargs):
         self.pre_processing()
         for slot in self.process_units:
             if slot.current_train and slot.current_train.ready_to_leave:
