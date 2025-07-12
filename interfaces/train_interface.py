@@ -100,6 +100,11 @@ class TrainInterface(SubjectWithOnlyOneObserver):
     def current_activity(self):
         pass
 
+    @property
+    @abstractmethod
+    def current_flow(self):
+        pass
+
 
     # ====== Properties ==========
     # ====== Events ==========

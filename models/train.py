@@ -149,6 +149,10 @@ class Train(TrainInterface):
     def current_activity(self):
         return self.activity_system.state_machine.current_state
 
+    @property
+    def current_flow(self):
+        return self.current_task.demand.flow
+
 
     def __str__(self):
         name = self.ID
@@ -212,7 +216,7 @@ class Train(TrainInterface):
             time=process_time,
             callback=self.finish_load,
             simulator=simulator,
-            node=kwargs.get('node')
+            **kwargs
         )
 
     def start_unload(
@@ -221,7 +225,8 @@ class Train(TrainInterface):
         start: datetime,
         process_time: timedelta,
         node: NodeInterface,
-        slot: Slot
+        slot: Slot,
+        **kwargs
    ):
         if not self._in_slot:
             raise Exception("Train is not in slot!")
@@ -277,7 +282,7 @@ class Train(TrainInterface):
             # slot=slot,
         )
 
-    def maneuvering_to_enter(self, simulator: DESSimulator, node: NodeInterface):
+    def maneuvering_to_enter(self, simulator: DESSimulator, node: NodeInterface, **kwargs):
         self.state.action = TrainActions.MANEUVERING_TO_ENTER
 
         time = self.clock.current_time + node.time_to_call
