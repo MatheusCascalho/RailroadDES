@@ -1,6 +1,7 @@
 from collections import deque
 from dataclasses import dataclass
 from models.des_model import DESModel
+from models.observers import AbstractSubject, to_notify
 from models.railroad import Railroad
 from models.tfr_state_factory import TFRStateFactory, TFRState
 from models.demand import Flow
@@ -16,12 +17,17 @@ class MemoryElement:
     next_state: TFRState
     is_done: bool
 
+    def __iter__(self):
+        values = [self.state, self.action, self.reward, self.next_state, self.is_done]
+        return iter(values)
 
-class RailroadEvolutionMemory:
+
+class RailroadEvolutionMemory(AbstractSubject):
     def __init__(self, railroad: Railroad=None, memory_size: int=1000) -> None:
         self._memory = deque(maxlen=memory_size)
         self._railroad = railroad
         self.previous_state = None
+        super().__init__()
 
     @property
     def railroad(self) -> Railroad:
@@ -58,6 +64,7 @@ class RailroadEvolutionMemory:
     def memory(self):
         return self._memory
 
+    @to_notify()
     def save(self, s1: TFRState, a, r: float, s2: TFRState):
         element = MemoryElement(state=s1, action=a, reward=r, next_state=s2, is_done=s2.is_final)
         self._memory.append(element)
