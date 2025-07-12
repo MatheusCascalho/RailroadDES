@@ -32,7 +32,8 @@ class ArriveScheduler(AbstractObserver):
             time=current_segment.time_to_destination,
             callback=current_segment.destination.receive,
             train=self.subjects[0],
-            simulator=self.simulator
+            simulator=self.simulator,
+            event_name=str(self.subjects[0].current_flow)
         )
 
     def update(self):
