@@ -32,7 +32,11 @@ class TrainState:
 class FlowState:
     flow: Flow
     has_demand: bool
-    completed_flow_weight_reward: float = 200
+    completed_flow_weight_reward: float = 500
+
+    @property
+    def name(self):
+        return str(self.flow)
 
     def reward(self) -> float:
         r = 0 if self.has_demand else self.completed_flow_weight_reward
@@ -65,6 +69,12 @@ class TFRState:
         for fs in self.flow_states:
             r += fs.reward()
         return r
+
+    def detailed_reward(self):
+        map = {ts.name: ts.reward() for ts in self.train_states}
+        map.update({cs.name: cs.reward() for cs in self.constraint_states})
+        map.update({fs.name: fs.reward() for fs in self.flow_states})
+        return map
 
 
 class TFRStateSpace:
