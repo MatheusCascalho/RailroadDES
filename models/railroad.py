@@ -10,7 +10,7 @@ from models.des_model import DESModel
 from models.event import Event
 from models.exceptions import FinishedTravelException
 from models.railroad_mesh import RailroadMesh
-from models.router import Router
+from models.router import Router, RandomRouter
 from models.states import ActivityState
 
 
@@ -20,7 +20,7 @@ class Railroad(DESModel):
             mesh: RailroadMesh,
             trains: list[TrainInterface],
             demands: list[Demand],
-            router: Router
+            router: Router = None
     ):
         super().__init__(
             controllable_events=[],
@@ -29,10 +29,20 @@ class Railroad(DESModel):
         self.mesh = mesh
         self.trains = trains
         self.demands = demands
-        self.router = router
+        self._router = router
         # self.petri_model = self.build_petri_model()
 
     # ===== Events =========
+    @property
+    def router(self):
+        if self._router is None:
+            self._router = RandomRouter(demands=self.demands)
+        return self._router
+
+    @router.setter
+    def router(self, value):
+        self._router = value
+
     @property
     def state(self):
         nodes = '\n'.join([f"{n} - {n.state}" for n in self.mesh])

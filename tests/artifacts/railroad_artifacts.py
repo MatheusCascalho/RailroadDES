@@ -110,12 +110,10 @@ def create_model(
 
             for _ in range(n_trains)
         ]
-        router = RandomRouter(demands=demands)
         model = Railroad(
             mesh=mesh,
             trains=trains,
             demands=demands,
-            router=router
         )
 
         return model
