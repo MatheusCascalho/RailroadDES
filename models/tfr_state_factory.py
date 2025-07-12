@@ -8,6 +8,7 @@ def TFRStateFactory(railroad: Railroad) -> TFRState:
                 name=t.ID,
                 local=t.current_location,
                 activity=t.current_activity,
+                transit_time=railroad.get_transit_time(t)
             )
             for t in railroad.trains
         ]

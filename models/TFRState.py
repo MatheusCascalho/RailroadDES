@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List
 from models.demand import Flow
 from models.states import ActivityState
@@ -12,18 +12,42 @@ class TrainState:
     name: str
     local: str
     activity: ActivityState
+    transit_time: float = 0
+    transit_weight_punishment: float = -2
+    loading_weight_reward: float = 100
+    queue_weight_punishment: float = -20
+
+    def reward(self) -> float:
+        r = 0
+        if self.activity == ActivityState.PROCESSING:
+            r += self.loading_weight_reward
+        elif self.activity == ActivityState.MOVING:
+            r += self.transit_time * self.transit_weight_punishment
+        else:
+            r += self.queue_weight_punishment
+        return r
 
 
 @dataclass(frozen=True)
 class FlowState:
     flow: Flow
     has_demand: bool
+    completed_flow_weight_reward: float = 200
+
+    def reward(self) -> float:
+        r = 0 if self.has_demand else self.completed_flow_weight_reward
+        return r
 
 
 @dataclass(frozen=True)
 class ConstraintState:
     name: str
     is_blocked: bool
+    blocked_constraint_weight: float = -10
+
+    def reward(self) -> float:
+        r = self.blocked_constraint_weight if self.is_blocked else 0
+        return r
 
 
 @dataclass(frozen=True)
@@ -33,7 +57,14 @@ class TFRState:
     flow_states: List[FlowState]
 
     def reward(self) -> float:
-        pass
+        r = 0
+        for ts in self.train_states:
+            r += ts.reward()
+        for cs in self.constraint_states:
+            r += cs.reward()
+        for fs in self.flow_states:
+            r += fs.reward()
+        return r
 
 
 class TFRStateSpace:

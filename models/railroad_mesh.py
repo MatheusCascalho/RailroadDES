@@ -3,9 +3,7 @@ from datetime import timedelta, datetime
 from interfaces.node_interce import NodeInterface
 from collections import defaultdict
 from typing import Union
-
-from interfaces.train_interface import TrainInterface
-
+from models.task import Task
 
 @dataclass
 class TransitTime:
@@ -129,7 +127,7 @@ class RailroadMesh:
     def __len__(self):
         return len(self.load_points) + len(self.unload_points)
 
-    def get_segments(self, task):
+    def get_segments(self, task: Task):
         segments = []
         last = ''
         for n in task.path.path:
@@ -142,6 +140,15 @@ class RailroadMesh:
                 s = self.graph[d][0].reversed()
             segments.append(s)
         return segments
+
+    def get_current_segment(self, task: Task) -> RailSegment:
+        location = task.path.current_location
+        o, d = location.split('-')
+        if o in self.graph:
+            for s in self.graph[o]:
+                if s.destination == d:
+                    return s
+        raise Exception(f"No such segment: {location}")
 
     def to_json(self):
         return {

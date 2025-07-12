@@ -11,6 +11,7 @@ from models.event_calendar import Event
 from models.exceptions import FinishedTravelException
 from models.railroad_mesh import RailroadMesh
 from models.router import Router
+from models.states import ActivityState
 
 
 class Railroad(DESModel):
@@ -81,6 +82,14 @@ class Railroad(DESModel):
             trains=len(self.trains),
             demands=[d.to_json() for d in self.demands],
         )
+
+    def get_transit_time(self, t: TrainInterface):
+        if t.current_activity != ActivityState.MOVING:
+            return 0
+        segment = self.mesh.get_current_segment(t.current_task)
+        time = segment.time_to_destination
+        return time
+
 
     # ===== Events =========
     # ===== Decision Methods =========
