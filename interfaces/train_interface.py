@@ -95,6 +95,12 @@ class TrainInterface(SubjectWithOnlyOneObserver):
     def arrived_right_now(self):
         pass
 
+    @property
+    @abstractmethod
+    def current_activity(self):
+        pass
+
+
     # ====== Properties ==========
     # ====== Events ==========
     @abstractmethod

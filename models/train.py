@@ -145,6 +145,11 @@ class Train(TrainInterface):
             return False
         return self.current_task.time_table.arrived_right_now
 
+    @property
+    def current_activity(self):
+        return self.activity_system.state_machine.current_state
+
+
     def __str__(self):
         name = self.ID
         return f"{name} | Capacidade: {self.capacity} | {self.state}"
