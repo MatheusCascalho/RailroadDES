@@ -1,29 +1,13 @@
 import math
 from typing import Callable, Any
-from dataclasses import dataclass
-from datetime import datetime, timedelta
-
-
-@dataclass
-class Event:
-    time_until_happen: timedelta
-    callback: Callable
-    data: Any
-
-    def __repr__(self):
-        e = self.callback.__qualname__
-        t = self.time_until_happen
-        return f"{t} - {e}"
-
-    __str__ = __repr__
-
-    def reschedule(self, time_to_happen):
-        self.time_until_happen = time_to_happen
+from datetime import timedelta
+from models.event import Event, EventFactory, DefaultEventFactory
 
 
 class EventCalendar:
-    def __init__(self):
+    def __init__(self, event_factory: EventFactory = DefaultEventFactory()):
         self.calendar: list[Event] = []
+        self.event_factory = event_factory
 
     def push(self, time: float, callback: Callable, **data: Any):
         """
@@ -34,7 +18,7 @@ class EventCalendar:
         """
         event = data.get('event')
         if not isinstance(event, Event):
-            event = Event(time_until_happen=time, callback=callback, data=data)
+            event = self.event_factory.create(time_until_happen=time, callback=callback, data=data)
         edge_indexes = [0, len(self.calendar)]
         while edge_indexes[0] != edge_indexes[1]:
             pivot = math.floor((edge_indexes[0]+edge_indexes[1])/2)

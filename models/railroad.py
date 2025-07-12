@@ -7,7 +7,7 @@ from interfaces.train_interface import TrainInterface
 from models.arrive_scheduler import ArriveScheduler
 from models.demand import Demand
 from models.des_model import DESModel
-from models.event_calendar import Event
+from models.event import Event
 from models.exceptions import FinishedTravelException
 from models.railroad_mesh import RailroadMesh
 from models.router import Router
