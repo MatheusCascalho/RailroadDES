@@ -73,3 +73,14 @@ class RailroadEvolutionMemory(AbstractSubject):
         states = len(self.memory)
         return f"Memory of {states} states of {self.railroad}"
 
+    __str__ = __repr__
+
+    @property
+    def last_item(self):
+        if self.memory:
+            return self.memory[-1]
+        return None
+
+    def __iter__(self):
+        return self.memory.__iter__()
+
