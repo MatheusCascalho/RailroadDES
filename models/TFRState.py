@@ -81,7 +81,7 @@ class TFRState:
     def is_final(self):
         return all([not f.has_demand for f in self.flow_states])
 
-
+EMBEDDING_SPACE_DIMENSION = 5
 
 class TFRStateSpace:
     def __init__(
@@ -99,7 +99,7 @@ class TFRStateSpace:
         self.locals_to_index = {
             loc: i
             for i, loc in enumerate(sorted(stations+connections))}
-        self.embedding_locals = Embedding(num_embeddings=len(self.locals_to_index), embedding_dim=5)
+        self.embedding_locals = Embedding(num_embeddings=len(self.locals_to_index), embedding_dim=EMBEDDING_SPACE_DIMENSION)
 
         # Attributes coded with one-hot encoding
         a = len(activities)
