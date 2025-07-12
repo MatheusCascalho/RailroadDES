@@ -33,11 +33,13 @@ class DefaultEventFactory(EventFactory):
 
 
 class DecoratedEventFactory(EventFactory):
-    def __init__(self, pos_method: Callable):
+    def __init__(self, pos_method: Callable, pre_method: Callable):
         self.pos_method = pos_method
+        self.pre_method = pre_method
 
     def wrapper(self, callback: Callable):
         def decorated(*args, **kwargs):
+            self.pre_method(*args, **kwargs)
             callback(*args, **kwargs)
             self.pos_method(*args, **kwargs)
         return decorated
