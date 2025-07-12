@@ -1,5 +1,5 @@
 from interfaces.des_simulator_interface import DESSimulatorInterface
-from models import event_calendar as ec
+from models.event_calendar import EventCalendar
 from datetime import datetime, timedelta
 from models.exceptions import FinishedTravelException, NotCompletedEvent
 from models.des_model import DESModel
@@ -11,9 +11,9 @@ class DESSimulator(Entity, DESSimulatorInterface):
     """
     Discrete Event System simulator
     """
-    def __init__(self, clock: Clock):
+    def __init__(self, clock: Clock, calendar: EventCalendar = EventCalendar()):
         # setup
-        self.calendar = ec.EventCalendar()
+        self.calendar = calendar
         self.clock = clock
         self.initial_date = clock.current_time
         self.model = None ## Melhorar isso!
