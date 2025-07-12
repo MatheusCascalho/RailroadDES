@@ -136,7 +136,7 @@ class TFRStateSpace:
 
         return n
 
-    def to_tensor(self, state: TFRState):
+    def to_array(self, state: TFRState):
         locations = []
         activities = []
         flows = []
@@ -145,7 +145,8 @@ class TFRStateSpace:
         for t in state.train_states:
             idx = torch.tensor([self.locals_to_index[t.local]])
             loc = self.embedding_locals(idx)
-            locations.append(loc)
+            loc = loc.detach().numpy()[0].tolist()
+            locations += loc
 
             a = self.activities[t.activity.name.name]
 
@@ -158,8 +159,8 @@ class TFRStateSpace:
         for constraint in state.constraint_states:
             constraints.append(int(constraint.is_blocked))
 
-        t1 = torch.cat(locations, dim=1)
-        t2 = np.array(activities+flows+constraints)
-        t2 = torch.tensor(t2.reshape(1,len(t2)))
-        tensor = torch.cat((t1, t2), dim=1)
-        return tensor
+        locations = [l for l in locations]
+        arr = locations+activities+flows+constraints
+        arr = np.array(arr)
+        return arr
+
