@@ -77,6 +77,12 @@ class TFRState:
         return map
 
 
+    @property
+    def is_final(self):
+        return all([not f.has_demand for f in self.flow_states])
+
+
+
 class TFRStateSpace:
     def __init__(
             self,
