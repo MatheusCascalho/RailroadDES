@@ -209,10 +209,16 @@ def test_stock_based_model(create_model, simple_clock):
 
 def test_simulation_with_snapshot(create_model, simple_clock):
     memory = RailroadEvolutionMemory()
-    event_factory = DecoratedEventFactory(pos_method=memory.take_a_snapshot)
+    event_factory = DecoratedEventFactory(
+        pre_method=memory.save_previous_state,
+        pos_method=memory.save_consequence
+    )
     calendar = EventCalendar(event_factory=event_factory)
     sim = DESSimulator(clock=simple_clock, calendar=calendar)
     model = create_model(sim=sim, n_trains=15)
     memory.railroad = model
-    sim.simulate(model=model, time_horizon=timedelta(days=20))
+    sim.simulate(model=model, time_horizon=timedelta(days=60))
+
+    from collections import Counter
     print(memory)
+    print(Counter([s.reward for s in memory.memory]))
