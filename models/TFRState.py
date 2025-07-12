@@ -114,6 +114,27 @@ class TFRStateSpace:
         self.train_names = sorted(train_names)
         self.constraints = sorted(constraints)
 
+    @property
+    def cardinality(self):
+        n = 0
+
+        # cardinalidade dos locais
+        trains = len(self.train_names)
+        n += trains * EMBEDDING_SPACE_DIMENSION
+
+        # cardinalidade das atividades
+        acitivities = len(self.activities)
+        n += trains ** acitivities
+
+        # cardinalidade dos fluxos
+        flows = len(self.flows)
+        n += flows
+
+        # cardinalidade das restrições
+        constraints = len(self.constraints)
+        n += constraints
+
+        return n
 
     def to_tensor(self, state: TFRState):
         locations = []
@@ -136,6 +157,7 @@ class TFRStateSpace:
 
         for constraint in state.constraint_states:
             constraints.append(int(constraint.is_blocked))
+
         t1 = torch.cat(locations, dim=1)
         t2 = np.array(activities+flows+constraints)
         t2 = torch.tensor(t2.reshape(1,len(t2)))
