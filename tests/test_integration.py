@@ -1,5 +1,8 @@
 import pytest
 from datetime import timedelta
+
+from models.event import DecoratedEventFactory
+from models.event_calendar import EventCalendar
 from models.exceptions import TrainExceptions
 from hypothesis import given, strategies as st
 from hypothesis import HealthCheck, settings
@@ -11,6 +14,7 @@ from models.railroad import Railroad
 from models.des_simulator import DESSimulator
 from models.gantt import Gantt
 from models.stock_graphic import StockGraphic
+from models.system_evolution_memory import RailroadEvolutionMemory
 from tests.artifacts.simulator_artifacts import FakeSimulator
 from pytest import mark
 
@@ -202,3 +206,13 @@ def test_stock_based_model(create_model, simple_clock):
     op_vol = OperatedVolume(model.router.completed_tasks)
     op_vol.plot_operated_volume().show()
     print(op_vol.operated_volume_by_flow())
+
+def test_simulation_with_snapshot(create_model, simple_clock):
+    memory = RailroadEvolutionMemory()
+    event_factory = DecoratedEventFactory(pos_method=memory.take_a_snapshot)
+    calendar = EventCalendar(event_factory=event_factory)
+    sim = DESSimulator(clock=simple_clock, calendar=calendar)
+    model = create_model(sim=sim, n_trains=15)
+    memory.railroad = model
+    sim.simulate(model=model, time_horizon=timedelta(days=20))
+    print(memory)
