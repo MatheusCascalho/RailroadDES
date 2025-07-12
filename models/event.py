@@ -30,3 +30,19 @@ class EventFactory(ABC):
 class DefaultEventFactory(EventFactory):
     def create(self, time_until_happen, callback, data):
         return Event(time_until_happen, callback, data)
+
+
+class DecoratedEventFactory(EventFactory):
+    def __init__(self, pos_method: Callable):
+        self.pos_method = pos_method
+
+    def wrapper(self, callback: Callable):
+        def decorated(*args, **kwargs):
+            callback(*args, **kwargs)
+            self.pos_method(*args, **kwargs)
+        return decorated
+
+    def create(self, time_until_happen, callback, data):
+        decorated_callback = self.wrapper(callback)
+        return Event(time_until_happen, decorated_callback, data)
+
