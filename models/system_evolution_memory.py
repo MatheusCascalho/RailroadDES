@@ -21,6 +21,11 @@ class MemoryElement:
         values = [self.state, self.action, self.reward, self.next_state, self.is_done]
         return iter(values)
 
+    def is_static(self):
+        s1 = str(self.state)
+        s2 = str(self.next_state)
+        return s1 == s2
+
 
 class RailroadEvolutionMemory(AbstractSubject):
     def __init__(self, railroad: Railroad=None, memory_size: int=1000) -> None:
@@ -51,12 +56,12 @@ class RailroadEvolutionMemory(AbstractSubject):
 
     def save_consequence(self, *args, **kwargs):
         event_name = kwargs.get("event_name", "AUTOMATIC")
-        state = self.take_a_snapshot(*args, **kwargs)
+        next_state = self.take_a_snapshot(*args, **kwargs)
         self.save(
             s1=self.previous_state,
-            s2=state,
+            s2=next_state,
             a=event_name,
-            r=state.reward(),
+            r=next_state.reward(),
         )
 
 
@@ -67,7 +72,8 @@ class RailroadEvolutionMemory(AbstractSubject):
     @to_notify()
     def save(self, s1: TFRState, a, r: float, s2: TFRState):
         element = MemoryElement(state=s1, action=a, reward=r, next_state=s2, is_done=s2.is_final)
-        self._memory.append(element)
+        if not element.is_static():
+            self._memory.append(element)
 
     def __repr__(self):
         states = len(self.memory)
