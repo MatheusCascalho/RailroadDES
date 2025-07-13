@@ -13,37 +13,34 @@ import dill
 from datetime import datetime, timedelta
 from models.clock import Clock
 from tqdm import tqdm
-from logging import info
+from logging import info, critical
 import warnings
 warnings.filterwarnings('ignore')
 N_EPISODES = 10000
 
 def run_episode():
-    simple_clock = Clock(
-        start=datetime(2025, 4, 1),
-        discretization=timedelta(hours=1)
-    )
+    with open('../tests/artifacts/model_to_train.dill', 'rb') as f:
+        model = dill.load(f)
+
     memory = RailroadEvolutionMemory()
     event_factory = DecoratedEventFactory(
         pre_method=memory.save_previous_state,
         pos_method=memory.save_consequence
     )
     calendar = EventCalendar(event_factory=event_factory)
-    sim = DESSimulator(clock=simple_clock, calendar=calendar)
-    with open('../tests/artifacts/model_to_train_15.dill', 'rb') as f:
-        model = dill.load(f)
+    sim = DESSimulator(clock=model.mesh.load_points[0].clock, calendar=calendar)
     state_space = TFRStateSpaceFactory(model)
-    router = DQNRouter(state_space=state_space, demands=model.demands)
+    router = DQNRouter(state_space=state_space, demands=model.demands, epsilon=1.0)
 
     model.router = router
     memory.railroad = model
     memory.add_observers([router])
     with router:
-        sim.simulate(model=model, time_horizon=timedelta(days=60))
+        sim.simulate(model=model, time_horizon=timedelta(days=30))
 
     return router.operated_volume(), router.total_demand()
 
 
 for episode in range(N_EPISODES):
     op_vol, dem = run_episode()
-    info(f'Episode {episode} - Volume: {op_vol} | Demanda: {dem}')
+    critical(f'Episode {episode} - Volume: {op_vol} | Demanda: {dem}')
