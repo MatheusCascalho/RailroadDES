@@ -9,9 +9,13 @@ class Event:
     time_until_happen: timedelta
     callback: Callable
     data: Any
+    event_name: str = ''
 
     def __repr__(self):
-        e = self.callback.__qualname__
+        if self.event_name:
+            e = self.event_name
+        else:
+            e = self.callback.__qualname__
         t = self.time_until_happen
         return f"{t} - {e}"
 
@@ -46,5 +50,10 @@ class DecoratedEventFactory(EventFactory):
 
     def create(self, time_until_happen, callback, data):
         decorated_callback = self.wrapper(callback)
-        return Event(time_until_happen, decorated_callback, data)
+        return Event(
+            time_until_happen,
+            decorated_callback,
+            data,
+            event_name=f"Decorated {callback.__qualname__}"
+        )
 
