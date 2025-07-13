@@ -144,9 +144,15 @@ class RailroadMesh:
     def get_current_segment(self, task: Task) -> RailSegment:
         location = task.path.current_location
         o, d = location.split('-')
+        if o == '_':
+            possible_segments = [s for s in self.segments if s.destination.name == d]
+            if not possible_segments:
+                possible_segments = [s for s in self.segments if s.reversed().destination.name == d]
+            s = possible_segments[0]
+            return s
         if o in self.graph:
             for s in self.graph[o]:
-                if s.destination == d:
+                if s.destination.name == d:
                     return s
         raise Exception(f"No such segment: {location}")
 
