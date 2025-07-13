@@ -15,7 +15,7 @@ from logging import debug
 
 EPSILON_DEFAULT = 1.0
 N_NEURONS = 64
-BATCH_SIZE = 64
+BATCH_SIZE = 10
 GAMMA = 0.99
 LEARNING_RATE = 1e-3
 epsilon_min = 0.01
