@@ -15,103 +15,8 @@
     "product": "product"
   },
   {
-    "origin": "origin",
-    "destination": "destination",
-    "product": "product"
-  },
-  {
-    "origin": "origin",
-    "destination": "destination",
-    "product": "product"
-  },
-  {
-    "origin": "origin",
-    "destination": "destination",
-    "product": "product"
-  },
-  {
-    "origin": "origin",
-    "destination": "destination",
-    "product": "product"
-  },
-  {
-    "origin": "origin",
-    "destination": "destination",
-    "product": "product"
-  },
-  {
-    "origin": "origin",
-    "destination": "destination",
-    "product": "product"
-  },
-  {
-    "origin": "origin",
-    "destination": "destination",
-    "product": "product"
-  },
-  {
-    "origin": "origin",
-    "destination": "destination",
-    "product": "product"
-  },
-  {
-    "origin": "origin",
-    "destination": "destination",
-    "product": "product"
-  },
-  {
-    "origin": "origin",
-    "destination": "destination",
-    "product": "product"
-  },
-  {
-    "origin": "origin",
-    "destination": "destination",
-    "product": "product"
-  },
-  {
-    "origin": "origin",
-    "destination": "destination",
-    "product": "product"
-  },
-  {
-    "origin": "Souza",
-    "destination": "Campos da Serra",
-    "product": "product"
-  },
-  {
-    "origin": "Souza",
-    "destination": "Campos da Serra",
-    "product": "product"
-  },
-  {
-    "origin": "Cavalcanti da Prata",
-    "destination": "Ramos do Campo",
-    "product": "product"
-  },
-  {
-    "origin": "Cavalcanti da Prata",
-    "destination": "Ramos do Campo",
-    "product": "product"
-  },
-  {
-    "origin": "Leão",
-    "destination": "Caldeira Alegre",
-    "product": "product"
-  },
-  {
-    "origin": "Souza",
-    "destination": "Campos da Serra",
-    "product": "product"
-  },
-  {
-    "origin": "Souza",
-    "destination": "Campos da Serra",
-    "product": "product"
-  },
-  {
-    "origin": "Leão",
-    "destination": "Caldeira Alegre",
+    "origin": "Camargo de Abreu",
+    "destination": "Ferreira de Pereira",
     "product": "product"
   },
   {
@@ -125,33 +30,8 @@
     "product": "product"
   },
   {
-    "origin": "Mendes",
-    "destination": "Santos",
-    "product": "product"
-  },
-  {
-    "origin": "Mendes",
-    "destination": "Santos",
-    "product": "product"
-  },
-  {
     "origin": "Cavalcanti da Prata",
     "destination": "Ramos do Campo",
-    "product": "product"
-  },
-  {
-    "origin": "Cavalcanti da Prata",
-    "destination": "Ramos do Campo",
-    "product": "product"
-  },
-  {
-    "origin": "Souza",
-    "destination": "Campos da Serra",
-    "product": "product"
-  },
-  {
-    "origin": "Souza",
-    "destination": "Campos da Serra",
     "product": "product"
   },
   {
@@ -160,33 +40,8 @@
     "product": "product"
   },
   {
-    "origin": "Mendes",
-    "destination": "Santos",
-    "product": "product"
-  },
-  {
-    "origin": "Cavalcanti da Prata",
-    "destination": "Ramos do Campo",
-    "product": "product"
-  },
-  {
-    "origin": "Cavalcanti da Prata",
-    "destination": "Ramos do Campo",
-    "product": "product"
-  },
-  {
-    "origin": "Souza",
-    "destination": "Campos da Serra",
-    "product": "product"
-  },
-  {
-    "origin": "Souza",
-    "destination": "Campos da Serra",
-    "product": "product"
-  },
-  {
-    "origin": "Mendes",
-    "destination": "Santos",
+    "origin": "Leão",
+    "destination": "Caldeira Alegre",
     "product": "product"
   },
   {
@@ -197,11 +52,6 @@
   {
     "origin": "Cavalcanti da Prata",
     "destination": "Ramos do Campo",
-    "product": "product"
-  },
-  {
-    "origin": "Leão",
-    "destination": "Caldeira Alegre",
     "product": "product"
   }
 ]
