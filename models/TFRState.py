@@ -19,9 +19,9 @@ class TrainState:
 
     def reward(self) -> float:
         r = 0
-        if self.activity == ActivityState.PROCESSING:
+        if self.activity.name == ActivityState.PROCESSING:
             r += self.loading_weight_reward
-        elif self.activity == ActivityState.MOVING:
+        elif self.activity.name == ActivityState.MOVING:
             r += self.transit_time * self.transit_weight_punishment
         else:
             r += self.queue_weight_punishment
