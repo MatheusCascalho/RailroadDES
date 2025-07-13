@@ -13,6 +13,8 @@ from models.railroad_mesh import RailroadMesh
 from models.router import Router, RandomRouter
 from models.states import ActivityState
 
+SECONDS_IN_HOUR = 60*60
+
 
 class Railroad(DESModel):
     def __init__(
@@ -94,10 +96,11 @@ class Railroad(DESModel):
         )
 
     def get_transit_time(self, t: TrainInterface):
-        if t.current_activity != ActivityState.MOVING:
+        if t.current_activity.name != ActivityState.MOVING:
             return 0
         segment = self.mesh.get_current_segment(t.current_task)
         time = segment.time_to_destination
+        time = time.total_seconds() / SECONDS_IN_HOUR
         return time
 
 
