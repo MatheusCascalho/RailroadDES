@@ -3,7 +3,7 @@ import logging
 
 def configurar_logs():
     # Configuração básica de logging
-    logging.basicConfig(level=logging.CRITICAL,  # Define o nível mínimo de log
+    logging.basicConfig(level=logging.INFO,  # Define o nível mínimo de log
                         format='%(asctime)s - %(levelname)s - %(message)s',
                         handlers=[
                             logging.StreamHandler(),  # Exibe no terminal
