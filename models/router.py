@@ -21,6 +21,12 @@ class Router(ABC):
     def route(self, train: TrainInterface, current_time: datetime, state: Any) -> Task:
         pass
 
+    def operated_volume(self):
+        return sum([d.operated for d in self.demands])
+
+    def total_demand(self):
+        return sum([d.volume for d in self.demands])
+
 class RandomRouter(Router):
     def __init__(self, demands):
         super().__init__(demands=demands)
