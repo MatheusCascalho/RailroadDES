@@ -17,6 +17,7 @@ from models.gantt import Gantt
 from models.stock_graphic import StockGraphic
 from models.system_evolution_memory import RailroadEvolutionMemory
 from models.tfr_state_factory import TFRStateSpaceFactory
+from models.target import SimpleTargetManager
 from tests.artifacts.simulator_artifacts import FakeSimulator
 from pytest import mark
 import dill
@@ -243,3 +244,43 @@ def test_simulation_with_snapshot(create_model, simple_clock):
     op_vol.plot_operated_volume().show()
     print(op_vol.operated_volume_by_flow())
 
+
+
+def test_simulation_with_dqn_and_target(create_model, simple_clock):
+    memory = RailroadEvolutionMemory()
+    event_factory = DecoratedEventFactory(
+        pre_method=memory.save_previous_state,
+        pos_method=memory.save_consequence
+    )
+    calendar = EventCalendar(event_factory=event_factory)
+    sim = DESSimulator(clock=simple_clock, calendar=calendar)
+    model = create_model(sim=sim, n_trains=15)
+    target = SimpleTargetManager(demand=model.demands)
+    with open('artifacts/model_to_train_15.dill', 'wb') as f:
+        dill.dump(model, f)
+    state_space = TFRStateSpaceFactory(model)
+    router = DQNRouter(
+        state_space=state_space,
+        demands=model.demands,
+        policy_net_path='../serialized_models/policy_net_150x6_TFRState_v1_TargetBased.dill',
+        target_net_path='../serialized_models/target_net_150x6_TFRState_v1_TargetBased.dill',
+        explortation_method=target.furthest_from_the_target
+    )
+
+    model.router = router
+    memory.railroad = model
+    memory.add_observers([router])
+    with router:
+        sim.simulate(model=model, time_horizon=timedelta(days=60))
+
+    from collections import Counter
+    print(memory)
+    print(Counter([s.reward for s in memory.memory]))
+
+    # sg = StockGraphic(list(model.mesh.load_points) + list(model.mesh.unload_points))
+    # sg.get_figures()[0].show()
+    # Gantt().build_gantt_with_all_trains(model.trains, final_date=model.mesh.load_points[0].clock.current_time)
+    # Gantt().build_gantt_by_trains(model.trains)
+    op_vol = OperatedVolume(model.router.completed_tasks)
+    op_vol.plot_operated_volume().show()
+    print(op_vol.operated_volume_by_flow())
