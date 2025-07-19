@@ -4,7 +4,7 @@ from models.demand import Demand
 
 class TargetManager(ABC):
     @abstractmethod
-    def furthest_from_the_target(self):
+    def furthest_from_the_target(self) -> Demand:
         pass
 
 
@@ -18,7 +18,7 @@ class SimpleTargetManager(TargetManager):
             } for d in demand
         }
 
-    def furthest_from_the_target(self):
+    def furthest_from_the_target(self) -> Demand:
         rank = [
             {
                 'demand': d['demand'],
