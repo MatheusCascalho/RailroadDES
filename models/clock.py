@@ -1,10 +1,19 @@
 from datetime import datetime, timedelta
 
+def clock_id_generator():
+    i = 0
+    while True:
+        clock_id = f"clock_{i}"
+        yield clock_id
+        i += 1
+clock_id = clock_id_generator()
+
 class Clock:
     def __init__(self, start: datetime, discretization: timedelta):
         self.__current_time = start
         self.discretization = discretization
         self.init = start
+        self.ID = next(clock_id)
 
     @property
     def current_time(self):

@@ -27,6 +27,7 @@ class DESSimulator(Entity, DESSimulatorInterface):
         self.calendar.push(time, callback, **data)
 
     def simulate(self, model: DESModel, time_horizon=timedelta(hours=28)):
+        self.validate_clock(model=model)
         self.model = model
         self.model.starting_events(simulator=self, time_horizon=time_horizon)
         debug(
@@ -53,3 +54,8 @@ class DESSimulator(Entity, DESSimulatorInterface):
         event = kwargs.get('event')
         self.model.solver_exceptions(exception=error, event=event, simulator=self)
 
+    def validate_clock(self, model: DESModel):
+        clocks = model.model_clocks()
+        all_clocks_are_the_same = all(c.ID == self.clock.ID for c in clocks)
+        if not all_clocks_are_the_same:
+            raise Exception(f"Clocks {self.clock} are not the same")

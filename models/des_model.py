@@ -2,6 +2,7 @@ import abc
 from interfaces.des_simulator_interface import DESSimulatorInterface
 from models.event import Event
 from datetime import timedelta
+from models.clock import Clock
 
 
 class DESModel(abc.ABC):
@@ -19,6 +20,10 @@ class DESModel(abc.ABC):
 
     @abc.abstractmethod
     def solver_exceptions(self, exception: Exception, event: Event):
+        pass
+
+    @abc.abstractmethod
+    def model_clocks(self) -> list[Clock]:
         pass
 
 

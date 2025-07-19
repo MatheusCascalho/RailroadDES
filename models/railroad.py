@@ -109,3 +109,10 @@ class Railroad(DESModel):
 
     def __repr__(self):
         return f"Railroad with {len(self.mesh)} nodes and {len(self.trains)} trains"
+
+    def model_clocks(self):
+        node_clocks = [
+            n.clock
+            for n in self.mesh
+        ]
+        return node_clocks
