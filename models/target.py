@@ -25,5 +25,5 @@ class SimpleTargetManager(TargetManager):
                 'distance_to_target': d['target'] - d['demand'].promised
             } for d in self.target.values()
         ]
-        rank = sorted(rank, key=lambda x: x['distance_to_target'])
+        rank = sorted(rank, key=lambda x: x['distance_to_target'], reverse=True)
         return rank[0]['demand']
