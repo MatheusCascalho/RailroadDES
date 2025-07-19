@@ -65,6 +65,7 @@ class DQNRouter(Router, AbstractObserver):
             target_net_path: str = '../serialized_models/target_net.dill',
             target_update_freq: int = 10,
             epsilon: float = EPSILON_DEFAULT,
+            explortation_method: callable = None,
     ):
         super().__init__(demands=demands)
         self.action_space = ActionSpace(demands)
@@ -85,6 +86,7 @@ class DQNRouter(Router, AbstractObserver):
         self.optimizer = optim.Adam(self.policy_net.parameters(), lr=LEARNING_RATE)
         self.criterion = nn.MSELoss()
         self.episode = 0
+        self.explore = explortation_method if explortation_method else self.action_space.sample
 
     def load_policies(self, filepath: str):
         try:
@@ -99,7 +101,7 @@ class DQNRouter(Router, AbstractObserver):
 
     def choose_task(self, current_time, train_size, model_state):
         if self.subjects[0].last_item is None or random.random() < self.epsilon:
-            selected_demand = self.action_space.sample()
+            selected_demand = self.explore()
         else:
             with torch.no_grad():
                 state = self.subjects[0].last_item.next_state
