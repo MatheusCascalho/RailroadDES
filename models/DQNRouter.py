@@ -97,13 +97,6 @@ class DQNRouter(Router, AbstractObserver):
             )
         return policy
 
-    def route(self, train, current_time, state) -> Task:
-        completed = train.current_task
-        self.completed_tasks.append(completed)
-        task = self.choose_task(current_time, train_size=train.capacity, model_state=state)
-        train.current_task = task
-        self.running_tasks[task] = train
-
     def choose_task(self, current_time, train_size, model_state):
         if self.subjects[0].last_item is None or random.random() < self.epsilon:
             selected_demand = self.action_space.sample()

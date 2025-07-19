@@ -16,20 +16,6 @@ class Router(ABC):
     def __init__(self, demands: list[Demand]):
         self.demands = demands
         self.decision_map = defaultdict(list)
-
-    @abstractmethod
-    def route(self, train: TrainInterface, current_time: datetime, state: Any) -> Task:
-        pass
-
-    def operated_volume(self):
-        return sum([d.operated for d in self.demands])
-
-    def total_demand(self):
-        return sum([d.volume for d in self.demands])
-
-class RandomRouter(Router):
-    def __init__(self, demands):
-        super().__init__(demands=demands)
         self.completed_tasks = []
         self.running_tasks = {}
 
@@ -42,6 +28,20 @@ class RandomRouter(Router):
         self.decision_map[task.model_state].append(task)
         train.current_task = task
         self.running_tasks[task] = train
+
+    @abstractmethod
+    def choose_task(self, current_time, train_size, model_state):
+        pass
+
+    def operated_volume(self):
+        return sum([d.operated for d in self.demands])
+
+    def total_demand(self):
+        return sum([d.volume for d in self.demands])
+
+class RandomRouter(Router):
+    def __init__(self, demands):
+        super().__init__(demands=demands)
 
     def choose_task(self, current_time, train_size, model_state) -> Task:
         random_index = randint(0, len(self.demands)-1)
