@@ -5,7 +5,7 @@ sys.path.append('../')
 
 from models.DQNRouter import DQNRouter, ActorLearner, ActionSpace
 from models.tfr_state_factory import TFRStateSpaceFactory
-from models.system_evolution_memory import RailroadEvolutionMemory
+from models.system_evolution_memory import RailroadEvolutionMemory, GlobalMemory
 from models.event import DecoratedEventFactory
 from models.event_calendar import EventCalendar
 from models.des_simulator import DESSimulator
@@ -25,10 +25,10 @@ def run_episode():
         model = dill.load(f)
     target = SimpleTargetManager(demand=model.demands)
 
-    memory = RailroadEvolutionMemory()
+    local_memory = RailroadEvolutionMemory()
     event_factory = DecoratedEventFactory(
-        pre_method=memory.save_previous_state,
-        pos_method=memory.save_consequence
+        pre_method=local_memory.save_previous_state,
+        pos_method=local_memory.save_consequence
     )
     calendar = EventCalendar(event_factory=event_factory)
     sim = DESSimulator(clock=model.mesh.load_points[0].clock, calendar=calendar)
@@ -39,18 +39,21 @@ def run_episode():
         policy_net_path='../serialized_models/policy_net_150x6_TFRState_v1_TargetBased.dill',
         target_net_path='../serialized_models/target_net_150x6_TFRState_v1_TargetBased.dill',
     )
+    global_memory = GlobalMemory()
+    local_memory.add_observers([global_memory])
+    global_memory.add_observers([learner])
     router = DQNRouter(
         state_space=state_space,
         demands=model.demands,
         policy_net=learner.policy_net,
-        simulation_memory=memory,
+        simulation_memory=local_memory,
         epsilon=1.0,
         exploration_method=target.furthest_from_the_target,
     )
 
     model.router = router
-    memory.railroad = model
-    memory.add_observers([learner])
+    local_memory.railroad = model
+    local_memory.add_observers([learner])
     with learner:
         sim.simulate(model=model, time_horizon=timedelta(days=30))
 
