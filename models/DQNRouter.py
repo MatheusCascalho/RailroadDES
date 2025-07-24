@@ -57,7 +57,7 @@ class ActionSpace:
             return self.sample()
         return self.demands[i]
 
-class ActorLearner(AbstractObserver):
+class Learner(AbstractObserver):
     def __init__(
             self,
             state_space: TFRStateSpace,

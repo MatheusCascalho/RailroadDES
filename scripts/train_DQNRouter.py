@@ -3,7 +3,7 @@ import sys
 # Adicionando o diretório ao sys.path
 sys.path.append('../')
 
-from models.DQNRouter import DQNRouter, ActorLearner, ActionSpace
+from models.DQNRouter import DQNRouter, Learner, ActionSpace
 from models.tfr_state_factory import TFRStateSpaceFactory
 from models.system_evolution_memory import RailroadEvolutionMemory, GlobalMemory
 from models.event import DecoratedEventFactory
@@ -33,7 +33,7 @@ def run_episode():
     calendar = EventCalendar(event_factory=event_factory)
     sim = DESSimulator(clock=model.mesh.load_points[0].clock, calendar=calendar)
     state_space = TFRStateSpaceFactory(model)
-    learner = ActorLearner(
+    learner = Learner(
         state_space=state_space,
         action_space=ActionSpace(model.demands),
         policy_net_path='../serialized_models/policy_net_150x6_TFRState_v1_TargetBased.dill',
