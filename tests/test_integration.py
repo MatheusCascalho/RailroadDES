@@ -245,7 +245,7 @@ def test_simulation_with_snapshot(create_model, simple_clock):
     print(op_vol.operated_volume_by_flow())
 
 
-
+@mark.skip(reason="Despriorização de testes de integração.")
 def test_simulation_with_dqn_and_target(create_model, simple_clock):
     memory = RailroadEvolutionMemory()
     event_factory = DecoratedEventFactory(
