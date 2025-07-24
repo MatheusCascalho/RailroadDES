@@ -19,7 +19,7 @@ def memory_id_gen():
 memory_id = memory_id_gen()
 
 @dataclass(frozen=True)
-class MemoryElement:
+class Experience:
     state: TFRState
     action: str
     reward: float
@@ -84,7 +84,7 @@ class RailroadEvolutionMemory(AbstractSubject):
 
     @to_notify()
     def save(self, s1: TFRState, a, r: float, s2: TFRState):
-        element = MemoryElement(state=s1, action=a, reward=r, next_state=s2, is_done=s2.is_final)
+        element = Experience(state=s1, action=a, reward=r, next_state=s2, is_done=s2.is_final)
         if not element.is_static():
             self._memory.append(element)
 
@@ -103,7 +103,7 @@ class RailroadEvolutionMemory(AbstractSubject):
     def __iter__(self):
         return self.memory.__iter__()
 
-class GlobalMemory(AbstractObserver):
+class ExperienceProducer(AbstractObserver):
     def __init__(self, queue, memory_size: int=1000):
         self._memory = deque(maxlen=memory_size)
         self.queue = queue
@@ -111,10 +111,10 @@ class GlobalMemory(AbstractObserver):
 
     def update(self):
         new_items = [
-            memory_element
+            experience
             for system_memory in self.subjects
-            for memory_element in system_memory
-            if memory_element not in self._memory
+            for experience in system_memory
+            if experience not in self._memory
         ]
         for memory_element in new_items:
             self.queue.put(memory_element)
