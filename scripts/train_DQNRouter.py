@@ -3,7 +3,7 @@ import sys
 # Adicionando o diretório ao sys.path
 sys.path.append('../')
 
-from models.DQNRouter import DQNRouter
+from models.DQNRouter import DQNRouter, ActorLearner, ActionSpace
 from models.tfr_state_factory import TFRStateSpaceFactory
 from models.system_evolution_memory import RailroadEvolutionMemory
 from models.event import DecoratedEventFactory
@@ -18,7 +18,7 @@ import warnings
 from models.target import SimpleTargetManager
 
 warnings.filterwarnings('ignore')
-N_EPISODES = 100_000
+N_EPISODES = 10
 
 def run_episode():
     with open('../tests/artifacts/model_to_train_15.dill', 'rb') as f:
@@ -33,19 +33,25 @@ def run_episode():
     calendar = EventCalendar(event_factory=event_factory)
     sim = DESSimulator(clock=model.mesh.load_points[0].clock, calendar=calendar)
     state_space = TFRStateSpaceFactory(model)
+    learner = ActorLearner(
+        state_space=state_space,
+        action_space=ActionSpace(model.demands),
+        policy_net_path='../serialized_models/policy_net_150x6_TFRState_v1_TargetBased.dill',
+        target_net_path='../serialized_models/target_net_150x6_TFRState_v1_TargetBased.dill',
+    )
     router = DQNRouter(
         state_space=state_space,
         demands=model.demands,
+        policy_net=learner.policy_net,
+        simulation_memory=memory,
         epsilon=1.0,
-        explortation_method=target.furthest_from_the_target,
-        policy_net_path='../serialized_models/policy_net_150x6_TFRState_v1_TargetBased.dill',
-        target_net_path='../serialized_models/target_net_150x6_TFRState_v1_TargetBased.dill',
+        exploration_method=target.furthest_from_the_target,
     )
 
     model.router = router
     memory.railroad = model
-    memory.add_observers([router])
-    with router:
+    memory.add_observers([learner])
+    with learner:
         sim.simulate(model=model, time_horizon=timedelta(days=30))
 
     return router.operated_volume(), router.total_demand(), router.epsilon
