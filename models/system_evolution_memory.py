@@ -8,6 +8,14 @@ from models.demand import Flow
 
 from logging import critical
 
+def memory_id_gen():
+    i = 0
+    while True:
+        mem_id = f"Memory{i}"
+        yield mem_id
+        i += 1
+
+memory_id = memory_id_gen()
 
 @dataclass(frozen=True)
 class MemoryElement:
@@ -16,6 +24,7 @@ class MemoryElement:
     reward: float
     next_state: TFRState
     is_done: bool
+    memory_id = next(memory_id)
 
     def __iter__(self):
         values = [self.state, self.action, self.reward, self.next_state, self.is_done]
@@ -25,6 +34,9 @@ class MemoryElement:
         s1 = str(self.state)
         s2 = str(self.next_state)
         return s1 == s2
+
+    def __eq__(self, other):
+        return self.memory_id == other.memory_id
 
 
 class RailroadEvolutionMemory(AbstractSubject):
