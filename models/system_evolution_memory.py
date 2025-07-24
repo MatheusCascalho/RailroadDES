@@ -1,7 +1,7 @@
 from collections import deque
 from dataclasses import dataclass
 from models.des_model import DESModel
-from models.observers import AbstractSubject, to_notify
+from models.observers import AbstractSubject, to_notify, AbstractObserver
 from models.railroad import Railroad
 from models.tfr_state_factory import TFRStateFactory, TFRState
 from models.demand import Flow
@@ -102,3 +102,19 @@ class RailroadEvolutionMemory(AbstractSubject):
     def __iter__(self):
         return self.memory.__iter__()
 
+class GlobalMemory(AbstractObserver, AbstractSubject):
+    def __init__(self, memory_size: int=1000):
+        self._memory = deque(maxlen=memory_size)
+        super().__init__()
+        AbstractSubject.__init__(self)
+
+    @to_notify()
+    def update(self):
+        new_items = [
+            memory_element
+            for system_memory in self.subjects
+            for memory_element in system_memory
+            if memory_element not in self._memory
+        ]
+
+        self._memory.extend(new_items)
