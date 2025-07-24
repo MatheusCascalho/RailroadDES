@@ -118,3 +118,7 @@ class GlobalMemory(AbstractObserver, AbstractSubject):
         ]
 
         self._memory.extend(new_items)
+
+    @property
+    def memory(self):
+        return self._memory
