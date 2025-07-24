@@ -1,3 +1,5 @@
+from collections import deque
+
 from interfaces.train_interface import TrainInterface
 from models.TFRState import TFRStateSpace
 from models.observers import AbstractObserver
@@ -57,7 +59,7 @@ class ActionSpace:
             return self.sample()
         return self.demands[i]
 
-class Learner(AbstractObserver):
+class Learner:
     def __init__(
             self,
             state_space: TFRStateSpace,
@@ -67,6 +69,7 @@ class Learner(AbstractObserver):
             target_update_freq: int = 10,
             epsilon: float = EPSILON_DEFAULT,
     ):
+        self._memory = deque(maxlen=BATCH_SIZE)
         self.state_space = state_space
         self.action_space = action_space
         suffix = f"{state_space.cardinality}x{self.action_space.n_actions}_TFRState_v1"
@@ -101,7 +104,7 @@ class Learner(AbstractObserver):
 
     @property
     def memory(self):
-        return self.subjects[0].memory
+        return self._memory
 
     def learn(self):
         # Amostra mini-batch
@@ -131,7 +134,8 @@ class Learner(AbstractObserver):
         self.optimizer.step()
 
 
-    def update(self):
+    def update(self, experience):
+        self.memory.append(experience)
         self.episode += 1
         if len(self.memory) >= BATCH_SIZE:
             self.learn()
