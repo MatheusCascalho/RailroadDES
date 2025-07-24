@@ -5,6 +5,7 @@ from models.observers import AbstractSubject, to_notify, AbstractObserver
 from models.railroad import Railroad
 from models.tfr_state_factory import TFRStateFactory, TFRState
 from models.demand import Flow
+from multiprocessing import Queue
 
 from logging import critical
 
@@ -102,13 +103,12 @@ class RailroadEvolutionMemory(AbstractSubject):
     def __iter__(self):
         return self.memory.__iter__()
 
-class GlobalMemory(AbstractObserver, AbstractSubject):
-    def __init__(self, memory_size: int=1000):
+class GlobalMemory(AbstractObserver):
+    def __init__(self, queue, memory_size: int=1000):
         self._memory = deque(maxlen=memory_size)
+        self.queue = queue
         super().__init__()
-        AbstractSubject.__init__(self)
 
-    @to_notify()
     def update(self):
         new_items = [
             memory_element
@@ -116,6 +116,8 @@ class GlobalMemory(AbstractObserver, AbstractSubject):
             for memory_element in system_memory
             if memory_element not in self._memory
         ]
+        for memory_element in new_items:
+            self.queue.put(memory_element)
 
         self._memory.extend(new_items)
 
