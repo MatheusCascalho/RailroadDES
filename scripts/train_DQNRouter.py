@@ -1,4 +1,5 @@
 import sys
+from concurrent.futures.process import ProcessPoolExecutor
 
 # Adicionando o diretório ao sys.path
 sys.path.append('../')
@@ -22,8 +23,8 @@ from dataclasses import dataclass
 
 warnings.filterwarnings('ignore')
 N_EPISODES = 10
-EPISODES_BY_PROCESS = 25
-NUM_PROCESSES = 4
+EPISODES_BY_PROCESS = 1
+NUM_PROCESSES = 1
 TRAINING_STEPS = 4
 
 @dataclass
@@ -55,14 +56,16 @@ def learning_loop(learner, queue, stop_event):
             try:
                 experience = queue.get(timeout=1)
                 learner.update(experience)
-            except queue.Empty:
+            except:
                 continue
 
-def logging_loop(stop_event, output_queue: Queue[OutputData]):
+def logging_loop(stop_event, output_queue):
     while not stop_event.is_set():
-        output = output_queue.get(timeout=1)
-        critical(f'Episode {output.episode_number} - PID: {output.process_id} - Volume: {output.operated_volume} - Demanda: {output.total_demand} - epsilon: {output.final_epsilon}')
-
+        try:
+            output = output_queue.get(timeout=1)
+            critical(f'Episode {output.episode_number} - PID: {output.process_id} - Volume: {output.operated_volume} - Demanda: {output.total_demand} - epsilon: {output.final_epsilon}')
+        except Exception as e:
+            continue
 
 def run_episode(experience_producer, learner, episode_number, output_queue: Queue):
     with open('../tests/artifacts/model_to_train_15.dill', 'rb') as f:
@@ -89,9 +92,7 @@ def run_episode(experience_producer, learner, episode_number, output_queue: Queu
 
     model.router = router
     local_memory.railroad = model
-    local_memory.add_observers([learner])
-    with learner:
-        sim.simulate(model=model, time_horizon=timedelta(days=30))
+    sim.simulate(model=model, time_horizon=timedelta(days=30))
 
     output = OutputData(
         operated_volume=router.operated_volume(),
@@ -102,7 +103,7 @@ def run_episode(experience_producer, learner, episode_number, output_queue: Queu
     )
     output_queue.put(output)
 
-def run_training_loop(experience_producer,learner, output_queue: Queue[OutputData]):
+def run_training_loop(experience_producer,learner, output_queue):
     for episode in range(EPISODES_BY_PROCESS):
         run_episode(
             experience_producer=experience_producer,
@@ -111,20 +112,35 @@ def run_training_loop(experience_producer,learner, output_queue: Queue[OutputDat
             output_queue=output_queue
         )
 
-learner, global_memory, experience_queue, output_queue = setup_shared_components()
-stop_signal = Event()
-
-# iniciar processo
-logging_process = Process(target=logging_loop, args=(output_queue, stop_signal))
-logging_process.start()
-
-learner_process = Process(target=learning_loop, args=(learner, experience_queue, stop_signal))
-learner_process.start()
+def training_process_wrapper(experience_producer,learner, output_queue):
+    p = Process(target=run_training_loop, args=(experience_producer,learner,output_queue))
+    return p
 
 
+if __name__ == '__main__':
+    learner, global_memory, experience_queue, output_queue = setup_shared_components()
+    stop_signal = Event()
 
-for episode in range(N_EPISODES):
-    op_vol, dem, final_epsilon = run_episode()
+    # iniciar processo
+    logging_process = Process(target=logging_loop, args=(stop_signal, output_queue))
+    logging_process.start()
 
-learner_process.join()
-logging_process.join()
+
+    learner_process = Process(target=learning_loop, args=(learner, experience_queue, stop_signal))
+    learner_process.start()
+
+    # Inicia os processos dos atores
+    actor_processes = [
+        training_process_wrapper(global_memory, learner, output_queue)
+        for _ in range(NUM_PROCESSES)
+    ]
+
+    for proc in actor_processes:
+        proc.start()
+
+    # Aguarda os atores terminarem
+    for proc in actor_processes:
+        proc.join()
+
+    learner_process.join()
+    logging_process.join()
