@@ -1,5 +1,7 @@
 from collections import deque
 from dataclasses import dataclass, field
+from queue import Full
+
 from models.des_model import DESModel
 from models.observers import AbstractSubject, to_notify, AbstractObserver
 from models.railroad import Railroad
@@ -9,6 +11,7 @@ from multiprocessing import Queue
 import dill
 import os
 from logging import critical
+from models.pickle_debugger import find_pickle_issues as find_unpicklables
 
 def memory_id_gen():
     i = 0
@@ -111,16 +114,20 @@ class ExperienceProducer(AbstractObserver):
         super().__init__()
 
     def update(self):
+        existing_keys = set(self._experience_key(e) for e in self._memory)
         new_items = [
             experience
             for system_memory in self.subjects
             for experience in system_memory
-            if experience not in self._memory
+            if self._experience_key(experience) not in existing_keys
         ]
         for memory_element in new_items:
             self.queue.put(memory_element)
 
         self._memory.extend(new_items)
+
+    def _experience_key(self, experience):
+        return experience.memory_id
 
     @property
     def memory(self):
