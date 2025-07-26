@@ -155,7 +155,7 @@ class TFRStateSpace:
         activities = list(np.array(activities).flatten())
 
         for flow in state.flow_states:
-            flows.append(int(flow.missing_volume))
+            flows.append(flow.missing_volume)
 
         for constraint in state.constraint_states:
             constraints.append(int(constraint.is_blocked))
