@@ -69,7 +69,7 @@ class Learner:
             target_update_freq: int = 10,
             epsilon: float = EPSILON_DEFAULT,
     ):
-        self._memory = deque(maxlen=BATCH_SIZE)
+        self._memory = deque(maxlen=100_000)
         self.state_space = state_space
         self.action_space = action_space
         suffix = f"{state_space.cardinality}x{self.action_space.n_actions}_TFRState_v1"
