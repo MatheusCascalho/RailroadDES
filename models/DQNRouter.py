@@ -161,6 +161,9 @@ class Learner:
         with open(self.target_net_path, 'wb') as f:
             dill.dump(self.target_net, f)
 
+        with open(f'all_experiences_{os.getpid()}.dill', 'wb') as f:
+            dill.dump(self.memory, f)
+
 
 class DQNRouter(Router):
     def __init__(
