@@ -17,15 +17,17 @@ from tqdm import tqdm
 from logging import info, critical
 import warnings
 from models.target import SimpleTargetManager
-from multiprocessing import Queue, Event, Process, Pool
+from multiprocessing import Event, Process, Pool
+from models.dill_queue import DillQueue
 import os
+from time import sleep
 from dataclasses import dataclass
 
 warnings.filterwarnings('ignore')
 N_EPISODES = 10
-EPISODES_BY_PROCESS = 1
-NUM_PROCESSES = 1
-TRAINING_STEPS = 4
+EPISODES_BY_PROCESS = 25
+NUM_PROCESSES = 4
+TRAINING_STEPS = 10_000
 
 @dataclass
 class OutputData:
@@ -38,8 +40,8 @@ class OutputData:
 def setup_shared_components():
     with open('../tests/artifacts/model_to_train_15.dill', 'rb') as f:
         model = dill.load(f)
-    experience_queue = Queue(maxsize=10_000)  # Limite opcional
-    output_queue = Queue(maxsize=10_000)  # Limite opcional
+    experience_queue = DillQueue(maxsize=10_000)  # Limite opcional
+    output_queue = DillQueue(maxsize=10_000)  # Limite opcional
     state_space = TFRStateSpaceFactory(model)
     learner = Learner(
         state_space=state_space,
@@ -57,17 +59,23 @@ def learning_loop(learner, queue, stop_event):
                 experience = queue.get(timeout=1)
                 learner.update(experience)
             except:
+                info('Experience queue is empty')
+                sleep(.1)
                 continue
 
 def logging_loop(stop_event, output_queue):
+    log_number = 0
     while not stop_event.is_set():
         try:
             output = output_queue.get(timeout=1)
-            critical(f'Episode {output.episode_number} - PID: {output.process_id} - Volume: {output.operated_volume} - Demanda: {output.total_demand} - epsilon: {output.final_epsilon}')
-        except Exception as e:
+            critical(f'Log {log_number} - Episode {output.episode_number} - PID: {output.process_id} - Volume: {output.operated_volume} - Demanda: {output.total_demand} - epsilon: {output.final_epsilon}')
+            log_number += 1
+        except:
+            info('Episode queue is empty')
+            sleep(.1)
             continue
 
-def run_episode(experience_producer, learner, episode_number, output_queue: Queue):
+def run_episode(experience_producer, learner, episode_number, output_queue: DillQueue):
     with open('../tests/artifacts/model_to_train_15.dill', 'rb') as f:
         model = dill.load(f)
     target = SimpleTargetManager(demand=model.demands)
@@ -111,6 +119,7 @@ def run_training_loop(experience_producer,learner, output_queue):
             episode_number=episode,
             output_queue=output_queue
         )
+    info(f"Trainamento do processo {os.getpid()} finalizado!")
 
 def training_process_wrapper(experience_producer,learner, output_queue):
     p = Process(target=run_training_loop, args=(experience_producer,learner,output_queue))
@@ -119,28 +128,38 @@ def training_process_wrapper(experience_producer,learner, output_queue):
 
 if __name__ == '__main__':
     learner, global_memory, experience_queue, output_queue = setup_shared_components()
-    stop_signal = Event()
+    stop_signal_log = Event()
 
     # iniciar processo
-    logging_process = Process(target=logging_loop, args=(stop_signal, output_queue))
+    logging_process = Process(target=logging_loop, args=(stop_signal_log, output_queue))
     logging_process.start()
+    logging_pid = logging_process.pid
 
+    for step in range(TRAINING_STEPS):
+        stop_signal = Event()
 
-    learner_process = Process(target=learning_loop, args=(learner, experience_queue, stop_signal))
-    learner_process.start()
+        learner_process = Process(target=learning_loop, args=(learner, experience_queue, stop_signal))
+        learner_process.start()
 
-    # Inicia os processos dos atores
-    actor_processes = [
-        training_process_wrapper(global_memory, learner, output_queue)
-        for _ in range(NUM_PROCESSES)
-    ]
+        # Inicia os processos dos atores
+        actor_processes = [
+            training_process_wrapper(global_memory, learner, output_queue)
+            for _ in range(NUM_PROCESSES)
+        ]
 
-    for proc in actor_processes:
-        proc.start()
+        for proc in actor_processes:
+            proc.start()
 
-    # Aguarda os atores terminarem
-    for proc in actor_processes:
-        proc.join()
+        # Aguarda os atores terminarem
+        for proc in actor_processes:
+            proc.join()
 
-    learner_process.join()
+        stop_signal.set()
+        learner_process.join()
+
+    while not output_queue.empty():
+        continue
+    stop_signal_log.set()
     logging_process.join()
+    with open('all_experiences.dill', 'wb') as f:
+        dill.dump(global_memory, f)
