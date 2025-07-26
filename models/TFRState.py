@@ -32,6 +32,7 @@ class TrainState:
 class FlowState:
     flow: Flow
     has_demand: bool
+    missing_volume: float
     completed_flow_weight_reward: float = 500
 
     @property
@@ -39,7 +40,7 @@ class FlowState:
         return str(self.flow)
 
     def reward(self) -> float:
-        r = 0 if self.has_demand else self.completed_flow_weight_reward
+        r = (1-self.missing_volume) * self.completed_flow_weight_reward
         return r
 
 
@@ -154,7 +155,7 @@ class TFRStateSpace:
         activities = list(np.array(activities).flatten())
 
         for flow in state.flow_states:
-            flows.append(int(flow.has_demand))
+            flows.append(int(flow.missing_volume))
 
         for constraint in state.constraint_states:
             constraints.append(int(constraint.is_blocked))

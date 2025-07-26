@@ -26,8 +26,8 @@ import cProfile
 
 warnings.filterwarnings('ignore')
 # N_EPISODES = 10
-EPISODES_BY_PROCESS = 2
-NUM_PROCESSES = 2
+EPISODES_BY_PROCESS = 25
+NUM_PROCESSES = 4
 TRAINING_STEPS = 2#_000
 
 @dataclass
@@ -61,15 +61,15 @@ def profile(func):
         return r
     return wrapper
 
-@profile
+# @profile
 def learning_loop(learner, queue, stop_event):
     # with learner:
     while not stop_event.is_set():
         try:
             experience = queue.get(timeout=1)
             learner.update(experience)
-        except:
-            info('Experience queue is empty')
+        except Exception as e:
+            info(f'Experience queue is empty - {e}')
             # sleep(.1)
             continue
     # while not queue.empty():
@@ -77,7 +77,7 @@ def learning_loop(learner, queue, stop_event):
     #     learner.update(experience)
     learner.save()
 
-@profile
+# @profile
 def logging_loop(stop_event, output_queue):
     log_number = 0
     while not stop_event.is_set():
@@ -126,7 +126,7 @@ def run_episode(experience_producer, learner, episode_number, output_queue: Dill
     )
     output_queue.put(dill.dumps(output))
 
-@profile
+# @profile
 def run_training_loop(experience_producer,learner, output_queue):
     for episode in range(EPISODES_BY_PROCESS):
         run_episode(
