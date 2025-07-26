@@ -19,9 +19,9 @@ class TrainState:
 
     def reward(self) -> float:
         r = 0
-        if self.activity.name == ActivityState.PROCESSING:
+        if self.activity == ActivityState.PROCESSING:
             r += self.loading_weight_reward
-        elif self.activity.name == ActivityState.MOVING:
+        elif self.activity == ActivityState.MOVING:
             r += self.transit_time * self.transit_weight_punishment
         else:
             r += self.queue_weight_punishment
@@ -148,7 +148,7 @@ class TFRStateSpace:
             loc = loc.detach().numpy()[0].tolist()
             locations += loc
 
-            a = self.activities[t.activity.name.name]
+            a = self.activities[t.activity.name]
 
             activities.append(a)
         activities = list(np.array(activities).flatten())
