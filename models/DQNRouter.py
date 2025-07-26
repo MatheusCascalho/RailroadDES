@@ -18,7 +18,7 @@ from logging import debug
 
 EPSILON_DEFAULT = 1.0
 N_NEURONS = 64
-BATCH_SIZE = 10
+BATCH_SIZE = 50
 GAMMA = 0.99
 LEARNING_RATE = 1e-3
 epsilon_min = 0.01
@@ -106,9 +106,13 @@ class Learner:
     def memory(self):
         return self._memory
 
+    @property
+    def memory_to_train(self):
+        return [e for e in self._memory if e.action != 'AUTOMATIC']
+
     def learn(self):
         # Amostra mini-batch
-        batch = random.sample(self.memory, BATCH_SIZE)
+        batch = random.sample(self.memory_to_train, BATCH_SIZE)
         states, actions, rewards, next_states, dones = zip(*batch)
         states = [self.state_space.to_array(s) for s in states]
         states = torch.FloatTensor(states)
@@ -137,7 +141,7 @@ class Learner:
     def update(self, experience):
         self.memory.append(experience)
         self.episode += 1
-        if len(self.memory) >= BATCH_SIZE:
+        if len(self.memory_to_train) >= BATCH_SIZE:
             self.learn()
 
         if self.episode % self.target_update_freq == 0:
@@ -148,6 +152,9 @@ class Learner:
         return self
 
     def __exit__(self, *args, **kwargs):
+        self.save(*args, **kwargs)
+
+    def save(self, *args, **kwargs):
         with open(self.policy_net_path, 'wb') as f:
             dill.dump(self.policy_net, f)
 
