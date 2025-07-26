@@ -104,7 +104,7 @@ class RailroadEvolutionMemory(AbstractSubject):
         return self.memory.__iter__()
 
 class ExperienceProducer(AbstractObserver):
-    def __init__(self, queue, memory_size: int=1000):
+    def __init__(self, queue, memory_size: int=100_000):
         self._memory = deque(maxlen=memory_size)
         self.queue = queue
         super().__init__()
