@@ -28,7 +28,7 @@ warnings.filterwarnings('ignore')
 # N_EPISODES = 10
 EPISODES_BY_PROCESS = 25
 NUM_PROCESSES = 4
-TRAINING_STEPS = 2#_000
+TRAINING_STEPS = 100
 
 @dataclass
 class OutputData:
@@ -45,8 +45,8 @@ def setup_shared_components(experience_queue):
     learner = Learner(
         state_space=state_space,
         action_space=ActionSpace(model.demands),
-        policy_net_path='../serialized_models/policy_net_150x6_TFRState_v1_TargetBased_parallel.dill',
-        target_net_path='../serialized_models/target_net_150x6_TFRState_v1_TargetBased_parallel.dill',
+        policy_net_path='../serialized_models/policy_net_150x6_TFRState_v2_TargetBased_parallel.dill',
+        target_net_path='../serialized_models/target_net_150x6_TFRState_v2_TargetBased_parallel.dill',
     )
     global_memory = ExperienceProducer(queue=experience_queue)
     return learner, global_memory
@@ -176,8 +176,6 @@ if __name__ == '__main__':
             # sleep(1)
             stop_signal.set()
             learner_process.join()
-            with open(f'all_experiences_{step}.dill', 'wb') as f:
-                dill.dump(global_memory.memory, f)
             stop_signal.clear()
 
         # while not output_queue.empty():

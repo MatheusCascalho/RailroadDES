@@ -1,3 +1,4 @@
+import os
 from collections import deque
 
 from interfaces.train_interface import TrainInterface
@@ -22,7 +23,7 @@ BATCH_SIZE = 50
 GAMMA = 0.99
 LEARNING_RATE = 1e-3
 epsilon_min = 0.01
-epsilon_decay = 0.995
+epsilon_decay = 0.89
 
 
 class DQN(nn.Module):
