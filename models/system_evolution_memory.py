@@ -1,18 +1,19 @@
 from collections import deque
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from models.des_model import DESModel
 from models.observers import AbstractSubject, to_notify, AbstractObserver
 from models.railroad import Railroad
 from models.tfr_state_factory import TFRStateFactory, TFRState
 from models.demand import Flow
 from multiprocessing import Queue
-
+import dill
+import os
 from logging import critical
 
 def memory_id_gen():
     i = 0
     while True:
-        mem_id = f"Memory{i}"
+        mem_id = f"Memory{i} - PID {os.getpid()}"
         yield mem_id
         i += 1
 
@@ -25,7 +26,7 @@ class Experience:
     reward: float
     next_state: TFRState
     is_done: bool
-    memory_id = next(memory_id)
+    memory_id: str = field(default_factory=lambda: next(memory_id))
 
     def __iter__(self):
         values = [self.state, self.action, self.reward, self.next_state, self.is_done]
