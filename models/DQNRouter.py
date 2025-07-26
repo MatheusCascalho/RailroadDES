@@ -184,6 +184,7 @@ class DQNRouter(Router):
         self.policy_net = policy_net
         self.memory = simulation_memory
         self.epsilon = epsilon
+        self.epsilon_steps = 0
 
     def choose_task(self, current_time, train_size, model_state):
         if self.memory.last_item is None or random.random() < self.epsilon:
@@ -209,3 +210,4 @@ class DQNRouter(Router):
         # Decaimento do epsilon
         if self.epsilon > epsilon_min:
             self.epsilon *= epsilon_decay
+            self.epsilon_steps += 1
