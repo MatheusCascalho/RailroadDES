@@ -37,4 +37,8 @@ class NodeInterface(Entity, ABC):
     def pre_processing(self):
         pass
 
+    @property
+    @abstractmethod
+    def daily_capacity(self):
+        pass
 

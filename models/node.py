@@ -164,6 +164,16 @@ class Node(NodeInterface):
 
         self.pos_processing()
 
+    @property
+    def daily_capacity(self):
+        daily_rates = [
+            r.rate * 24
+            for s in self.process_units
+            for r in s.rates.values()
+        ]
+        return sum(daily_rates)
+
+
 
 class StockNode(Node):
     def __init__(

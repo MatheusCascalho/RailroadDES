@@ -43,7 +43,7 @@ class TransitTime:
     time: float
 
 
-@dataclass
+@dataclass(frozen=True)
 class Demand:
     flow: Flow
     minimum: float
