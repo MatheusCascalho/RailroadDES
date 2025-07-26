@@ -66,7 +66,7 @@ def learning_loop(learner, queue, stop_event):
     # with learner:
     while not stop_event.is_set():
         try:
-            experience = dill.loads(queue.get(timeout=1))
+            experience = queue.get(timeout=1)
             learner.update(experience)
         except:
             info('Experience queue is empty')
