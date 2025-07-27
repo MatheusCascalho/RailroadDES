@@ -109,7 +109,7 @@ class Learner:
 
     @property
     def memory_to_train(self):
-        return [e for e in self._memory if e.action != 'AUTOMATIC']
+        return [e for e in self._memory if e.action != 'AUTOMATIC' and not e.state.is_initial]
 
     def learn(self):
         # Amostra mini-batch
@@ -188,7 +188,11 @@ class DQNRouter(Router):
         self.epsilon_steps = 0
 
     def choose_task(self, current_time, train_size, model_state):
-        if self.memory.last_item is None or random.random() < self.epsilon:
+        if (
+                self.memory.last_item is None or
+                self.memory.last_item.state.is_initial or
+                random.random() < self.epsilon
+        ):
             selected_demand = self.explore()
         else:
             with torch.no_grad():
@@ -206,6 +210,15 @@ class DQNRouter(Router):
         )
         self.update_epsilon()
         return task
+
+    def route(self, train: TrainInterface, current_time, state, is_initial=False):
+        if is_initial:
+            self.memory.save_previous_state(is_initial=True)
+            super().route(train=train, current_time=current_time, state=state, is_initial=is_initial)
+            self.memory.save_consequence()
+        else:
+            super().route(train=train, current_time=current_time, state=state, is_initial=is_initial)
+
 
     def update_epsilon(self):
         # Decaimento do epsilon
