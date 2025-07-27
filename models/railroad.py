@@ -59,8 +59,8 @@ class Railroad(DESModel):
 
     def starting_events(self, simulator: DESSimulatorInterface, time_horizon: timedelta):
         for train in self.trains:
-            self.router.route(current_time=simulator.current_date, train=train, state=self.state)
-
+            self.router.route(current_time=simulator.current_date, train=train, state=self.state, is_initial=True)
+            train.activity_system.update()
             segments = self.mesh.get_segments(train.current_task)
             scheduler = ArriveScheduler(
                 rail_segments=segments,

@@ -116,15 +116,30 @@ class ActivitySystem(DiscreteEventSystem):
         queue_to_enter = State(name=ActivityState.QUEUE_TO_ENTER, is_marked=False)
         processing = State(name=ActivityState.PROCESSING, is_marked=False)
         queue_to_leave = State(name=ActivityState.QUEUE_TO_LEAVE, is_marked=False)
-        for state in [moving, queue_to_enter, processing, queue_to_leave]:
+        waiting_to_route = State(name=ActivityState.WAITING_TO_ROUTE, is_marked=False)
+        all_states = [waiting_to_route, moving, queue_to_enter, processing, queue_to_leave]
+        for state in all_states:
             if state.name == initial_activity:
                 state.is_marked = True
                 break
+            else:
+                continue
+        if not any(s.is_marked for s in all_states):
             raise Exception('Initial activity is not a valid state')
 
         leave = Transition(
             name="leave",
             origin=queue_to_leave,
+            destination=moving
+        )
+        routing = Transition(
+            name="routing",
+            origin=queue_to_leave,
+            destination=waiting_to_route
+        )
+        assigned = Transition(
+            name="assigned",
+            origin=waiting_to_route,
             destination=moving
         )
         arrive = Transition(
@@ -144,7 +159,8 @@ class ActivitySystem(DiscreteEventSystem):
         )
         transitions = [
             leave, arrive,
-            start, finish
+            start, finish,
+            routing, assigned
         ]
         sm = StateMachine(transitions=transitions)
         return sm
@@ -169,10 +185,18 @@ class ActivitySystem(DiscreteEventSystem):
 
     def leave(self):
         if self.state_machine.current_state.name == ActivityState.QUEUE_TO_LEAVE:
+            if self.path.is_finished:
+                self.state_machine.update('routing')
+            else:
+                self.state_machine.update('leave')
+                self.path.walk()
+        elif self.state_machine.current_state.name == ActivityState.WAITING_TO_ROUTE and not self.path.is_finished:
             self.state_machine.update()
-            self.path.walk()
 
     def arrive(self):
         if self.state_machine.current_state.name == ActivityState.MOVING:
             self.state_machine.update()
             self.path.walk()
+
+    def update(self):
+        self.state_machine.update()

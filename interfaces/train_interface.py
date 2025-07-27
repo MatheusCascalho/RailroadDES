@@ -9,6 +9,11 @@ class TrainInterface(SubjectWithOnlyOneObserver):
 
     @property
     @abstractmethod
+    def activity_system(self):
+        pass
+
+    @property
+    @abstractmethod
     def current_task(self):
         pass
 

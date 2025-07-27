@@ -37,11 +37,11 @@ class Train(TrainInterface):
             task: Task,
             is_loaded: bool,
             clock: Clock,
-            initial_activity: ActivityState = ActivityState.MOVING
+            initial_activity: ActivityState = ActivityState.WAITING_TO_ROUTE
     ):
         self.ID = next(train_id)
         self.clock = clock
-        self.activity_system = ActivitySystem(
+        self._activity_system = ActivitySystem(
             path=[],
             initial_activity=initial_activity
         )
@@ -152,6 +152,14 @@ class Train(TrainInterface):
     @property
     def current_flow(self):
         return self.current_task.demand.flow
+
+    @property
+    def activity_system(self):
+        return self._activity_system
+
+    @activity_system.setter
+    def activity_system(self, new_activity):
+        self._activity_system = new_activity
 
 
     def __str__(self):

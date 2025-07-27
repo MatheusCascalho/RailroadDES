@@ -18,6 +18,7 @@ class ActivityState(Enum):
     QUEUE_TO_ENTER = "Queue to enter"
     PROCESSING = "Processing"
     QUEUE_TO_LEAVE = "Queue to leave"
+    WAITING_TO_ROUTE = "Waiting to route"
 
 
 class ProcessorState(Enum):

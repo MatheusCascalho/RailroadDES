@@ -34,6 +34,10 @@ class Path:
             return '' # Means that train finish travel, therefore, is not in load point
         return self.__path[0]
 
+    @property
+    def is_finished(self):
+        return len(self.path) == 1
+
     def next_location(self):
         if self.__path[1] in self.__path[0]:
             return self.__path[1]
