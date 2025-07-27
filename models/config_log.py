@@ -1,13 +1,15 @@
 # config_log.py
 import logging
+from datetime import datetime
 
 def configurar_logs():
     # Configuração básica de logging
-    logging.basicConfig(level=logging.CRITICAL,  # Define o nível mínimo de log
+    t = datetime.now().strftime('%d_%m_%Y_%H_%M_%S')
+    logging.basicConfig(level=logging.INFO,  # Define o nível mínimo de log
                         format='%(asctime)s - %(levelname)s - %(message)s',
                         handlers=[
                             logging.StreamHandler(),  # Exibe no terminal
-                            logging.FileHandler('meu_projeto_2.log', 'w', 'utf-8')  # Salva em arquivo
+                            logging.FileHandler(f'logs_treinamento_{t}.log', 'w', 'utf-8')  # Salva em arquivo
                         ])
 
 class CriticalFilter(logging.Filter):
