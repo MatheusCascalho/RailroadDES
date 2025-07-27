@@ -13,7 +13,7 @@ class TrainState:
     local: str
     activity: ActivityState
     transit_time: float = 0
-    transit_weight_punishment: float = -2
+    transit_weight_punishment: float = -.2
     loading_weight_reward: float = 100
     queue_weight_punishment: float = -20
 
