@@ -19,7 +19,7 @@ class Router(ABC):
         self.completed_tasks = []
         self.running_tasks = {}
 
-    def route(self, train: TrainInterface, current_time, state):
+    def route(self, train: TrainInterface, current_time, state, is_initial=False):
         completed = train.current_task
         self.completed_tasks.append(completed)
         if completed in self.running_tasks:
@@ -84,7 +84,7 @@ class ChainedHistoryRouter(RandomRouter):
         AbstractObserver().__init__()
 
 
-    def route(self, train: TrainInterface, current_time, state):
+    def route(self, train: TrainInterface, current_time, state, *args, **kwargs):
         previous_flow = train.current_task.demand.flow
         super().route(train, current_time, state)
         valuable_state = '\n'.join([str(d) for d in self.demands])
@@ -106,7 +106,7 @@ class RepeatedRouter(Router):
         self.to_repeat = to_repeat
         self.completed_tasks = []
 
-    def route(self, train: TrainInterface, current_time: datetime, state: Any) -> Task:
+    def route(self, train: TrainInterface, current_time: datetime, state: Any, *args, **kwargs) -> Task:
         completed = train.current_task
         self.completed_tasks.append(completed)
         task = None

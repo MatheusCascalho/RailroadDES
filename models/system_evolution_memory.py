@@ -60,15 +60,16 @@ class RailroadEvolutionMemory(AbstractSubject):
         self._railroad = railroad
 
     def save_previous_state(self, *args, **kwargs):
-        state = self.take_a_snapshot()
+        state = self.take_a_snapshot(is_initial=kwargs.get('is_initial', False))
         self.previous_state = state
 
 
     def take_a_snapshot(self, *args, **kwargs):
+        is_initial = kwargs.get('is_initial', False)
         if not self.railroad:
             critical("Memory does not know the railroad and therefore does not perform any snapshots")
             return
-        state = TFRStateFactory(self.railroad)
+        state = TFRStateFactory(self.railroad, is_initial=is_initial)
         return state
 
     def save_consequence(self, *args, **kwargs):

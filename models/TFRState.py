@@ -60,6 +60,10 @@ class TFRState:
     train_states: List[TrainState]
     constraint_states: List[ConstraintState]
     flow_states: List[FlowState]
+    is_initial: bool
+
+    def __post_init__(self):
+        pass
 
     def reward(self) -> float:
         r = 0
