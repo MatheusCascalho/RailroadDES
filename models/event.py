@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from datetime import timedelta
 from typing import Callable, Any
+from logging import info
+from models.exceptions import FinishedTravelException
 
 
 @dataclass
@@ -44,8 +46,13 @@ class DecoratedEventFactory(EventFactory):
     def wrapper(self, callback: Callable):
         def decorated(*args, **kwargs):
             self.pre_method(*args, **kwargs)
-            callback(*args, **kwargs)
-            self.pos_method(*args, **kwargs)
+            try:
+                callback(*args, **kwargs)
+                self.pos_method(*args, **kwargs)
+            except FinishedTravelException as e:
+                info(f"Taking a snapshot because event generate an exception: {e}")
+                self.pos_method(*args, **kwargs)
+                raise e
         return decorated
 
     def create(self, time_until_happen, callback, data):
