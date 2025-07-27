@@ -5,6 +5,7 @@ from interfaces.train_interface import TrainInterface
 from models.TFRState import TFRStateSpace
 from models.observers import AbstractObserver
 from models.router import Router
+from models.states import ActivityState
 from models.system_evolution_memory import RailroadEvolutionMemory
 from datetime import datetime
 from typing import Any
@@ -16,6 +17,8 @@ import dill
 import random
 import numpy as np
 from logging import debug
+from collections import Counter
+
 
 EPSILON_DEFAULT = 1.0
 N_NEURONS = 64
@@ -197,6 +200,9 @@ class DQNRouter(Router):
         else:
             with torch.no_grad():
                 state = self.memory.last_item.next_state
+                train_activities = Counter(t.activity for t in state.train_states)
+                if train_activities.get(ActivityState.WAITING_TO_ROUTE) != 1:
+                    raise Exception('It is not possible to identify the train that will be routed by the system state')
                 state = self.state_space.to_array(state)
                 state = torch.FloatTensor(state).unsqueeze(0)
                 demand_index = self.policy_net(state).argmax().item()
