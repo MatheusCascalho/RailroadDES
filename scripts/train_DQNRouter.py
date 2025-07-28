@@ -18,6 +18,7 @@ from logging import info, critical
 import warnings
 from models.target import SimpleTargetManager
 from multiprocessing import Event, Process, Pool, Manager
+import multiprocessing
 from models.dill_queue import DillQueue
 import os
 from time import sleep
@@ -45,8 +46,8 @@ def setup_shared_components(experience_queue):
     learner = Learner(
         state_space=state_space,
         action_space=ActionSpace(model.demands),
-        policy_net_path='../serialized_models/policy_net_150x6_TFRState_v2_TargetBased_parallel.dill',
-        target_net_path='../serialized_models/target_net_150x6_TFRState_v2_TargetBased_parallel.dill',
+        policy_net_path='../serialized_models/policy_net_TargetBased_parallel.dill',
+        target_net_path='../serialized_models/target_net_TargetBased_parallel.dill',
     )
     global_memory = ExperienceProducer(queue=experience_queue)
     return learner, global_memory
@@ -62,7 +63,16 @@ def profile(func):
     return wrapper
 
 # @profile
-def learning_loop(learner, queue, stop_event):
+def learning_loop(queue, stop_event):
+    with open('../tests/artifacts/model_to_train_15.dill', 'rb') as f:
+        model = dill.load(f)
+    state_space = TFRStateSpaceFactory(model)
+    learner = Learner(
+        state_space=state_space,
+        action_space=ActionSpace(model.demands),
+        policy_net_path='../serialized_models/policy_net_TargetBased_parallel.dill',
+        target_net_path='../serialized_models/target_net_TargetBased_parallel.dill',
+    )
     # with learner:
     while not stop_event.is_set():
         try:
@@ -90,11 +100,18 @@ def logging_loop(stop_event, output_queue):
             # sleep(.1)
             continue
 
-def run_episode(experience_producer, learner, episode_number, output_queue: DillQueue):
-    with open('../tests/artifacts/model_to_train_15.dill', 'rb') as f:
+def run_episode(episode_number, output_queue: DillQueue):
+    with open('../tests/artifacts/model_to_train_15_sim_v2.dill', 'rb') as f:
         model = dill.load(f)
     target = SimpleTargetManager(demand=model.demands)
     state_space = TFRStateSpaceFactory(model)
+    learner = Learner(
+        state_space=state_space,
+        action_space=ActionSpace(model.demands),
+        policy_net_path='../serialized_models/policy_net_150x6_TFRState_v2_TargetBased_parallel.dill',
+        target_net_path='../serialized_models/target_net_150x6_TFRState_v2_TargetBased_parallel.dill',
+    )
+    experience_producer = ExperienceProducer(queue=experience_queue)
 
     local_memory = RailroadEvolutionMemory()
     event_factory = DecoratedEventFactory(
@@ -127,18 +144,16 @@ def run_episode(experience_producer, learner, episode_number, output_queue: Dill
     output_queue.put(dill.dumps(output))
 
 # @profile
-def run_training_loop(experience_producer,learner, output_queue):
+def run_training_loop(output_queue):
     for episode in range(EPISODES_BY_PROCESS):
         run_episode(
-            experience_producer=experience_producer,
-            learner=learner,
             episode_number=episode,
             output_queue=output_queue
         )
     info(f"Trainamento do processo {os.getpid()} finalizado!")
 
-def training_process_wrapper(experience_producer,learner, output_queue):
-    p = Process(target=run_training_loop, args=(experience_producer,learner,output_queue))
+def training_process_wrapper(output_queue):
+    p = Process(target=run_training_loop, args=(output_queue,))
     return p
 
 
@@ -146,7 +161,7 @@ if __name__ == '__main__':
     with Manager() as manager:
         output_queue = manager.Queue()
         experience_queue = manager.Queue()
-        learner, global_memory = setup_shared_components(experience_queue)
+        # _, _ = setup_shared_components(experience_queue)
         stop_signal_log = Event()
 
         # iniciar processo
@@ -155,7 +170,7 @@ if __name__ == '__main__':
         logging_pid = logging_process.pid
         stop_signal = Event()
 
-        learner_process = Process(target=learning_loop, args=(learner, experience_queue, stop_signal))
+        learner_process = Process(target=learning_loop, args=(experience_queue, stop_signal))
         learner_process.start()
 
         for step in range(TRAINING_STEPS):
@@ -163,7 +178,7 @@ if __name__ == '__main__':
 
             # Inicia os processos dos atores
             actor_processes = [
-                training_process_wrapper(global_memory, learner, output_queue)
+                training_process_wrapper(output_queue)
                 for _ in range(NUM_PROCESSES)
             ]
 
