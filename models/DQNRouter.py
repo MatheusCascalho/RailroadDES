@@ -76,7 +76,7 @@ class Learner:
         self._memory = deque(maxlen=100_000)
         self.state_space = state_space
         self.action_space = action_space
-        suffix = f"{state_space.cardinality}x{self.action_space.n_actions}_TFRState_v1"
+        suffix = f"{state_space.cardinality}x{self.action_space.n_actions}_TFRState_v2"
         offset = len('.dill')
 
         policy_net_path = policy_net_path[:-offset] + f"_{suffix}" + policy_net_path[-offset:]
