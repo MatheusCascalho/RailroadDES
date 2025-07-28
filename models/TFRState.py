@@ -13,8 +13,8 @@ class TrainState:
     local: str
     activity: ActivityState
     transit_time: float = 0
-    transit_weight_punishment: float = -.2
-    loading_weight_reward: float = 100
+    transit_weight_punishment: float = -2
+    loading_weight_reward: float = 500
     queue_weight_punishment: float = -20
 
     def reward(self) -> float:
@@ -33,7 +33,7 @@ class FlowState:
     flow: Flow
     has_demand: bool
     missing_volume: float
-    completed_flow_weight_reward: float = 500
+    completed_flow_weight_reward: float = 5000
 
     @property
     def name(self):
