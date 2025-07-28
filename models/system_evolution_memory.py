@@ -123,7 +123,7 @@ class ExperienceProducer(AbstractObserver):
             if self._experience_key(experience) not in existing_keys
         ]
         for memory_element in new_items:
-            self.queue.put(memory_element)
+            self.queue.put(memory_element, timeout=1)
 
         self._memory.extend(new_items)
 
