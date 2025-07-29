@@ -27,6 +27,7 @@ def TFRStateFactory(railroad: Railroad, is_initial=False) -> TFRState:
                 flow=d.flow,
                 has_demand=not d.is_completed,
                 missing_volume=d.cut/d.volume,
+                completed_flow_weight_reward=d.volume
             )
             for d in railroad.router.demands
         ]
