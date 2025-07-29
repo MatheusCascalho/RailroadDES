@@ -1,0 +1,14 @@
+[
+  {
+    "load_origin": "Souza",
+    "load_destination": "Santos",
+    "loaded_time": 21.33,
+    "empty_time": 10.0
+  },
+  {
+    "load_origin": "Mendes",
+    "load_destination": "Santos",
+    "loaded_time": 68.51,
+    "empty_time": 99.44
+  }
+]

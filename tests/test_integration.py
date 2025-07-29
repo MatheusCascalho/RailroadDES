@@ -284,3 +284,36 @@ def test_simulation_with_dqn_and_target(create_model, simple_clock):
     op_vol = OperatedVolume(model.router.completed_tasks)
     op_vol.plot_operated_volume().show()
     print(op_vol.operated_volume_by_flow())
+
+
+def test_simulation_simplified_model(create_simple_model, simple_clock):
+    memory = RailroadEvolutionMemory()
+    event_factory = DecoratedEventFactory(
+        pre_method=memory.save_previous_state,
+        pos_method=memory.save_consequence
+    )
+    calendar = EventCalendar(event_factory=event_factory)
+    sim = DESSimulator(clock=simple_clock, calendar=calendar)
+    model = create_simple_model(sim=sim, n_trains=1)
+    with open('artifacts/simple_model_to_train_1_sim_v2.dill', 'wb') as f:
+        dill.dump(model, f)
+    state_space = TFRStateSpaceFactory(model)
+    router = DQNRouter(state_space=state_space, demands=model.demands)
+
+    model.router = router
+    memory.railroad = model
+    memory.add_observers([router])
+    with router:
+        sim.simulate(model=model, time_horizon=timedelta(days=60))
+
+    from collections import Counter
+    print(memory)
+    print(Counter([s.reward for s in memory.memory]))
+
+    # sg = StockGraphic(list(model.mesh.load_points) + list(model.mesh.unload_points))
+    # sg.get_figures()[0].show()
+    # Gantt().build_gantt_with_all_trains(model.trains, final_date=model.mesh.load_points[0].clock.current_time)
+    # Gantt().build_gantt_by_trains(model.trains)
+    op_vol = OperatedVolume(model.router.completed_tasks)
+    op_vol.plot_operated_volume().show()
+    print(op_vol.operated_volume_by_flow())

@@ -118,3 +118,112 @@ def create_model(
 
         return model
     return create
+
+
+@fixture
+def create_simple_model(
+        simple_stock_node_factory,
+        simple_clock,
+        simple_product,
+        simple_train
+):
+    def create(
+            sim,
+            n_trains,
+            train_size = 6e3,
+            process_times = [10,7,15,7]
+    ):
+        o1 = "Souza"
+        o2 = "Mendes"
+        d = "Santos"
+        data = [
+          {
+            "load_origin": o1,
+            "load_destination": d,
+            "loaded_time": 21.33,
+            "empty_time": 10.0
+          },
+          {
+            "load_origin": o2,
+            "load_destination": d,
+            "loaded_time": 68.51,
+            "empty_time": 99.44
+          }
+        ]
+        demands = [
+            Demand(
+                flow=Flow(
+                    origin=o1,
+                    destination=d,
+                    product=simple_product
+                ),
+                volume=train_size * 10
+            ),
+            Demand(
+                flow=Flow(
+                    origin=o2,
+                    destination=d,
+                    product=simple_product
+                ),
+                volume=train_size * 3
+            ),
+        ]
+        d = simple_stock_node_factory(
+            d,
+            clock=simple_clock,
+            process='unload',
+            has_replanisher=False,
+            process_rate=train_size / 24,
+            initial_stock=randint(0, int(60e3))
+        )
+        unload_points = [d]
+        o1 = simple_stock_node_factory(
+            o1,
+            clock=simple_clock,
+            process='load',
+            has_replanisher=True,
+            process_rate=train_size / 12,
+            initial_stock=5*train_size
+        )
+        o2 = simple_stock_node_factory(
+            o2,
+            clock=simple_clock,
+            process='load',
+            has_replanisher=True,
+            process_rate=train_size / 12,
+            initial_stock=5*train_size
+        )
+        load_points = [o1, o2]
+
+
+        transit_times = []
+
+        for tt in data:
+
+            transit_time = TransitTime(**tt)
+            transit_times.append(transit_time)
+
+        mesh = RailroadMesh(
+            load_points=tuple(load_points),
+            unload_points=tuple(unload_points),
+            transit_times=transit_times
+        )
+
+        trains = [
+            simple_train(
+                simple_product,
+                simple_clock,
+                train_size=train_size,
+                simulator=sim
+            )
+
+            for _ in range(n_trains)
+        ]
+        model = Railroad(
+            mesh=mesh,
+            trains=trains,
+            demands=demands,
+        )
+
+        return model
+    return create
