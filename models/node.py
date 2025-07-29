@@ -80,7 +80,7 @@ class Node(NodeInterface):
     def to_json(self):
         return {}
 
-    def dispatch(self):
+    def dispatch(self, *args, **kwargs):
         """
         Percorre a fila de saída e remove todos os trens que não estiverem com a saída bloqueada por alguma restrição
         :param train_picker:
@@ -159,7 +159,8 @@ class Node(NodeInterface):
                 self.liberation_constraints[train.ID].append(constraint)
                 simulator.add_event(
                     time=constraint.post_operation_time,
-                    callback=self.dispatch
+                    callback=self.dispatch,
+                    event_name=str(train.current_flow) if train.is_empty else 'AUTOMATIC'
                 )
 
         self.pos_processing()

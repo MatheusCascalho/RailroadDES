@@ -50,6 +50,7 @@ class DecoratedEventFactory(EventFactory):
                 callback(*args, **kwargs)
                 self.pos_method(*args, **kwargs)
             except FinishedTravelException as e:
+                kwargs['event_name'] = 'ROUTING'
                 info(f"Taking a snapshot because event generate an exception: {e}")
                 self.pos_method(*args, **kwargs)
                 raise e

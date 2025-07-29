@@ -43,18 +43,18 @@ class DQN(nn.Module):
 
 class ActionSpace:
     def __init__(self, demands):
-        self.demands = demands + ['AUTOMATIC']
+        self.demands = demands + ['AUTOMATIC', 'ROUTING']
 
     @property
     def n_actions(self):
         return len(self.demands)
 
     def sample(self):
-        i = random.randint(0, len(self.demands) - 2)
+        i = random.randint(0, len(self.demands) - 3)
         return self.demands[i]
 
     def to_scalar(self, action):
-        flows = [str(d.flow) for d in self.demands[:-1]] + [self.demands[-1]]
+        flows = [str(d.flow) for d in self.demands[:-2]] + self.demands[-2:]
         v = flows.index(action)
         return v
 
@@ -112,7 +112,7 @@ class Learner:
 
     @property
     def memory_to_train(self):
-        return [e for e in self._memory if e.action != 'AUTOMATIC' and not e.state.is_initial]
+        return [e for e in self._memory if e.action not in ['AUTOMATIC', 'ROUTING'] and not e.state.is_initial]
 
     def learn(self):
         # Amostra mini-batch
