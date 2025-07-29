@@ -116,7 +116,7 @@ class Learner:
 
     def learn(self):
         # Amostra mini-batch
-        batch = random.sample(self.memory_to_train, BATCH_SIZE)
+        batch = random.sample(self.memory, BATCH_SIZE)
         states, actions, rewards, next_states, dones = zip(*batch)
         states = [self.state_space.to_array(s) for s in states]
         states = torch.FloatTensor(states)
