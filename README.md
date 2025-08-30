@@ -1,10 +1,7 @@
 # RailroadDES
 Simulador a eventos discretos de um sistema ferroviário
 
+## Requisitos
 
-# Relatório de Cobertura
-
-Veja o gráfico interativo da cobertura clicando aqui:
-<iframe src="coverage_treemap.html" width="100%" height="600px"></iframe>
-
-[Gráfico de Cobertura](coverage_treemap.html)
+* Python version: 3.11
+* SO: Ubuntu
