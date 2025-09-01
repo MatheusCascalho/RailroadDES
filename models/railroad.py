@@ -81,6 +81,7 @@ class Railroad(DESModel):
         if isinstance(exception, FinishedTravelException):
             train: TrainInterface = exception.train
             self.router.route(train=train,current_time=exception.current_time, state=self.state)
+            event.data['event_name'] = train.current_task.demand.flow
             segments = self.mesh.get_segments(train.current_task)
             scheduler = ArriveScheduler(
                 rail_segments=segments,
