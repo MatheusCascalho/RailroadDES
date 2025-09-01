@@ -2,9 +2,11 @@ import sys
 from concurrent.futures.process import ProcessPoolExecutor
 
 # Adicionando o diretório ao sys.path
-sys.path.append('../')
-
-from models.DQNRouter import DQNRouter, Learner, ActionSpace
+sys.path.append('')
+sys.path.append('.')
+import random
+from models.DQNRouter import DQNRouter, Learner
+from models.action_space import ActionSpace
 from models.tfr_state_factory import TFRStateSpaceFactory
 from models.system_evolution_memory import RailroadEvolutionMemory, ExperienceProducer
 from models.event import DecoratedEventFactory
@@ -27,9 +29,9 @@ import cProfile
 
 warnings.filterwarnings('ignore')
 # N_EPISODES = 10
-EPISODES_BY_PROCESS = 1#25
-NUM_PROCESSES = 1#6
-TRAINING_STEPS = 1#10_000
+EPISODES_BY_PROCESS = 10
+NUM_PROCESSES = 1
+TRAINING_STEPS = 1
 
 @dataclass
 class OutputData:
@@ -40,15 +42,15 @@ class OutputData:
     episode_number: int
 
 def setup_shared_components(experience_queue):
-    # with open('../tests/artifacts/model_to_train_15.dill', 'rb') as f:
-    with open('../tests/artifacts/simple_model_to_train_1_sim_v2.dill', 'rb') as f:
+    # with open('tests/artifacts/model_to_train_15.dill', 'rb') as f:
+    with open('tests/artifacts/simple_model_to_train_1_sim_v2.dill', 'rb') as f:
         model = dill.load(f)
     state_space = TFRStateSpaceFactory(model)
     learner = Learner(
         state_space=state_space,
         action_space=ActionSpace(model.demands),
-        policy_net_path='../serialized_models/policy_net_TargetBased_parallel.dill',
-        target_net_path='../serialized_models/target_net_TargetBased_parallel.dill',
+        policy_net_path='serialized_models/policy_net_TargetBased_parallel.dill',
+        target_net_path='serialized_models/target_net_TargetBased_parallel.dill',
     )
     global_memory = ExperienceProducer(queue=experience_queue)
     return learner, global_memory
@@ -65,15 +67,15 @@ def profile(func):
 
 # @profile
 def learning_loop(queue, stop_event):
-    # with open('../tests/artifacts/model_to_train_15.dill', 'rb') as f:
-    with open('../tests/artifacts/simple_model_to_train_1_sim_v2.dill', 'rb') as f:
+    # with open('tests/artifacts/model_to_train_15.dill', 'rb') as f:
+    with open('tests/artifacts/simple_model_to_train_1_sim_v2.dill', 'rb') as f:
         model = dill.load(f)
     state_space = TFRStateSpaceFactory(model)
     learner = Learner(
         state_space=state_space,
         action_space=ActionSpace(model.demands),
-        policy_net_path='../serialized_models/policy_net_TargetBased_parallel_simple_model.dill',
-        target_net_path='../serialized_models/target_net_TargetBased_parallel_simple_model.dill',
+        policy_net_path='serialized_models/policy_net_TargetBased_parallel_simple_model.dill',
+        target_net_path='serialized_models/target_net_TargetBased_parallel_simple_model.dill',
     )
     # with learner:
     while not stop_event.is_set():
@@ -103,16 +105,16 @@ def logging_loop(stop_event, output_queue):
             continue
 
 def run_episode(episode_number, output_queue: DillQueue):
-    with open('../tests/artifacts/simple_model_to_train_1_sim_v2.dill', 'rb') as f:
-    # with open('../tests/artifacts/model_to_train_15_sim_v2.dill', 'rb') as f:
+    with open('tests/artifacts/simple_model_to_train_1_sim_v2.dill', 'rb') as f:
+    # with open('tests/artifacts/model_to_train_15_sim_v2.dill', 'rb') as f:
         model = dill.load(f)
     target = SimpleTargetManager(demand=model.demands)
     state_space = TFRStateSpaceFactory(model)
     learner = Learner(
         state_space=state_space,
         action_space=ActionSpace(model.demands),
-        policy_net_path='../serialized_models/policy_net_TargetBased_parallel_simple_model.dill',
-        target_net_path='../serialized_models/target_net_TargetBased_parallel_simple_model.dill',
+        policy_net_path='serialized_models/policy_net_TargetBased_parallel_simple_model.dill',
+        target_net_path='serialized_models/target_net_TargetBased_parallel_simple_model.dill',
     )
     experience_producer = ExperienceProducer(queue=experience_queue)
 
@@ -124,10 +126,14 @@ def run_episode(episode_number, output_queue: DillQueue):
     calendar = EventCalendar(event_factory=event_factory)
     sim = DESSimulator(clock=model.mesh.load_points[0].clock, calendar=calendar)
     local_memory.add_observers([experience_producer])
+    action_space = ActionSpace(model.demands)
     def always_the_same():
-        yield model.demands[0]
+        yield model.demands[1]
+        i = random.randint(0,1)
+        yield model.demands[i]
+
         while True:
-            yield ActionSpace(model.demands).sample()
+            yield action_space.sample()
     alws = always_the_same()
     router = DQNRouter(
         state_space=state_space,

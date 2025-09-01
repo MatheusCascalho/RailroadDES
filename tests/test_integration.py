@@ -295,7 +295,7 @@ def test_simulation_simplified_model(create_simple_model, simple_clock):
     calendar = EventCalendar(event_factory=event_factory)
     sim = DESSimulator(clock=simple_clock, calendar=calendar)
     model = create_simple_model(sim=sim, n_trains=1)
-    with open('artifacts/simple_model_to_train_1_sim_v2.dill', 'wb') as f:
+    with open('tests/artifacts/simple_model_to_train_1_sim_v2.dill', 'wb') as f:
         dill.dump(model, f)
     state_space = TFRStateSpaceFactory(model)
     router = DQNRouter(state_space=state_space, demands=model.demands)
