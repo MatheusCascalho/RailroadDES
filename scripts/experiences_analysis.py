@@ -1,13 +1,15 @@
+import sys
+sys.path.append(".")
 import dill
 import os
 import numpy as np
 from collections import defaultdict
 import pandas as pd
 from models.tfr_state_factory import TFRStateSpaceFactory
-from models.DQNRouter import ActionSpace
+from models.action_space import ActionSpace
 import networkx as nx
 import matplotlib.pyplot as plt
-from pyvis.network import Network
+# from pyvis.network import Network
 from pprint import pprint
 import itertools
 import matplotlib.colors as colors
@@ -17,12 +19,13 @@ from pprint import pprint
 import torch
 import torch.nn as nn
 
+
 # Camada de projeção para dimensão 2
 linear = nn.Linear(15, 2)
 
 
-# with open('../tests/artifacts/model_to_train_15.dill', 'rb') as f:
-with open('../tests/artifacts/simple_model_to_train_1_sim_v2.dill', 'rb') as f:
+# with open('tests/artifacts/model_to_train_15.dill', 'rb') as f:
+with open('tests/artifacts/simple_model_to_train_1_sim_v2.dill', 'rb') as f:
     model = dill.load(f)
 state_space = TFRStateSpaceFactory(model)
 action_space = ActionSpace(model.demands)
@@ -30,7 +33,8 @@ experiences = []
 files = os.listdir()
 # files = [f for f in files if f.startswith('all_experiences')]
 # files = ['current/all_experiences_143591.dill']
-files = ['current/all_experiences_4635.dill']
+# files = ['scripts/current/all_experiences_73673.dill']
+files = ['scripts/current/all_experiences_379691.dill']
 # files = ['current/all_experiences_98630.dill']
 # files = [
 #     "all_experiences_71113.dill",
@@ -48,6 +52,7 @@ for file in files:
         filtered_files.append(file)
 
 print(filtered_files)
+experiences = [e for e in experiences if '_-origin' not in str(e.state)]
 states, actions, rewards, next_states, dones = zip(*experiences)
 df = pd.DataFrame(
     {"Estado": states,
@@ -55,18 +60,23 @@ df = pd.DataFrame(
      "Próxima Estado": next_states,
      "Reward": rewards}
 )
-def to_tuple(x, use_embedding=True):
-    try:
-        # Aplicar a transformação
-        x = state_space.to_array(x)
-        x = torch.from_numpy(np.array(x)).float()
-        if use_embedding:
-            x_embedded = linear(x)  # shape: (1, 2)
-            return tuple(x_embedded.detach().numpy())
-        else:
-            return tuple(x.detach().numpy())
-    except Exception as e:
-        return None
+
+
+embbed_map = {}
+def to_tuple(_x, use_embedding=True):
+    # try:
+    # Aplicar a transformação
+    x = state_space.to_array(_x)
+    x = torch.from_numpy(np.array(x)).float()
+    if use_embedding:
+        x_embedded = linear(x)  # shape: (1, 2)
+        tp = tuple([round(float(i),5) for i in tuple(x_embedded.detach().numpy())])
+        embbed_map[tuple(float(t) for t in tp)] = str(_x)
+        return tp
+    else:
+        return tuple(x.detach().numpy())
+    # except Exception as e:
+    #     return None
 
 def to_scalar(a):
     try:
@@ -86,12 +96,26 @@ def to_location(x):
         positions = positions[local_cardinality:]
     return locs
 
-df['Estado raw'] = df['Estado'].apply(lambda x: to_tuple(x, False))
+df['Estado raw'] = df['Estado']#.apply(lambda x: to_tuple(x, False))
+df['Proximo Estado raw'] = df['Próxima Estado']#.apply(lambda x: to_tuple(x, False))
 df['Estado'] = df['Estado'].apply(to_tuple)
-df = df.dropna(subset=['Estado'])
 df['Próxima Estado'] = df['Próxima Estado'].apply(to_tuple)
 
-nos = np.unique(df[['Estado', 'Próxima Estado']].values.ravel())
+df = df.dropna(subset=['Estado'])
+
+transitions = df.to_dict(orient='records')
+filtered_transitions = []
+for t in transitions:
+    if len(filtered_transitions) == 0:
+        filtered_transitions.append(t)
+    elif t['Estado'] == filtered_transitions[-1]['Próxima Estado'] and t['Ação'] in ['AUTOMATIC', 'ROUTING']:
+        filtered_transitions[-1]['Próxima Estado'] = t['Próxima Estado']
+        filtered_transitions[-1]['Reward'] += t['Reward']
+    else:
+        filtered_transitions.append(t)
+
+# df = pd.DataFrame(filtered_transitions)
+nos = np.unique(df.dropna(subset='Próxima Estado')[['Estado', 'Próxima Estado']].values.ravel())
 combinacoes = pd.DataFrame(itertools.product(nos, nos), columns=['Estado', 'Próxima Estado'])
 novas = combinacoes.merge(df[['Estado', 'Próxima Estado']], on=['Estado', 'Próxima Estado'], how='left', indicator=True)
 novas = novas[novas['_merge'] == 'left_only'].drop(columns=['_merge'])
@@ -104,9 +128,14 @@ novas['Reward'] = 9999999
 # df = df[df['Ação']!='AUTOMATIC']
 # df = df[df['Ação']!='ROUTING']
 df['Ação'] = df['Ação'].apply(to_scalar)
-df = df.groupby(['Estado', 'Ação', 'Próxima Estado']).mean().reset_index()
+df['idx'] = df['Estado'].apply(str)
+df_raw = df.set_index('idx')
+df = df.groupby(['Estado', 'Ação', 'Próxima Estado'])['Reward'].mean().reset_index()
 
 q_table = df.pivot(index='Estado', columns='Ação', values='Reward')
+q_table = q_table[q_table[2].isna()]
+q_table = q_table[q_table[3].isna()]
+
 q_table_dict = defaultdict(lambda: defaultdict(float))
 
 for i, row in df.iterrows():
@@ -319,7 +348,7 @@ for i, edge_row in edges_df.iterrows():
         x=edge_x[-3:],
         y=edge_y[-3:],
         mode='lines',
-        line=dict(width=1+w,color=cor_hex),
+        line=dict(width=2,color=cor_hex),
         hoverinfo='text',
         hovertext=f'peso: {peso}',
         showlegend=False
@@ -341,11 +370,12 @@ fig = go.Figure()
 # ))
 
 # Nós
+estados = [embbed_map[x,y].replace('\n', '<br>') for x,y in zip(x_nodes, y_nodes)]
 node_trace = go.Scatter(
     x=x_nodes, y=y_nodes,
-    mode='markers+text',
+    mode='markers',
     marker=dict(size=20, color='skyblue'),
-    # text=[str(i) for i in G.nodes()],
+    text=estados,
     # textposition="bottom center"
 )
 
