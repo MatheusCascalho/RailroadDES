@@ -70,8 +70,8 @@ class Learner:
             self,
             state_space: TFRStateSpace,
             action_space: ActionSpace,
-            policy_net_path: str = '../serialized_models/policy_net.dill',
-            target_net_path: str = '../serialized_models/target_net.dill',
+            policy_net_path: str = 'serialized_models/policy_net.dill',
+            target_net_path: str = 'serialized_models/target_net.dill',
             target_update_freq: int = 10,
             epsilon: float = EPSILON_DEFAULT,
     ):
@@ -167,7 +167,7 @@ class Learner:
         with open(self.target_net_path, 'wb') as f:
             dill.dump(self.target_net, f)
 
-        with open(f'current/all_experiences_{os.getpid()}.dill', 'wb') as f:
+        with open(f'scripts/current/all_experiences_{os.getpid()}.dill', 'wb') as f:
             dill.dump(self.memory, f)
 
 
