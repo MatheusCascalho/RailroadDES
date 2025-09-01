@@ -190,11 +190,12 @@ class DQNRouter(Router):
         self.epsilon = epsilon
         self.epsilon_steps = 0
 
-    def choose_task(self, current_time, train_size, model_state):
+    def choose_task(self, current_time, train_size, model_state, current_location):
+        roullete = random.random()
         if (
                 self.memory.last_item is None or
                 self.memory.last_item.state.is_initial or
-                random.random() < self.epsilon
+                roullete < self.epsilon
         ):
             selected_demand = self.explore()
         else:
@@ -207,13 +208,19 @@ class DQNRouter(Router):
                 state = torch.FloatTensor(state).unsqueeze(0)
                 demand_index = self.policy_net(state).argmax().item()
                 selected_demand = self.action_space.get_demand(demand_index)
+        path = [selected_demand.flow.origin, selected_demand.flow.destination]
+        is_moving = '_' in current_location
+        if not is_moving:
+            path.insert(0, current_location)
         task = Task(
             demand=selected_demand,
-            path=[selected_demand.flow.origin, selected_demand.flow.destination],
+            path=path,
             task_volume=train_size,
             current_time=current_time,
-            state=model_state
+            state=model_state,
+            starts_moving=is_moving
         )
+        
         self.update_epsilon()
         return task
 

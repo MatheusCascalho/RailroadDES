@@ -24,7 +24,8 @@ class Task(AbstractSubject):
             path: list[str],
             task_volume: float,
             current_time: datetime,
-            state: Any
+            state: Any,
+            starts_moving=False
     ):
         """
         Initializes a Task object that represents a routing decision for a train at a specific point in the simulation.
@@ -38,7 +39,7 @@ class Task(AbstractSubject):
         self.ID = next(task_id)
         self.demand = demand
         demand.promised += task_volume
-        self.path = Path(path)
+        self.path = Path(path, is_moving=starts_moving)
         self.time_table = TimeTable()
         event = TimeEvent(
             event=EventName.DEPARTURE,

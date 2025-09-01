@@ -192,6 +192,7 @@ class ActivitySystem(DiscreteEventSystem):
                 self.path.walk()
         elif self.state_machine.current_state.name == ActivityState.WAITING_TO_ROUTE and not self.path.is_finished:
             self.state_machine.update()
+            self.path.walk()
 
     def arrive(self):
         if self.state_machine.current_state.name == ActivityState.MOVING:
