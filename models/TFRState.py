@@ -116,7 +116,9 @@ class TFRStateSpace:
     ):
         # Attributes coded with embedding
         stations = sorted(set({s[0] for s in mesh_edges}.union({s[1] for s in mesh_edges})))
-        connections = [f"_-{s}" for s in stations] + [f"{c[0]}-{c[1]}" for c in mesh_edges]
+        connections = [f"_-{s}" for s in stations] 
+        connections += [f"{c[0]}-{c[1]}" for c in mesh_edges]
+        connections += [f"{c[1]}-{c[0]}" for c in mesh_edges]
 
         self.locals_to_index = {
             loc: i
