@@ -18,7 +18,7 @@ import random
 import numpy as np
 from logging import debug
 from collections import Counter
-
+from models.action_space import ActionSpace
 
 EPSILON_DEFAULT = 1.0
 N_NEURONS = 64
@@ -41,29 +41,6 @@ class DQN(nn.Module):
     def forward(self, x):
         return self.fc(x)
 
-class ActionSpace:
-    def __init__(self, demands):
-        self.demands = demands + ['AUTOMATIC', 'ROUTING']
-
-    @property
-    def n_actions(self):
-        return len(self.demands) - 2
-
-    def sample(self):
-        i = random.randint(0, len(self.demands) - 3)
-        return self.demands[i]
-
-    def to_scalar(self, action):
-        if not isinstance(action, str):
-            action = str(action)
-        flows = [str(d.flow) for d in self.demands[:-2]] + self.demands[-2:]
-        v = flows.index(action)
-        return v
-
-    def get_demand(self, i):
-        if i == len(self.demands) - 1:
-            return self.sample()
-        return self.demands[i]
 
 class Learner:
     def __init__(
