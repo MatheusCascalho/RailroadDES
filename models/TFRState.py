@@ -27,6 +27,8 @@ class TrainState:
             r += self.queue_weight_punishment
         return r
 
+    def __str__(self):
+        return f"Trem {self.name} em {self.local}-{self.activity.value}"
 
 @dataclass(frozen=True)
 class FlowState:
@@ -42,6 +44,9 @@ class FlowState:
     def reward(self) -> float:
         r = (1-self.missing_volume) * self.completed_flow_weight_reward
         return r
+    
+    def __str__(self):
+        return f"Fluxo {self.flow.origin}-{self.flow.destination} com {round(100*(1-self.missing_volume))}% de atendimento"
 
 
 @dataclass(frozen=True)
@@ -85,6 +90,18 @@ class TFRState:
     @property
     def is_final(self):
         return all([not f.has_demand for f in self.flow_states])
+    
+    def __str__(self):
+        s = ""
+        for f in self.flow_states:
+            s += str(f) + "\n"
+        for t in self.train_states:
+            s += str(t) + "\n"
+        for c in self.constraint_states:
+            if c.is_blocked:
+                s += str(c.name) + "\n"
+        s += f"Recompensa {round(self.reward())}"
+        return s
 
 EMBEDDING_SPACE_DIMENSION = 5
 
