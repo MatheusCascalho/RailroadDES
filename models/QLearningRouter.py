@@ -27,12 +27,28 @@ GAMMA = 0.9
 
 
 class QTable(AbstractObserver):
-    def __init__(self,  action_space: ActionSpace, learning_rate=ALPHA, discount_factor=GAMMA):
-        self.q_table = defaultdict(lambda : defaultdict(float))
+    def __init__(
+            self,  
+            action_space: ActionSpace, 
+            learning_rate=ALPHA,
+            discount_factor=GAMMA,
+            q_table_file='q_table.dill'
+        ):
+        self.q_table_file = q_table_file
+        self.q_table = self.load_table()
         self.learning_rate = learning_rate
         self.discount_factor = discount_factor
         self.action_space = action_space
         super().__init__()
+
+    def load_table(self):
+        try:
+            with open(self.q_table_file, 'rb') as f:
+                q_table = dill.load(f)
+        except:
+            q_table = defaultdict(lambda : defaultdict(float))
+
+        return q_table
 
     def learn(self, current_state, next_state: TFRState, action):
         q_actual = self.q_table.get(current_state, 0).get(action)
@@ -53,6 +69,16 @@ class QTable(AbstractObserver):
     @property
     def memory(self) -> RailroadEvolutionMemory:
         return self.subjects[0]
+    
+    def __enter__(self):
+        debug('Start Q-learning')
+
+    def __exit__(self, *args, **kwargs):
+        self.save(*args, **kwargs)
+
+    def save(self, *args, **kwargs):
+        with open(self.q_table_file, 'wb') as f:
+            dill.dump(self.q_table_file, f)
 
 
 class QRouter(Router):
