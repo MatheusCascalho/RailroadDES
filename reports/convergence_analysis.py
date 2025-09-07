@@ -2,9 +2,9 @@ import pandas as pd
 import plotly.express as px
 import os
 
-df = pd.read_csv('scripts/logs_treinamento_29_07_2025_00_30_16.log', sep=' - ')
+df = pd.read_csv('logs_treinamento_06_09_2025_23_55_26.log', sep=' - ')
 
-df.columns=['date', 'log_type','log number', 'episode', 'PID', 'volume', 'demand', 'epsilon']
+df.columns=['date', 'log_type','log number', 'episode', 'PID', 'volume', 'demand']
 df['date'] = pd.to_datetime(df['date'])
 df['volume'] = df['volume'].apply(lambda x: float(x[len('volume: '):]))
 df['demand'] = df['demand'].apply(lambda x: float(x[len('demanda: '):]))
@@ -23,3 +23,4 @@ fig.show()
 
 fig = px.scatter(df, x="date", y="volume", title="Convergencia do algoritmo")
 fig.show()
+ 
