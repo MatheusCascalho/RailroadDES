@@ -50,12 +50,22 @@ class QTable(AbstractObserver):
 
         return q_table
 
-    def learn(self, current_state, next_state: TFRState, action):
-        q_actual = self.q_table.get(current_state, 0).get(action)
+    def learn(self, current_state: TFRState, next_state: TFRState, action):
+        current_state = str(current_state)
         reward = next_state.reward()
-        max_future_value = max(self.q_table[next_state, a] for a in self.action_space[next_state])
-        q_next = q_actual + self.learning_rate * (reward + self.dicount_factor * max_future_value - q_actual)
-        self.q_table[current_state, action] = q_next
+        next_state = str(next_state)
+        if current_state not in self.q_table:
+            for action in self.action_space.actions:
+                if isinstance(action, Demand):
+                    action = action.flow
+                self.q_table[current_state][action] = 0
+        q_actual = self.q_table.get(current_state, {}).get(action, 0)
+        future_values = [self.q_table[next_state][a] for a in self.q_table[next_state]]
+        max_future_value = 0 if len(future_values) == 0 else max(future_values)
+        q_next = q_actual + self.learning_rate * (reward + self.discount_factor * max_future_value - q_actual)
+        if isinstance(action, Demand):
+            action = action.flow
+        self.q_table[current_state][action] = q_next
 
     def update(self):
         current_state = self.memory.last_item.state
