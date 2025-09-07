@@ -221,7 +221,7 @@ def test_simulation_with_snapshot(create_model, simple_clock):
     calendar = EventCalendar(event_factory=event_factory)
     sim = DESSimulator(clock=simple_clock, calendar=calendar)
     model = create_model(sim=sim, n_trains=15)
-    with open('artifacts/model_to_train_15_sim_v2.dill', 'wb') as f:
+    with open('tests/artifacts/model_to_train_15_sim_v2.dill', 'wb') as f:
         dill.dump(model, f)
     state_space = TFRStateSpaceFactory(model)
     router = DQNRouter(state_space=state_space, demands=model.demands)
