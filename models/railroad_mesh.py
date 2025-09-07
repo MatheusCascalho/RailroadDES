@@ -140,7 +140,10 @@ class RailroadMesh:
 
     def get_current_segment(self, task: Task) -> RailSegment:
         location = task.path.current_location
-        o, d = location.split('-')
+        try:
+            o, d = location.split('-')
+        except:
+            raise Exception(f"Train is in node, but activity state is not MOVING")
         if o == '_':
             possible_segments = [s for s in self.segments if s.destination.name == d]
             if not possible_segments:
