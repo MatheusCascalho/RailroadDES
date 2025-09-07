@@ -78,7 +78,20 @@ class QTable(AbstractObserver):
 
     def save(self, *args, **kwargs):
         with open(self.q_table_file, 'wb') as f:
-            dill.dump(self.q_table_file, f)
+            dill.dump(self.q_table, f)
+
+    def best_action(self, current_state):
+        best_action = None
+        best_q = 0
+        for action, q in self.q_table.get(str(current_state), {}).items():
+            if q >= best_q:
+                best_q = q
+                best_action = action
+        if best_action and not isinstance(best_action, str):
+            best_action = [d for d in self.action_space.actions if d.flow==best_action][0]
+        if best_action is None:
+            best_action = self.action_space.sample()
+        return best_action
 
 
 class QRouter(Router):
