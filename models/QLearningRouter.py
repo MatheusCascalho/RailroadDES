@@ -68,12 +68,14 @@ class QTable(AbstractObserver):
         self.q_table[current_state][action] = q_next
 
     def update(self):
+        if self.memory.last_item is None:
+            return
         current_state = self.memory.last_item.state
         next_state = self.memory.last_item.next_state
         self.learn(
             current_state=current_state,
             next_state=next_state,
-            action=self.memory[-1].action
+            action=self.memory.last_item.action
         )
 
     @property
