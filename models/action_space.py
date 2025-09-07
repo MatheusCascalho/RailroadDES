@@ -1,4 +1,4 @@
-from random import random
+import random
 
 class ActionSpace:
     def __init__(self, demands):
@@ -23,3 +23,7 @@ class ActionSpace:
         if i == len(self.demands) - 1:
             return self.sample()
         return self.demands[i]
+    
+    @property
+    def actions(self):
+        return [d for d in self.demands[:-2]]

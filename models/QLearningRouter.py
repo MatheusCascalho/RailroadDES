@@ -1,6 +1,6 @@
 import os
 from collections import deque
-
+from models.demand import Demand
 from interfaces.train_interface import TrainInterface
 from models.TFRState import TFRStateSpace
 from models.observers import AbstractObserver
@@ -24,7 +24,7 @@ from models.system_evolution_memory import Experience, RailroadEvolutionMemory
 
 ALPHA = 0.2
 GAMMA = 0.9
-
+EPSILON = 0.5
 
 class QTable(AbstractObserver):
     def __init__(
@@ -32,7 +32,7 @@ class QTable(AbstractObserver):
             action_space: ActionSpace, 
             learning_rate=ALPHA,
             discount_factor=GAMMA,
-            q_table_file='q_table.dill'
+            q_table_file='q_table.dill',
         ):
         self.q_table_file = q_table_file
         self.q_table = self.load_table()
@@ -50,20 +50,32 @@ class QTable(AbstractObserver):
 
         return q_table
 
-    def learn(self, current_state, next_state: TFRState, action):
-        q_actual = self.q_table.get(current_state, 0).get(action)
+    def learn(self, current_state: TFRState, next_state: TFRState, action):
+        current_state = str(current_state)
         reward = next_state.reward()
-        max_future_value = max(self.q_table[next_state, a] for a in self.action_space[next_state])
-        q_next = q_actual + self.learning_rate * (reward + self.dicount_factor * max_future_value - q_actual)
-        self.q_table[current_state, action] = q_next
+        next_state = str(next_state)
+        if current_state not in self.q_table:
+            for action in self.action_space.actions:
+                if isinstance(action, Demand):
+                    action = action.flow
+                self.q_table[current_state][action] = 0
+        q_actual = self.q_table.get(current_state, {}).get(action, 0)
+        future_values = [self.q_table[next_state][a] for a in self.q_table[next_state]]
+        max_future_value = 0 if len(future_values) == 0 else max(future_values)
+        q_next = q_actual + self.learning_rate * (reward + self.discount_factor * max_future_value - q_actual)
+        if isinstance(action, Demand):
+            action = action.flow
+        self.q_table[current_state][action] = q_next
 
     def update(self):
+        if self.memory.last_item is None:
+            return
         current_state = self.memory.last_item.state
         next_state = self.memory.last_item.next_state
         self.learn(
             current_state=current_state,
             next_state=next_state,
-            action=self.memory[-1].action
+            action=self.memory.last_item.action
         )
 
     @property
@@ -78,53 +90,66 @@ class QTable(AbstractObserver):
 
     def save(self, *args, **kwargs):
         with open(self.q_table_file, 'wb') as f:
-            dill.dump(self.q_table_file, f)
+            dill.dump(self.q_table, f)
+
+    def best_action(self, current_state):
+        best_action = None
+        best_q = 0
+        for action, q in self.q_table.get(str(current_state), {}).items():
+            if q >= best_q:
+                best_q = q
+                best_action = action
+        if best_action and not isinstance(best_action, str):
+            best_action = [d for d in self.action_space.actions if d.flow==best_action][0]
+        if best_action is None:
+            best_action = self.action_space.sample()
+        return best_action
 
 
 class QRouter(Router):
     def __init__(
             self,
             demands,
+            q_table: QTable,
             state_space: TFRStateSpace,
             simulation_memory: RailroadEvolutionMemory,
             exploration_method: callable = None,
+            epsilon=EPSILON
     ):
         super().__init__(demands=demands)
         self.action_space = ActionSpace(demands)
+        self.q_table = q_table
         self.completed_tasks = []
         self.running_tasks = {}
         self.state_space = state_space
         self.explore = exploration_method if exploration_method else self.action_space.sample
-        self.policy_net = policy_net
         self.memory = simulation_memory
-        self.epsilon = epsilon
         self.epsilon_steps = 0
+        self.epsilon = epsilon
 
-    def choose_task(self, current_time, train_size, model_state):
+    def choose_task(self, current_time, train_size, model_state, current_location):
+        token = random.random()
         if (
+                token < self.epsilon or
                 self.memory.last_item is None or
-                self.memory.last_item.state.is_initial or
-                random.random() < self.epsilon
+                self.memory.last_item.state.is_initial
         ):
             selected_demand = self.explore()
         else:
-            with torch.no_grad():
-                state = self.memory.last_item.next_state
-                train_activities = Counter(t.activity for t in state.train_states)
-                if train_activities.get(ActivityState.WAITING_TO_ROUTE) != 1:
-                    raise Exception('It is not possible to identify the train that will be routed by the system state')
-                state = self.state_space.to_array(state)
-                state = torch.FloatTensor(state).unsqueeze(0)
-                demand_index = self.policy_net(state).argmax().item()
-                selected_demand = self.action_space.get_demand(demand_index)
+            selected_demand = self.q_table.best_action(current_state=self.memory.next_state)
+        path = [selected_demand.flow.origin, selected_demand.flow.destination]
+        is_moving = '_' in current_location or current_location == 'origin'
+        if not is_moving:
+            path.insert(0, current_location)
+        
         task = Task(
             demand=selected_demand,
-            path=[selected_demand.flow.origin, selected_demand.flow.destination],
+            path=path,
             task_volume=train_size,
             current_time=current_time,
-            state=model_state
+            state=model_state,
+            starts_moving=is_moving
         )
-        self.update_epsilon()
         return task
 
     def route(self, train: TrainInterface, current_time, state, is_initial=False):
@@ -135,9 +160,3 @@ class QRouter(Router):
         else:
             super().route(train=train, current_time=current_time, state=state, is_initial=is_initial)
 
-
-    def update_epsilon(self):
-        # Decaimento do epsilon
-        if self.epsilon > epsilon_min:
-            self.epsilon *= epsilon_decay
-            self.epsilon_steps += 1

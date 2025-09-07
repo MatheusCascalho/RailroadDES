@@ -56,7 +56,7 @@ def create_model(
             train_size = 6e3,
             process_times = [5,6,10,7,15,8.9,30,18,4,6]
     ):
-        with open('artifacts/transit_times.json', 'r') as f:
+        with open('tests/artifacts/transit_times.json', 'r') as f:
             data = json.load(f)
 
         load_points = []

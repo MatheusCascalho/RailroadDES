@@ -83,6 +83,30 @@ class RailroadMesh:
             self.segments.append(segment)
             self.graph[origin.name].append(segment)
             self.graph[destination.name].append(segment.reversed())
+        for origin in self.name_to_node:
+            for destination in self.name_to_node:
+                if origin == destination:
+                    continue
+                if (origin, destination) in [(s.origin, s.destination) for s in self.graph[origin]]:
+                    continue
+
+                segment = RailSegment(
+                    origin=self.name_to_node[origin],
+                    destination=self.name_to_node[destination],
+                    time_to_origin=self.graph[origin][0].time_to_origin,
+                    time_to_destination=self.graph[origin][0].time_to_destination
+                )
+                self.graph[origin].append(segment)
+                if (destination, origin) in [(s.origin, s.destination) for s in self.graph[destination]]:
+                    continue
+
+                segment = RailSegment(
+                    origin=self.name_to_node[destination],
+                    destination=self.name_to_node[origin],
+                    time_to_origin=self.graph[destination][0].time_to_origin,
+                    time_to_destination=self.graph[destination][0].time_to_destination
+                )
+                self.graph[destination].append(segment)
 
     def __iter__(self):
         all_points = self.load_points + self.unload_points
@@ -116,7 +140,10 @@ class RailroadMesh:
 
     def get_current_segment(self, task: Task) -> RailSegment:
         location = task.path.current_location
-        o, d = location.split('-')
+        try:
+            o, d = location.split('-')
+        except:
+            raise Exception(f"Train is in node, but activity state is not MOVING")
         if o == '_':
             possible_segments = [s for s in self.segments if s.destination.name == d]
             if not possible_segments:

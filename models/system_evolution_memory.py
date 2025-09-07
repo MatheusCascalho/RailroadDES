@@ -104,6 +104,11 @@ class RailroadEvolutionMemory(AbstractSubject):
         if self.memory:
             return self.memory[-1]
         return None
+    
+    @property
+    def next_state(self):
+        if self.last_item:
+            return self.last_item.next_state
 
     def __iter__(self):
         return self.memory.__iter__()
