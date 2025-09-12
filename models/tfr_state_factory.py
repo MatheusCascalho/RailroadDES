@@ -42,7 +42,11 @@ def TFRStateFactory(railroad: Railroad, is_initial=False) -> TFRState:
 
 def TFRStateSpaceFactory(railroad: Railroad) -> TFRStateSpace:
     space = TFRStateSpace(
-        mesh_edges=[(t.load_origin, t.load_destination) for t in railroad.mesh.transit_times],
+        mesh_edges=[
+            (t.origin.name, t.destination.name) 
+            for _, segments in railroad.mesh.graph.items()
+            for t in segments
+        ],
         activities=[a.name for a in ActivityState],
         train_names=[t.ID for t in railroad.trains],
         flows=[d.flow for d in railroad.router.demands],

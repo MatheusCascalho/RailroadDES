@@ -35,6 +35,8 @@ class DQN(nn.Module):
         self.fc = nn.Sequential(
             nn.Linear(n_states, N_NEURONS),
             nn.ReLU(),
+            nn.ReLU(),
+            nn.ReLU(),
             nn.Linear(N_NEURONS, n_actions),
         )
 
@@ -188,7 +190,7 @@ class DQNRouter(Router):
                 demand_index = self.policy_net(state).argmax().item()
                 selected_demand = self.action_space.get_demand(demand_index)
         path = [selected_demand.flow.origin, selected_demand.flow.destination]
-        is_moving = '_' in current_location
+        is_moving = '_' in current_location or current_location == 'origin'
         if not is_moving:
             path.insert(0, current_location)
         task = Task(
