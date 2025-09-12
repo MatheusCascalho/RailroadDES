@@ -51,12 +51,15 @@ class Learner:
             action_space: ActionSpace,
             policy_net_path: str = 'serialized_models/policy_net.dill',
             target_net_path: str = 'serialized_models/target_net.dill',
-            target_update_freq: int = 10,
-            epsilon: float = EPSILON_DEFAULT,
+            target_update_freq: int = 10_000,   # agora em steps, não episódios
+            epsilon_start: float = 1.0,
+            epsilon_end: float = 0.01,
+            epsilon_decay_steps: int = 100_000,
     ):
         self._memory = deque(maxlen=100_000)
         self.state_space = state_space
         self.action_space = action_space
+
         suffix = f"{state_space.cardinality}x{self.action_space.n_actions}_TFRState_v2"
         offset = len('.dill')
 
@@ -65,15 +68,21 @@ class Learner:
 
         self.policy_net = self.load_policies(policy_net_path)
         self.target_net = self.load_policies(target_net_path)
+        self.target_net.load_state_dict(self.policy_net.state_dict())  # sincronização inicial
 
         self.target_update_freq = target_update_freq
         self.policy_net_path = policy_net_path
         self.target_net_path = target_net_path
-        self.epsilon = epsilon
+
+        # ε-greedy params
+        self.epsilon_start = epsilon_start
+        self.epsilon_end = epsilon_end
+        self.epsilon_decay_steps = epsilon_decay_steps
+        self.epsilon = epsilon_start
+        self.global_step = 0  # usado para decaimento linear
 
         self.optimizer = optim.Adam(self.policy_net.parameters(), lr=LEARNING_RATE)
         self.criterion = nn.MSELoss()
-        self.episode = 0
         super().__init__()
 
     def load_policies(self, filepath: str):
@@ -91,27 +100,24 @@ class Learner:
     def memory(self):
         return self._memory
 
-    @property
-    def memory_to_train(self):
-        return [e for e in self._memory if e.action not in ['AUTOMATIC', 'ROUTING'] and not e.state.is_initial]
-
     def learn(self):
         # Amostra mini-batch
         batch = random.sample(self.memory, BATCH_SIZE)
         states, actions, rewards, next_states, dones = zip(*batch)
-        states = [self.state_space.to_array(s) for s in states]
-        states = torch.FloatTensor(states)
-        actions = [self.action_space.to_scalar(a) for a in actions]
-        actions = torch.LongTensor(actions).unsqueeze(1)
+
+        states = torch.FloatTensor([self.state_space.to_array(s) for s in states])
+        actions = torch.LongTensor([self.action_space.to_scalar(a) for a in actions]).unsqueeze(1)
         rewards = torch.FloatTensor(rewards).unsqueeze(1)
-        next_states = [self.state_space.to_array(s) for s in next_states]
-        next_states = torch.FloatTensor(next_states)
+        next_states = torch.FloatTensor([self.state_space.to_array(s) for s in next_states])
         dones = torch.FloatTensor(dones).unsqueeze(1)
 
-        # Q-alvo
+        # -------- Double DQN --------
         with torch.no_grad():
-            max_next_q = self.target_net(next_states).max(1, keepdim=True)[0]
-            target_q = rewards + GAMMA * max_next_q * (1 - dones)
+            # escolha da ação pela policy_net
+            next_actions = self.policy_net(next_states).argmax(1, keepdim=True)
+            # avaliação do valor da ação escolhida pela target_net
+            next_q = self.target_net(next_states).gather(1, next_actions)
+            target_q = rewards + GAMMA * next_q * (1 - dones)
 
         # Q previsto
         current_q = self.policy_net(states).gather(1, actions)
@@ -120,34 +126,30 @@ class Learner:
         loss = self.criterion(current_q, target_q)
         self.optimizer.zero_grad()
         loss.backward()
+        torch.nn.utils.clip_grad_norm_(self.policy_net.parameters(), 1.0)  # estabilidade
         self.optimizer.step()
-
 
     def update(self, experience):
         self.memory.append(experience)
-        self.episode += 1
-        if len(self.memory_to_train) >= BATCH_SIZE:
+        self.global_step += 1
+
+        # treina só se tiver memória suficiente
+        if len(self.memory) >= BATCH_SIZE:
             self.learn()
 
-        if self.episode % self.target_update_freq == 0:
+        # atualização periódica da rede alvo
+        if self.global_step % self.target_update_freq == 0:
             self.target_net.load_state_dict(self.policy_net.state_dict())
 
-    def __enter__(self, *args, **kwargs):
-        debug(f"Início da aprendizagem do DQNRouter")
-        return self
-
-    def __exit__(self, *args, **kwargs):
-        self.save(*args, **kwargs)
+        # atualização do epsilon (linear)
+        fraction = min(self.global_step / self.epsilon_decay_steps, 1.0)
+        self.epsilon = self.epsilon_start + fraction * (self.epsilon_end - self.epsilon_start)
 
     def save(self, *args, **kwargs):
         with open(self.policy_net_path, 'wb') as f:
             dill.dump(self.policy_net, f)
-
         with open(self.target_net_path, 'wb') as f:
             dill.dump(self.target_net, f)
-
-        with open(f'scripts/current/all_experiences_{os.getpid()}.dill', 'wb') as f:
-            dill.dump(self.memory, f)
 
 
 class DQNRouter(Router):
