@@ -2,7 +2,7 @@ import pandas as pd
 import plotly.express as px
 import os
 
-df = pd.read_csv('logs_treinamento_06_09_2025_23_55_26.log', sep=' - ')
+df = pd.read_csv('logs_treinamento_12_09_2025_19_27_41.log', sep=' - ')
 
 df.columns=['date', 'log_type','log number', 'episode', 'PID', 'volume', 'demand']
 df['date'] = pd.to_datetime(df['date'])

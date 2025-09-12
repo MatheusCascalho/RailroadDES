@@ -29,9 +29,9 @@ import cProfile
 
 warnings.filterwarnings('ignore')
 # N_EPISODES = 10
-EPISODES_BY_PROCESS = 10_000
-NUM_PROCESSES = 6
-TRAINING_STEPS = 100
+EPISODES_BY_PROCESS = 5
+NUM_PROCESSES = 1
+TRAINING_STEPS = 1
 
 @dataclass
 class OutputData:
@@ -47,7 +47,7 @@ def setup_shared_components(experience_queue):
     state_space = TFRStateSpaceFactory(model)
     learner = QTable(
         action_space=ActionSpace(model.demands),
-        q_table_file=f"q_table_pid_{os.getpid()}.dill"
+        q_table_file=f"serialized_models/q_tables/q_table_pid_{os.getpid()}.dill"
     )
     global_memory = ExperienceProducer(queue=experience_queue)
     return learner, global_memory
@@ -70,13 +70,13 @@ def learning_loop(queue, stop_event):
     state_space = TFRStateSpaceFactory(model)
     learner = QTable(
         action_space=ActionSpace(model.demands),
-        q_table_file=f"q_table_pid_{os.getpid()}.dill"
+        q_table_file=f"serialized_models/q_tables/q_table_pid_{os.getpid()}.dill"
     )
     # with learner:
     while not stop_event.is_set():
         try:
             experience = queue.get(timeout=1)
-            learner.update(experience)
+            learner.update()
         except Exception as e:
             info(f'Experience queue is empty - {e}')
             # sleep(.1)
@@ -107,7 +107,7 @@ def run_episode(episode_number, output_queue: DillQueue):
     state_space = TFRStateSpaceFactory(model)
     learner = QTable(
         action_space=ActionSpace(model.demands),
-        q_table_file=f"q_table_pid_{os.getpid()}.dill"
+        q_table_file=f"serialized_models/q_tables/q_table_pid_{os.getpid()}.dill"
     )
     experience_producer = ExperienceProducer(queue=experience_queue)
 
