@@ -29,7 +29,7 @@ import cProfile
 
 warnings.filterwarnings('ignore')
 # N_EPISODES = 10
-EPISODES_BY_PROCESS = 10
+EPISODES_BY_PROCESS = 1_000
 NUM_PROCESSES = 1
 TRAINING_STEPS = 1
 
@@ -42,8 +42,8 @@ class OutputData:
     episode_number: int
 
 def setup_shared_components(experience_queue):
-    # with open('tests/artifacts/model_to_train_15.dill', 'rb') as f:
-    with open('tests/artifacts/simple_model_to_train_1_sim_v2.dill', 'rb') as f:
+    with open('tests/artifacts/model_to_train_15_sim_v2.dill', 'rb') as f:
+    # with open('tests/artifacts/simple_model_to_train_1_sim_v2.dill', 'rb') as f:
         model = dill.load(f)
     state_space = TFRStateSpaceFactory(model)
     learner = Learner(
@@ -67,8 +67,8 @@ def profile(func):
 
 # @profile
 def learning_loop(queue, stop_event):
-    # with open('tests/artifacts/model_to_train_15.dill', 'rb') as f:
-    with open('tests/artifacts/simple_model_to_train_1_sim_v2.dill', 'rb') as f:
+    with open('tests/artifacts/model_to_train_15_sim_v2.dill', 'rb') as f:
+    # with open('tests/artifacts/simple_model_to_train_1_sim_v2.dill', 'rb') as f:
         model = dill.load(f)
     state_space = TFRStateSpaceFactory(model)
     learner = Learner(
@@ -105,8 +105,8 @@ def logging_loop(stop_event, output_queue):
             continue
 
 def run_episode(episode_number, output_queue: DillQueue):
-    with open('tests/artifacts/simple_model_to_train_1_sim_v2.dill', 'rb') as f:
-    # with open('tests/artifacts/model_to_train_15_sim_v2.dill', 'rb') as f:
+    # with open('tests/artifacts/simple_model_to_train_1_sim_v2.dill', 'rb') as f:
+    with open('tests/artifacts/model_to_train_15_sim_v2.dill', 'rb') as f:
         model = dill.load(f)
     target = SimpleTargetManager(demand=model.demands)
     state_space = TFRStateSpaceFactory(model)
@@ -140,7 +140,7 @@ def run_episode(episode_number, output_queue: DillQueue):
         demands=model.demands,
         policy_net=learner.policy_net,
         simulation_memory=local_memory,
-        epsilon=1.0,
+        epsilon=0.95,
         exploration_method=lambda: next(alws)#target.furthest_from_the_target,
     )
 

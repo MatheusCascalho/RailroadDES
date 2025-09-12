@@ -29,9 +29,9 @@ import cProfile
 
 warnings.filterwarnings('ignore')
 # N_EPISODES = 10
-EPISODES_BY_PROCESS = 10_000
-NUM_PROCESSES = 6
-TRAINING_STEPS = 100
+EPISODES_BY_PROCESS = 1_000
+NUM_PROCESSES = 1
+TRAINING_STEPS = 1
 
 @dataclass
 class OutputData:
@@ -39,6 +39,7 @@ class OutputData:
     total_demand: float
     process_id: int
     episode_number: int
+    q_table_size: int
 
 def setup_shared_components(experience_queue):
     with open('tests/artifacts/model_to_train_15.dill', 'rb') as f:
@@ -47,7 +48,8 @@ def setup_shared_components(experience_queue):
     state_space = TFRStateSpaceFactory(model)
     learner = QTable(
         action_space=ActionSpace(model.demands),
-        q_table_file=f"q_table_pid_{os.getpid()}.dill"
+        q_table_file=f"q_table_10_nos_15_trens.dill"
+        # q_table_file=f"q_table_pid_{os.getpid()}.dill"
     )
     global_memory = ExperienceProducer(queue=experience_queue)
     return learner, global_memory
@@ -70,7 +72,8 @@ def learning_loop(queue, stop_event):
     state_space = TFRStateSpaceFactory(model)
     learner = QTable(
         action_space=ActionSpace(model.demands),
-        q_table_file=f"q_table_pid_{os.getpid()}.dill"
+        q_table_file=f"q_table_10_nos_15_trens.dill"
+        # q_table_file=f"q_table_pid_{os.getpid()}.dill"    
     )
     # with learner:
     while not stop_event.is_set():
@@ -92,7 +95,7 @@ def logging_loop(stop_event, output_queue):
     while not stop_event.is_set():
         try:
             output = output_queue.get(timeout=1)
-            error(f'Log {log_number} - Episode {output.episode_number} - PID: {output.process_id} - Volume: {output.operated_volume} - Demanda: {output.total_demand}')
+            error(f'Log {log_number} - Episode {output.episode_number} - PID: {output.process_id} - Volume: {output.operated_volume} - Demanda: {output.total_demand} - q_table_size: {output.q_table_size}')
             log_number += 1
         except Exception as e:
             info('Episode queue is empty')
@@ -107,7 +110,8 @@ def run_episode(episode_number, output_queue: DillQueue):
     state_space = TFRStateSpaceFactory(model)
     learner = QTable(
         action_space=ActionSpace(model.demands),
-        q_table_file=f"q_table_pid_{os.getpid()}.dill"
+        q_table_file=f"q_table_10_nos_15_trens.dill"
+        # q_table_file=f"q_table_pid_{os.getpid()}.dill" .
     )
     experience_producer = ExperienceProducer(queue=experience_queue)
 
@@ -145,7 +149,8 @@ def run_episode(episode_number, output_queue: DillQueue):
         operated_volume=router.operated_volume(),
         total_demand=router.total_demand(),
         process_id=os.getpid(),
-        episode_number=episode_number
+        episode_number=episode_number,
+        q_table_size=len(learner.q_table)
     )
     output_queue.put(output)
     ...
