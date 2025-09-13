@@ -19,10 +19,14 @@ import numpy as np
 from logging import debug
 from collections import Counter
 from models.action_space import ActionSpace
+from typing import Callable
+import logging
+import numpy as np
+
 
 EPSILON_DEFAULT = 1.0
 N_NEURONS = 64
-BATCH_SIZE = 50
+BATCH_SIZE = 100
 GAMMA = 0.99
 LEARNING_RATE = 1e-3
 epsilon_min = 0.01
@@ -43,6 +47,12 @@ class DQN(nn.Module):
     def forward(self, x):
         return self.fc(x)
 
+def learner_id_gen():
+    i = 0
+    while True:
+        yield f"Learner_{i}"
+        i += 1
+leaner_id = learner_id_gen()
 
 class Learner:
     def __init__(
@@ -52,8 +62,8 @@ class Learner:
             policy_net_path: str = 'serialized_models/policy_net.dill',
             target_net_path: str = 'serialized_models/target_net.dill',
             target_update_freq: int = 10_000,   # agora em steps, não episódios
-            epsilon_start: float = .01,
-            epsilon_end: float = 0.01,
+            epsilon_start: float = 1,
+            epsilon_end: float = 0.001,
             epsilon_decay_steps: int = 100,
     ):
         self._memory = deque(maxlen=100_000)
@@ -84,6 +94,29 @@ class Learner:
         self.optimizer = optim.Adam(self.policy_net.parameters(), lr=LEARNING_RATE)
         self.criterion = nn.MSELoss()
         super().__init__()
+
+        # Configuração de logger
+        l_id = next(leaner_id)
+        self.logger = logging.getLogger(l_id)
+        self.logger.setLevel(logging.INFO)
+        # evita múltiplos handlers duplicados
+        if not self.logger.handlers:
+            log_dir = "logs/learning"
+            os.makedirs(log_dir, exist_ok=True)
+            fh = logging.FileHandler(os.path.join(log_dir, f"{l_id}.log"))
+            fh.setLevel(logging.INFO)
+            formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
+            fh.setFormatter(formatter)
+            self.logger.addHandler(fh)
+            sh = logging.StreamHandler()
+            self.logger.addHandler(sh)
+
+        self.logger.info("Learner inicializado com Double DQN + ε linear")
+
+        # ---- buffers de métricas ----
+        self.losses = deque(maxlen=500)
+        self.rewards = deque(maxlen=500)
+        self.q_values = deque(maxlen=500)
 
     def load_policies(self, filepath: str):
         try:
@@ -129,6 +162,23 @@ class Learner:
         torch.nn.utils.clip_grad_norm_(self.policy_net.parameters(), 1.0)  # estabilidade
         self.optimizer.step()
 
+        # ---- logging interno ----
+        self.losses.append(loss.item())
+        self.rewards.extend(rewards.squeeze().tolist())
+        self.q_values.extend(current_q.detach().squeeze().tolist())
+
+        if self.global_step % 1000 == 0:  # log periódico
+            avg_loss = np.mean(list(self.losses)) if self.losses else 0
+            avg_reward = np.mean(list(self.rewards)) if self.rewards else 0
+            avg_q = np.mean(list(self.q_values)) if self.q_values else 0
+            self.logger.info(
+                f"[step={self.global_step}] "
+                f"ε={self.epsilon:.3f} | "
+                f"loss={avg_loss:.4f} | "
+                f"reward_avg={avg_reward:.2f} | "
+                f"Q_avg={avg_q:.2f}"
+            )
+
     def update(self, experience):
         self.memory.append(experience)
         self.global_step += 1
@@ -159,7 +209,7 @@ class DQNRouter(Router):
             state_space: TFRStateSpace,
             learner: Learner,   # 🔹 novo: recebe o learner
             simulation_memory: RailroadEvolutionMemory,
-            exploration_method: callable = None,
+            exploration_method: Callable = lambda x: None,
     ):
         super().__init__(demands=demands)
         self.action_space = ActionSpace(demands)
@@ -190,18 +240,14 @@ class DQNRouter(Router):
                 demand_index = self.policy_net(state).argmax().item()
                 selected_demand = self.action_space.get_demand(demand_index)
 
-        path = [selected_demand.flow.origin, selected_demand.flow.destination]
-        is_moving = '_' in current_location or current_location == 'origin'
-        if not is_moving:
-            path.insert(0, current_location)
+        
 
-        task = Task(
-            demand=selected_demand,
-            path=path,
-            task_volume=train_size,
+        task = self.demand_to_task(
+            selected_demand=selected_demand,
+            current_location=current_location,
+            train_size=train_size,
             current_time=current_time,
-            state=model_state,
-            starts_moving=is_moving
+            model_state=model_state,
         )
 
         return task
