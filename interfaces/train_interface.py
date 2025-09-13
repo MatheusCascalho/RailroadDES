@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from asyncio import Task
 from models.observers import SubjectWithOnlyOneObserver
 
 
@@ -14,7 +15,7 @@ class TrainInterface(SubjectWithOnlyOneObserver):
 
     @property
     @abstractmethod
-    def current_task(self):
+    def current_task(self) -> Task:
         pass
 
     @current_task.setter
