@@ -32,8 +32,8 @@ warnings.filterwarnings('ignore')
 EPISODES_BY_PROCESS = 1_000
 NUM_PROCESSES = 1
 TRAINING_STEPS = 1
-base_model = 'tests/artifacts/model_to_train_15_sim_v2.dill'
-# base_model = 'tests/artifacts/simple_model_to_train_1_sim_v2.dill'
+# base_model = 'tests/artifacts/model_to_train_15_sim_v2.dill'
+base_model = 'tests/artifacts/simple_model_to_train_1_sim_v2.dill'
 
 @dataclass
 class OutputData:
@@ -137,9 +137,8 @@ def run_episode(episode_number, output_queue: DillQueue):
     router = DQNRouter(
         state_space=state_space,
         demands=model.demands,
-        policy_net=learner.policy_net,
         simulation_memory=local_memory,
-        epsilon=0.95,
+        learner=learner,
         exploration_method=lambda: next(alws)#target.furthest_from_the_target,
     )
 
@@ -150,7 +149,7 @@ def run_episode(episode_number, output_queue: DillQueue):
     output = OutputData(
         operated_volume=router.operated_volume(),
         total_demand=router.total_demand(),
-        final_epsilon=router.epsilon,
+        final_epsilon=router.learner.epsilon,
         process_id=os.getpid(),
         episode_number=episode_number
     )
