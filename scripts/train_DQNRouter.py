@@ -94,13 +94,24 @@ def learning_loop(queue, stop_event):
 # @profile
 def logging_loop(stop_event, output_queue):
     log_number = 0
+    experience_logger = logging.getLogger('ExperienceLogger')
+    log_dir = "logs/experiences"
+    os.makedirs(log_dir, exist_ok=True)
+    t = datetime.now().strftime('%d_%m_%Y_%H_%M_%S')
+
+    fh = logging.FileHandler(os.path.join(log_dir, f"experiences_{t}.log"))
+    fh.setLevel(logging.INFO)
+    formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
+    fh.setFormatter(formatter)
+    experience_logger.addHandler(fh)
+    
     while not stop_event.is_set():
         try:
             output = output_queue.get(timeout=1)
-            error(f'Log {log_number} - Episode {output.episode_number} - PID: {output.process_id} - Volume: {output.operated_volume} - Demanda: {output.total_demand} - epsilon: {output.final_epsilon}')
+            experience_logger.error(f'Log {log_number} - Episode {output.episode_number} - PID: {output.process_id} - Volume: {output.operated_volume} - Demanda: {output.total_demand}')
             log_number += 1
-        except:
-            info('Episode queue is empty')
+        except Exception as e:
+            experience_logger.info('Episode queue is empty')
             # sleep(.1)
             continue
 
