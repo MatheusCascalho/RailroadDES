@@ -64,30 +64,7 @@ def profile(func):
         return r
     return wrapper
 
-# @profile
-def learning_loop(queue, stop_event):
-    with open('tests/artifacts/model_to_train_15.dill', 'rb') as f:
-    # with open('tests/artifacts/simple_model_to_train_1_sim_v2.dill', 'rb') as f:
-        model = dill.load(f)
-    state_space = TFRStateSpaceFactory(model)
-    learner = QTable(
-        action_space=ActionSpace(model.demands),
-        q_table_file=f"q_table_10_nos_15_trens.dill"
-        # q_table_file=f"q_table_pid_{os.getpid()}.dill"    
-    )
-    # with learner:
-    while not stop_event.is_set():
-        try:
-            experience = queue.get(timeout=1)
-            learner.update(experience)
-        except Exception as e:
-            info(f'Experience queue is empty - {e}')
-            # sleep(.1)
-            continue
-    # while not queue.empty():
-    #     experience = dill.loads(queue.get(timeout=1))
-    #     learner.update(experience)
-    # learner.save()
+
 
 # @profile
 def logging_loop(stop_event, output_queue):
