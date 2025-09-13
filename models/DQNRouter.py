@@ -52,9 +52,9 @@ class Learner:
             policy_net_path: str = 'serialized_models/policy_net.dill',
             target_net_path: str = 'serialized_models/target_net.dill',
             target_update_freq: int = 10_000,   # agora em steps, não episódios
-            epsilon_start: float = 1.0,
+            epsilon_start: float = .01,
             epsilon_end: float = 0.01,
-            epsilon_decay_steps: int = 100_000,
+            epsilon_decay_steps: int = 100,
     ):
         self._memory = deque(maxlen=100_000)
         self.state_space = state_space
@@ -157,10 +157,9 @@ class DQNRouter(Router):
             self,
             demands,
             state_space: TFRStateSpace,
-            policy_net: DQN,
+            learner: Learner,   # 🔹 novo: recebe o learner
             simulation_memory: RailroadEvolutionMemory,
             exploration_method: callable = None,
-            epsilon: float = EPSILON_DEFAULT,
     ):
         super().__init__(demands=demands)
         self.action_space = ActionSpace(demands)
@@ -168,17 +167,16 @@ class DQNRouter(Router):
         self.running_tasks = {}
         self.state_space = state_space
         self.explore = exploration_method if exploration_method else self.action_space.sample
-        self.policy_net = policy_net
+        self.policy_net = learner.policy_net
         self.memory = simulation_memory
-        self.epsilon = epsilon
-        self.epsilon_steps = 0
+        self.learner = learner   # 🔹 guardamos a referência
 
     def choose_task(self, current_time, train_size, model_state, current_location):
         roullete = random.random()
         if (
                 self.memory.last_item is None or
                 self.memory.last_item.state.is_initial or
-                roullete < self.epsilon
+                roullete < self.learner.epsilon    # 🔹 usa epsilon do Learner
         ):
             selected_demand = self.explore()
         else:
@@ -191,10 +189,12 @@ class DQNRouter(Router):
                 state = torch.FloatTensor(state).unsqueeze(0)
                 demand_index = self.policy_net(state).argmax().item()
                 selected_demand = self.action_space.get_demand(demand_index)
+
         path = [selected_demand.flow.origin, selected_demand.flow.destination]
         is_moving = '_' in current_location or current_location == 'origin'
         if not is_moving:
             path.insert(0, current_location)
+
         task = Task(
             demand=selected_demand,
             path=path,
@@ -203,8 +203,7 @@ class DQNRouter(Router):
             state=model_state,
             starts_moving=is_moving
         )
-        
-        self.update_epsilon()
+
         return task
 
     def route(self, train: TrainInterface, current_time, state, is_initial=False):
