@@ -119,7 +119,7 @@ class TFRStateSpace:
         connections = [f"_-{s}" for s in stations] 
         connections += [f"{c[0]}-{c[1]}" for c in mesh_edges]
         connections += [f"{c[1]}-{c[0]}" for c in mesh_edges]
-
+        connections = list(set(connections))
         self.locals_to_index = {
             loc: i
             for i, loc in enumerate(sorted(stations+connections))}
