@@ -117,20 +117,16 @@ class ExperienceProducer(AbstractObserver):
     def __init__(self, queue, memory_size: int=100_000):
         self._memory = deque(maxlen=memory_size)
         self.queue = queue
+        self.existing_keys = set()
         super().__init__()
 
     def update(self):
-        existing_keys = set(self._experience_key(e) for e in self._memory)
-        new_items = [
-            experience
-            for system_memory in self.subjects
-            for experience in system_memory
-            if self._experience_key(experience) not in existing_keys
-        ]
-        for memory_element in new_items:
-            self.queue.put(memory_element, timeout=1)
+        experience = self.subjects[0].last_item
+        if experience and self._experience_key(experience) not in self.existing_keys:
+            self.queue.put(experience, timeout=1)
+            self.existing_keys.add(self._experience_key(experience=experience))
 
-        self._memory.extend(new_items)
+        self._memory.append(experience)
 
     def _experience_key(self, experience):
         return experience.memory_id
