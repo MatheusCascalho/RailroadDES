@@ -67,15 +67,15 @@ def profile(func):
     return wrapper
 
 # @profile
-def learning_loop(queue, stop_event):
+def learning_loop(queue, stop_event, save_event):
     with open(base_model, 'rb') as f:
         model = dill.load(f)
     state_space = TFRStateSpaceFactory(model)
     learner = Learner(
         state_space=state_space,
         action_space=ActionSpace(model.demands),
-        policy_net_path='serialized_models/policy_net_TargetBased_parallel_simple_model.dill',
-        target_net_path='serialized_models/target_net_TargetBased_parallel_simple_model.dill',
+        policy_net_path='serialized_models/dqn/policy_net_TargetBased_parallel_simple_model.dill',
+        target_net_path='serialized_models/dqn/target_net_TargetBased_parallel_simple_model.dill',
     )
     # with learner:
     while not stop_event.is_set():
@@ -86,6 +86,8 @@ def learning_loop(queue, stop_event):
             info(f'Experience queue is empty - {e}')
             # sleep(.1)
             continue
+        if save_event.is_set():
+            learner.save()
     # while not queue.empty():
     #     experience = dill.loads(queue.get(timeout=1))
     #     learner.update(experience)
@@ -184,7 +186,6 @@ if __name__ == '__main__':
     with Manager() as manager:
         output_queue = manager.Queue()
         experience_queue = manager.Queue()
-        # _, _ = setup_shared_components(experience_queue)
         stop_signal_log = Event()
 
         # iniciar processo
@@ -192,13 +193,13 @@ if __name__ == '__main__':
         logging_process.start()
         logging_pid = logging_process.pid
         stop_signal = Event()
+        save_signal = Event()
 
-        learner_process = Process(target=learning_loop, args=(experience_queue, stop_signal))
+        learner_process = Process(target=learning_loop, args=(experience_queue, stop_signal, save_signal))
         learner_process.start()
 
         for step in range(TRAINING_STEPS):
-
-
+            save_signal.clear()
             # Inicia os processos dos atores
             actor_processes = [
                 training_process_wrapper(output_queue)
@@ -211,10 +212,12 @@ if __name__ == '__main__':
             # Aguarda os atores terminarem
             for proc in actor_processes:
                 proc.join()
-            # sleep(1)
-            stop_signal.set()
-            learner_process.join()
-            stop_signal.clear()
+            save_signal.set()
+            sleep(.5)
+        # sleep(1)
+        stop_signal.set()
+        learner_process.join()
+        stop_signal.clear()
 
         # while not output_queue.empty():
         #     continue
