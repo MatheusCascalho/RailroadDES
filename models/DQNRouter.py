@@ -28,7 +28,7 @@ EPSILON_DEFAULT = 1.0
 N_NEURONS = 64
 BATCH_SIZE = 100
 GAMMA = 0.99
-LEARNING_RATE = 1e-3
+LEARNING_RATE = 1e-2
 epsilon_min = 0.01
 epsilon_decay = 0.89
 
