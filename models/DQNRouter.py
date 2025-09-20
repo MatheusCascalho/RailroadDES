@@ -39,13 +39,16 @@ class DQN(nn.Module):
         self.fc = nn.Sequential(
             nn.Linear(n_states, N_NEURONS),
             nn.ReLU(),
+            nn.Linear(N_NEURONS, N_NEURONS),
             nn.ReLU(),
+            nn.Linear(N_NEURONS, N_NEURONS),
             nn.ReLU(),
             nn.Linear(N_NEURONS, n_actions),
         )
 
     def forward(self, x):
-        return self.fc(x)
+        q_values = self.fc(x)
+        return q_values
 
 def learner_id_gen():
     i = 0
