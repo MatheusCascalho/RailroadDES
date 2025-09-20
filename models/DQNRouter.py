@@ -57,7 +57,7 @@ def learner_id_gen():
         i += 1
 leaner_id = learner_id_gen()
 
-class Learner:
+class Learner(AbstractObserver):
     def __init__(
             self,
             state_space: TFRStateSpace,
@@ -182,7 +182,9 @@ class Learner:
                 f"Q_avg={avg_q:.2f}"
             )
 
-    def update(self, experience):
+    def update(self, experience=None):
+        if experience is None:
+            experience = self.subjects[0].last_item
         self.memory.append(experience)
         self.global_step += 1
 
