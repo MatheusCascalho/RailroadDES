@@ -39,10 +39,10 @@ df = pd.DataFrame(data)
 df = df.set_index('timestamp')
 
 # Cria os gráficos separadamente, usando o índice (timestamp) no eixo X
-fig1 = px.line(df, x=df.index, y="loss", title="Convergência do Loss")
-fig2 = px.line(df, x=df.index, y="reward_avg", title="Recompensa Média por Step")
-fig3 = px.line(df, x=df.index, y="Q_avg", title="Valor Médio de Q")
-fig4 = px.line(df, x=df.index, y="epsilon", title="Decaimento de Epsilon")
+fig1 = px.line(df, x=df.index, y="loss", title="Convergência do Loss", markers=True)
+fig2 = px.line(df, x=df.index, y="reward_avg", title="Recompensa Média por Step", markers=True)
+fig3 = px.line(df, x=df.index, y="Q_avg", title="Valor Médio de Q", markers=True)
+fig4 = px.line(df, x=df.index, y="epsilon", title="Decaimento de Epsilon", markers=True)
 
 # Converte os gráficos para HTML
 html_content = f"""
