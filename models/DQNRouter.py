@@ -43,6 +43,10 @@ class DQN(nn.Module):
             nn.ReLU(),
             nn.Linear(N_NEURONS, N_NEURONS),
             nn.ReLU(),
+            nn.Linear(N_NEURONS, N_NEURONS),
+            nn.ReLU(),
+            nn.Linear(N_NEURONS, N_NEURONS),
+            nn.ReLU(),
             nn.Linear(N_NEURONS, n_actions),
         )
 
