@@ -1,7 +1,7 @@
 from collections import deque
 from dataclasses import dataclass, field
 from queue import Full
-
+from typing import Callable
 from models.des_model import DESModel
 from models.observers import AbstractSubject, to_notify, AbstractObserver
 from models.railroad import Railroad
@@ -45,10 +45,11 @@ class Experience:
 
 
 class RailroadEvolutionMemory(AbstractSubject):
-    def __init__(self, railroad: Railroad=None, memory_size: int=1000) -> None:
+    def __init__(self, railroad: Railroad=None, memory_size: int=1000, state_factory: Callable = TFRStateFactory) -> None:
         self._memory = deque(maxlen=memory_size)
         self._railroad = railroad
         self.previous_state = None
+        self.state_factory = state_factory
         super().__init__()
 
     @property
@@ -69,7 +70,7 @@ class RailroadEvolutionMemory(AbstractSubject):
         if not self.railroad:
             critical("Memory does not know the railroad and therefore does not perform any snapshots")
             return
-        state = TFRStateFactory(self.railroad, is_initial=is_initial)
+        state = self.state_factory(railroad=self.railroad, is_initial=is_initial)
         return state
 
     def save_consequence(self, *args, **kwargs):

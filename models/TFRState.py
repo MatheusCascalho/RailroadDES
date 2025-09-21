@@ -103,6 +103,19 @@ class TFRState:
         s += f"Recompensa {round(self.reward())}"
         return s
 
+class TFRBalanceState(TFRState):
+    penalty_factor: float = 1e3
+    def reward(self) -> float:
+        base_reward = sum([1e5 if f.activity == ActivityState.PROCESSING else 0 for f in self.train_states])
+        missing_volumes = [f.missing_volume for f in self.flow_states]
+        diff = sum(np.abs(np.diff(missing_volumes)))
+
+        # std_volumes = np.std(missing_volumes)
+        penalty = diff * self.penalty_factor
+        reward = base_reward - penalty
+        return reward # type: ignore
+
+
 EMBEDDING_SPACE_DIMENSION = 5
 
 class TFRStateSpace:

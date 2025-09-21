@@ -2,7 +2,7 @@ from models.railroad import Railroad
 from models.TFRState import TFRState, TrainState, ConstraintState, FlowState, TFRStateSpace
 from models.states import ActivityState
 
-def TFRStateFactory(railroad: Railroad, is_initial=False) -> TFRState:
+def TFRStateFactory(railroad: Railroad, is_initial=False, tfr_class = TFRState) -> TFRState:
         trains = [
             TrainState(
                 name=t.ID,
@@ -32,7 +32,7 @@ def TFRStateFactory(railroad: Railroad, is_initial=False) -> TFRState:
             for d in railroad.router.demands
         ]
 
-        state = TFRState(
+        state = tfr_class(
             train_states=trains,
             constraint_states=restrictions,
             flow_states=flows,
