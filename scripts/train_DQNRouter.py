@@ -5,11 +5,11 @@ import logging
 from numpy import save
 
 from models.router import RandomRouter
-
+from models.TFRState import TFRBalanceState
 import random
 from models.DQNRouter import DQNRouter, Learner
 from models.action_space import ActionSpace
-from models.tfr_state_factory import TFRStateSpaceFactory
+from models.tfr_state_factory import TFRStateSpaceFactory, TFRStateFactory
 from models.system_evolution_memory import RailroadEvolutionMemory, ExperienceProducer
 from models.event import DecoratedEventFactory
 from models.event_calendar import EventCalendar
@@ -36,6 +36,10 @@ NUM_PROCESSES = max(1, multiprocessing.cpu_count() - 5)
 TRAINING_STEPS = 100
 # base_model = 'tests/artifacts/model_to_train_15_sim_v2.dill'
 base_model = 'tests/artifacts/simple_model_to_train_1_sim_v2.dill'
+# policy_net_path='serialized_models/dqn/policy_net_TargetBased_parallel_simple_model.dill'
+# target_net_path='serialized_models/dqn/target_net_TargetBased_parallel_simple_model.dill'
+policy_net_path='serialized_models/dqn/policy_net_BALANCE_parallel_simple_model.dill'
+target_net_path='serialized_models/dqn/target_net_BALANCE_parallel_simple_model.dill'
 
 @dataclass
 class OutputData:
@@ -63,8 +67,8 @@ def learning_loop(queue, stop_event, save_event):
     learner = Learner(
         state_space=state_space,
         action_space=ActionSpace(model.demands),
-        policy_net_path='serialized_models/dqn/policy_net_TargetBased_parallel_simple_model.dill',
-        target_net_path='serialized_models/dqn/target_net_TargetBased_parallel_simple_model.dill',
+        policy_net_path=policy_net_path,
+        target_net_path=target_net_path,
     )
     # with learner:
     while not stop_event.is_set():
@@ -110,9 +114,11 @@ def run_episode(episode_number, output_queue: DillQueue, is_training=True):
     with open(base_model, 'rb') as f:
         model = dill.load(f)
     state_space = TFRStateSpaceFactory(model)
+    def state_factory_wrapper(**kwargs):
+        state = TFRStateFactory(tfr_class=TFRBalanceState, **kwargs)
+        return state
+    local_memory = RailroadEvolutionMemory(state_factory=state_factory_wrapper)
 
-
-    local_memory = RailroadEvolutionMemory()
     event_factory = DecoratedEventFactory(
         pre_method=local_memory.save_previous_state,
         pos_method=local_memory.save_consequence
@@ -137,8 +143,8 @@ def run_episode(episode_number, output_queue: DillQueue, is_training=True):
         learner = Learner(
             state_space=state_space,
             action_space=ActionSpace(model.demands),
-            policy_net_path='serialized_models/dqn/policy_net_TargetBased_parallel_simple_model.dill',
-            target_net_path='serialized_models/dqn/target_net_TargetBased_parallel_simple_model.dill',
+            policy_net_path=policy_net_path,
+            target_net_path=target_net_path,
             epsilon_decay_steps=50,
             epsilon_start=1,
             epsilon_end=1

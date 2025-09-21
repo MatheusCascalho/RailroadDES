@@ -57,10 +57,10 @@ with open(base_model, 'rb') as f:
     model = dill.load(f)
 state_space = TFRStateSpaceFactory(model)
 action_space = ActionSpace(model.demands)
-with open('serialized_models/dqn/policy_net_TargetBased_parallel_simple_model_15x4_TFRState_v2.dill', 'rb') as f:
+with open('serialized_models/dqn/policy_net_BALANCE_parallel_simple_model_15x4_TFRState_v2.dill', 'rb') as f:
     policy_net = dill.load(f)
 
-with open('serialized_models/q_tables/q_table_1trem_2_nos_souza_mendes_santos.dill', 'rb') as f:
+with open('serialized_models/q_tables/q_table_10_nos_15_trens_balance.dill', 'rb') as f:
     q_table = dill.load(f)
 report = []
 for state_str in q_table:

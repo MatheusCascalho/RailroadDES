@@ -1,13 +1,15 @@
 import sys
 from concurrent.futures.process import ProcessPoolExecutor
 
+from models.TFRState import TFRBalanceState
+
 # Adicionando o diretório ao sys.path
 sys.path.append('')
 sys.path.append('.')
 import random
 from models.QLearningRouter import QRouter, QTable
 from models.action_space import ActionSpace
-from models.tfr_state_factory import TFRStateSpaceFactory
+from models.tfr_state_factory import TFRStateFactory, TFRStateSpaceFactory
 from models.system_evolution_memory import RailroadEvolutionMemory, ExperienceProducer
 from models.event import DecoratedEventFactory
 from models.event_calendar import EventCalendar
@@ -32,6 +34,9 @@ warnings.filterwarnings('ignore')
 EPISODES_BY_PROCESS = 1_000
 NUM_PROCESSES = 1
 TRAINING_STEPS = 1
+# base_model = 'tests/artifacts/model_to_train_15.dill'
+base_model = 'tests/artifacts/simple_model_to_train_1_sim_v2.dill'
+q_table_file = f"serialized_models/q_tables/q_table_10_nos_15_trens_balance.dill"
 
 @dataclass
 class OutputData:
@@ -42,13 +47,12 @@ class OutputData:
     q_table_size: int
 
 def setup_shared_components(experience_queue):
-    with open('tests/artifacts/model_to_train_15.dill', 'rb') as f:
-    # with open('tests/artifacts/simple_model_to_train_1_sim_v2.dill', 'rb') as f:
+    with open(base_model, 'rb') as f:
         model = dill.load(f)
     state_space = TFRStateSpaceFactory(model)
     learner = QTable(
         action_space=ActionSpace(model.demands),
-        q_table_file=f"q_table_10_nos_15_trens.dill"
+        q_table_file=q_table_file
         # q_table_file=f"q_table_pid_{os.getpid()}.dill"
     )
     global_memory = ExperienceProducer(queue=experience_queue)
@@ -80,19 +84,20 @@ def logging_loop(stop_event, output_queue):
             continue
 
 def run_episode(episode_number, output_queue: DillQueue):
-    # with open('tests/artifacts/simple_model_to_train_1_sim_v2.dill', 'rb') as f:
-    with open('tests/artifacts/model_to_train_15_sim_v2.dill', 'rb') as f:
+    with open(base_model, 'rb') as f:
         model = dill.load(f)
     target = SimpleTargetManager(demand=model.demands)
     state_space = TFRStateSpaceFactory(model)
     learner = QTable(
         action_space=ActionSpace(model.demands),
-        q_table_file=f"q_table_10_nos_15_trens.dill"
+        q_table_file=q_table_file,
         # q_table_file=f"q_table_pid_{os.getpid()}.dill" .
     )
     experience_producer = ExperienceProducer(queue=experience_queue)
-
-    local_memory = RailroadEvolutionMemory()
+    def state_factory_wrapper(**kwargs):
+        state = TFRStateFactory(tfr_class=TFRBalanceState, **kwargs)
+        return state
+    local_memory = RailroadEvolutionMemory(state_factory=state_factory_wrapper)
     event_factory = DecoratedEventFactory(
         pre_method=local_memory.save_previous_state,
         pos_method=local_memory.save_consequence
@@ -115,7 +120,7 @@ def run_episode(episode_number, output_queue: DillQueue):
         demands=model.demands,
         simulation_memory=local_memory,
         exploration_method=lambda: next(alws),#target.furthest_from_the_target,
-        epsilon=1
+        epsilon=0
     )
 
     model.router = router
