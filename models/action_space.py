@@ -20,7 +20,8 @@ class ActionSpace:
         return v
 
     def get_demand(self, i):
-        if i == len(self.demands) - 1:
+        
+        if i >= len(self.demands) - 2:
             return self.sample()
         return self.demands[i]
     
