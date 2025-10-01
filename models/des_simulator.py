@@ -1,3 +1,4 @@
+from decimal import DivisionByZero
 from interfaces.des_simulator_interface import DESSimulatorInterface
 from models.event_calendar import EventCalendar
 from datetime import datetime, timedelta
@@ -48,8 +49,10 @@ class DESSimulator(Entity, DESSimulatorInterface):
                 except NotCompletedEvent as error:
                     event.reschedule(time_to_happen=timedelta(hours=1))
                     self.calendar.push(time=timedelta(hours=1), event=event, callback=None)
-            except Exception as e:
-                print("Forced Stop")
+            # except Exception as e:
+            #     print("Forced Stop")
+            #     break
+            except DivisionByZero:
                 break
         debug(f"Finish simulation")
 

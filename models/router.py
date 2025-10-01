@@ -35,7 +35,7 @@ class Router(ABC):
         self.running_tasks[task] = train
 
     @abstractmethod
-    def choose_task(self, current_time, train_size, model_state):
+    def choose_task(self, current_time, train_size, model_state, **kwargs) -> Task:
         pass
 
     def operated_volume(self):
@@ -43,21 +43,42 @@ class Router(ABC):
 
     def total_demand(self):
         return sum([d.volume for d in self.demands])
+    
+    @staticmethod
+    def create_path(selected_demand: Demand, current_location: str):
+        path = [selected_demand.flow.origin, selected_demand.flow.destination]
+        is_moving = '_' in current_location or current_location == 'origin'
+        if not is_moving:
+            path.insert(0, current_location)
+        return path, is_moving
+
+    def demand_to_task(self, selected_demand, current_location, train_size, current_time, model_state):
+        path, is_moving = self.create_path(selected_demand=selected_demand, current_location=current_location)
+        task = Task(
+            demand=selected_demand,
+            path=path,
+            task_volume=train_size,
+            current_time=current_time,
+            state=model_state,
+            starts_moving=is_moving
+        )
+        return task
 
 class RandomRouter(Router):
     def __init__(self, demands):
         super().__init__(demands=demands)
 
-    def choose_task(self, current_time, train_size, model_state) -> Task:
+    def choose_task(self, current_time, train_size, model_state, **kwargs) -> Task:
         random_index = randint(0, len(self.demands)-1)
         random_demand = self.demands[random_index]
-        task = Task(
-            demand=random_demand,
-            path=[random_demand.flow.origin, random_demand.flow.destination],
-            task_volume=train_size,
+        task = self.demand_to_task(
+            selected_demand=random_demand,
+            current_location=kwargs.get('current_location', ''),
+            train_size=train_size,
             current_time=current_time,
-            state=model_state
+            model_state=model_state,
         )
+
         return task
 
     def save(self, file: str):
@@ -111,7 +132,7 @@ class RepeatedRouter(Router):
         self.to_repeat = to_repeat
         self.completed_tasks = []
 
-    def route(self, train: TrainInterface, current_time: datetime, state: Any, *args, **kwargs) -> Task:
+    def route(self, train: TrainInterface, current_time: datetime, state: Any, current_location, *args, **kwargs) -> Task:
         completed = train.current_task
         self.completed_tasks.append(completed)
         task = None
@@ -123,27 +144,28 @@ class RepeatedRouter(Router):
                 choice = self.to_repeat.pop(0)
                 demand = self.demand_map.get(choice)
                 not_found = demand is None
-            task = Task(
-                demand=demand,
-                path=[demand.flow.origin, demand.flow.destination],
-                task_volume=train.capacity,
+            task = self.demand_to_task(
+                selected_demand=demand,
+                current_location=current_location,
+                train_size=kwargs.get('train_size'),
                 current_time=current_time,
-                state=state
+                model_state=kwargs.get('model_state'),
             )
         if not self.to_repeat and task is None:
-            task = self.choose_task(current_time, train_size=train.capacity, model_state=state)
+            task = self.choose_task(current_time, train_size=train.capacity, model_state=state, current_location=current_location)
 
-        self.decision_map[task.model_state].append(task)
+        # self.decision_map[task.model_state].append(task)
         train.current_task = task
 
-    def choose_task(self, current_time, train_size, model_state) -> Task:
+    def choose_task(self, current_time, train_size, model_state, current_location) -> Task:
         random_index = randint(0, len(self.demands)-1)
         random_demand = self.demands[random_index]
-        task = Task(
-            demand=random_demand,
-            path=[random_demand.flow.origin, random_demand.flow.destination],
-            task_volume=train_size,
+        task = self.demand_to_task(
+            selected_demand=random_demand,
+            current_location=current_location,
+            train_size=train_size,
             current_time=current_time,
-            state=model_state
+            model_state=model_state,
         )
+
         return task

@@ -137,19 +137,14 @@ class QRouter(Router):
             selected_demand = self.explore()
         else:
             selected_demand = self.q_table.best_action(current_state=self.memory.next_state)
-        path = [selected_demand.flow.origin, selected_demand.flow.destination]
-        is_moving = '_' in current_location or current_location == 'origin'
-        if not is_moving:
-            path.insert(0, current_location)
-        
-        task = Task(
-            demand=selected_demand,
-            path=path,
-            task_volume=train_size,
+        task = self.demand_to_task(
+            selected_demand=selected_demand,
+            current_location=current_location,
+            train_size=train_size,
             current_time=current_time,
-            state=model_state,
-            starts_moving=is_moving
+            model_state=model_state,
         )
+
         return task
 
     def route(self, train: TrainInterface, current_time, state, is_initial=False):

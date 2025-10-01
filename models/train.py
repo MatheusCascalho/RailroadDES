@@ -67,7 +67,7 @@ class Train(TrainInterface):
         self._train_id = value
 
     @property
-    def current_task(self):
+    def current_task(self) -> Task:
         return self.__current_task
 
     @current_task.setter

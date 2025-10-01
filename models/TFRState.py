@@ -78,7 +78,7 @@ class TFRState:
             r += cs.reward()
         for fs in self.flow_states:
             r += fs.reward()
-        return r
+        return r / 1e5
 
     def detailed_reward(self):
         map = {ts.name: ts.reward() for ts in self.train_states}
@@ -103,6 +103,19 @@ class TFRState:
         s += f"Recompensa {round(self.reward())}"
         return s
 
+class TFRBalanceState(TFRState):
+    penalty_factor: float = 1e3
+    def reward(self) -> float:
+        base_reward = sum([1e5 if f.activity == ActivityState.PROCESSING else 0 for f in self.train_states])
+        missing_volumes = [f.missing_volume for f in self.flow_states]
+        diff = sum(np.abs(np.diff(missing_volumes)))
+
+        # std_volumes = np.std(missing_volumes)
+        penalty = diff * self.penalty_factor
+        reward = base_reward - penalty
+        return reward # type: ignore
+
+
 EMBEDDING_SPACE_DIMENSION = 5
 
 class TFRStateSpace:
@@ -119,7 +132,7 @@ class TFRStateSpace:
         connections = [f"_-{s}" for s in stations] 
         connections += [f"{c[0]}-{c[1]}" for c in mesh_edges]
         connections += [f"{c[1]}-{c[0]}" for c in mesh_edges]
-
+        connections = list(set(connections))
         self.locals_to_index = {
             loc: i
             for i, loc in enumerate(sorted(stations+connections))}

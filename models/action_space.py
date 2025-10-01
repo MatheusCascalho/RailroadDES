@@ -6,7 +6,7 @@ class ActionSpace:
 
     @property
     def n_actions(self):
-        return len(self.demands) - 2
+        return len(self.demands) 
 
     def sample(self):
         i = random.randint(0, len(self.demands) - 3)
@@ -20,7 +20,8 @@ class ActionSpace:
         return v
 
     def get_demand(self, i):
-        if i == len(self.demands) - 1:
+        
+        if i >= len(self.demands) - 2:
             return self.sample()
         return self.demands[i]
     

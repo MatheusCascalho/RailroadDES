@@ -1,0 +1,889 @@
+state,Q_TABLE,DQN,consensus
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 0% de atendimento
+Trem train_0 em _-origin-Waiting to route
+Recompensa -20","Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)","Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",True
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 0% de atendimento
+Trem train_0 em _-Mendes-Waiting to route
+Recompensa -20",,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 0% de atendimento
+Trem train_0 em _-Mendes-Moving
+Recompensa -199",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 0% de atendimento
+Trem train_0 em Mendes-Queue to enter
+Recompensa -20",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 0% de atendimento
+Trem train_0 em Mendes-Processing
+Recompensa 500",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Mendes-Queue to leave
+Recompensa 5980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Mendes-Santos-Moving
+Recompensa 5801",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Santos-Queue to enter
+Recompensa 5980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Santos-Processing
+Recompensa 6500",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Santos-Queue to leave
+Recompensa 5980",ROUTING,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Santos-Waiting to route
+Recompensa 5980","Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)","Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",True
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Santos-Souza-Moving
+Recompensa 5957",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Souza-Queue to enter
+Recompensa 5980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Souza-Processing
+Recompensa 6500",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 10% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Souza-Queue to leave
+Recompensa 11980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 10% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Souza-Santos-Moving
+Recompensa 11980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 10% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Santos-Queue to enter
+Recompensa 11980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 10% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Santos-Processing
+Recompensa 12500",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 10% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Santos-Queue to leave
+Recompensa 11980",ROUTING,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 10% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Santos-Waiting to route
+Recompensa 11980","Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)","Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",True
+"Fluxo Souza-Santos com 10% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Santos-Souza-Moving
+Recompensa 11957",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 10% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Souza-Queue to enter
+Recompensa 11980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 10% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Souza-Processing
+Recompensa 12500",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 20% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Souza-Queue to leave
+Recompensa 17980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 20% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Souza-Santos-Moving
+Recompensa 17980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 20% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Santos-Queue to enter
+Recompensa 17980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 20% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Santos-Processing
+Recompensa 18500",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 20% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Santos-Queue to leave
+Recompensa 17980",ROUTING,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 20% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Santos-Waiting to route
+Recompensa 17980","Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)","Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",True
+"Fluxo Souza-Santos com 20% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Santos-Souza-Moving
+Recompensa 17957",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 20% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Souza-Queue to enter
+Recompensa 17980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 20% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Souza-Processing
+Recompensa 18500",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 30% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Souza-Queue to leave
+Recompensa 23980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 30% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Souza-Santos-Moving
+Recompensa 23980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 30% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Santos-Queue to enter
+Recompensa 23980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 30% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Santos-Processing
+Recompensa 24500",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 30% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Santos-Queue to leave
+Recompensa 23980",ROUTING,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 30% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Santos-Waiting to route
+Recompensa 23980","Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)","Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",True
+"Fluxo Souza-Santos com 30% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Santos-Souza-Moving
+Recompensa 23957",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 30% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Souza-Queue to enter
+Recompensa 23980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 30% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Souza-Processing
+Recompensa 24500",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 40% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Souza-Queue to leave
+Recompensa 29980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 40% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Souza-Santos-Moving
+Recompensa 29980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 40% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Santos-Queue to enter
+Recompensa 29980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 40% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Santos-Processing
+Recompensa 30500",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 40% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Santos-Queue to leave
+Recompensa 29980",ROUTING,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 40% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Santos-Waiting to route
+Recompensa 29980","Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)","Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",True
+"Fluxo Souza-Santos com 40% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Santos-Souza-Moving
+Recompensa 29957",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 40% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Souza-Queue to enter
+Recompensa 29980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 40% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Souza-Processing
+Recompensa 30500",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 50% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Souza-Queue to leave
+Recompensa 35980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 50% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Souza-Santos-Moving
+Recompensa 35980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 50% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Santos-Queue to enter
+Recompensa 35980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 50% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Santos-Processing
+Recompensa 36500",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 50% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Santos-Queue to leave
+Recompensa 35980",ROUTING,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 50% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Santos-Waiting to route
+Recompensa 35980","Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)","Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",True
+"Fluxo Souza-Santos com 50% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Santos-Souza-Moving
+Recompensa 35957",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 50% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Souza-Queue to enter
+Recompensa 35980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 50% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Souza-Processing
+Recompensa 36500",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 60% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Souza-Queue to leave
+Recompensa 41980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 60% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Souza-Santos-Moving
+Recompensa 41980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 60% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Santos-Queue to enter
+Recompensa 41980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 60% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Santos-Processing
+Recompensa 42500",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 60% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Santos-Queue to leave
+Recompensa 41980",ROUTING,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 60% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Santos-Waiting to route
+Recompensa 41980","Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)","Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",True
+"Fluxo Souza-Santos com 60% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Santos-Mendes-Moving
+Recompensa 41863",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 60% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Mendes-Queue to enter
+Recompensa 41980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 60% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Mendes-Processing
+Recompensa 42500",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 60% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Mendes-Queue to leave
+Recompensa 47980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 60% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Mendes-Santos-Moving
+Recompensa 47801",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 60% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Santos-Queue to enter
+Recompensa 47980",,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 40% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Santos-Mendes-Moving
+Recompensa 29863",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 40% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Mendes-Queue to enter
+Recompensa 29980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 40% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Mendes-Processing
+Recompensa 30500",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 40% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Mendes-Queue to leave
+Recompensa 35980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 40% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Mendes-Santos-Moving
+Recompensa 35801",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 40% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Santos-Queue to enter
+Recompensa 35980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 40% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Santos-Processing
+Recompensa 36500",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 40% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Santos-Queue to leave
+Recompensa 35980",ROUTING,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 40% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Santos-Waiting to route
+Recompensa 35980","Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)","Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",True
+"Fluxo Souza-Santos com 40% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Santos-Souza-Moving
+Recompensa 35957",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 40% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Souza-Queue to enter
+Recompensa 35980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 40% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Souza-Processing
+Recompensa 36500",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 50% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Souza-Queue to leave
+Recompensa 41980",,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 30% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Santos-Mendes-Moving
+Recompensa 23863",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 30% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Mendes-Queue to enter
+Recompensa 23980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 30% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Mendes-Processing
+Recompensa 24500",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 30% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Mendes-Queue to leave
+Recompensa 29980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 30% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Mendes-Santos-Moving
+Recompensa 29801",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 30% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Santos-Queue to enter
+Recompensa 29980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 30% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Santos-Processing
+Recompensa 30500",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 30% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Santos-Queue to leave
+Recompensa 29980",ROUTING,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 30% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Santos-Waiting to route
+Recompensa 29980","Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)","Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",True
+"Fluxo Souza-Santos com 30% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Santos-Souza-Moving
+Recompensa 29957",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 30% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Souza-Queue to enter
+Recompensa 29980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 30% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Souza-Processing
+Recompensa 30500",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 40% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Souza-Queue to leave
+Recompensa 35980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 40% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Souza-Santos-Moving
+Recompensa 35980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 50% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Santos-Mendes-Moving
+Recompensa 35863",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 50% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Mendes-Queue to enter
+Recompensa 35980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 50% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Mendes-Processing
+Recompensa 36500",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 50% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Mendes-Queue to leave
+Recompensa 41980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 50% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Mendes-Santos-Moving
+Recompensa 41801",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 50% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Santos-Queue to enter
+Recompensa 41980",,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 10% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Santos-Mendes-Moving
+Recompensa 11863",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 10% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Mendes-Queue to enter
+Recompensa 11980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 10% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Mendes-Processing
+Recompensa 12500",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 10% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Mendes-Queue to leave
+Recompensa 17980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 10% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Mendes-Santos-Moving
+Recompensa 17801",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 10% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Santos-Queue to enter
+Recompensa 17980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 10% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Santos-Processing
+Recompensa 18500",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 10% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Santos-Queue to leave
+Recompensa 17980",ROUTING,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 10% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Santos-Waiting to route
+Recompensa 17980","Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)","Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",True
+"Fluxo Souza-Santos com 10% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Santos-Souza-Moving
+Recompensa 17957",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 10% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Souza-Queue to enter
+Recompensa 17980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 10% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Souza-Processing
+Recompensa 18500",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 20% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Souza-Queue to leave
+Recompensa 23980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 20% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Souza-Santos-Moving
+Recompensa 23980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 20% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Santos-Queue to enter
+Recompensa 23980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 20% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Santos-Processing
+Recompensa 24500",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 20% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Santos-Queue to leave
+Recompensa 23980",ROUTING,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 20% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Santos-Waiting to route
+Recompensa 23980","Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)","Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",True
+"Fluxo Souza-Santos com 20% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Santos-Mendes-Moving
+Recompensa 23863",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 20% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Mendes-Queue to enter
+Recompensa 23980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 20% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Mendes-Processing
+Recompensa 24500",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 20% de atendimento
+Fluxo Mendes-Santos com 100% de atendimento
+Trem train_0 em Mendes-Queue to leave
+Recompensa 29980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 20% de atendimento
+Fluxo Mendes-Santos com 100% de atendimento
+Trem train_0 em Mendes-Santos-Moving
+Recompensa 29801",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 20% de atendimento
+Fluxo Mendes-Santos com 100% de atendimento
+Trem train_0 em Santos-Queue to enter
+Recompensa 29980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 20% de atendimento
+Fluxo Mendes-Santos com 100% de atendimento
+Trem train_0 em Santos-Processing
+Recompensa 30500",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 20% de atendimento
+Fluxo Mendes-Santos com 100% de atendimento
+Trem train_0 em Santos-Queue to leave
+Recompensa 29980",ROUTING,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 20% de atendimento
+Fluxo Mendes-Santos com 100% de atendimento
+Trem train_0 em Santos-Waiting to route
+Recompensa 29980","Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)","Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",True
+"Fluxo Souza-Santos com 20% de atendimento
+Fluxo Mendes-Santos com 100% de atendimento
+Trem train_0 em Santos-Mendes-Moving
+Recompensa 29863",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 20% de atendimento
+Fluxo Mendes-Santos com 100% de atendimento
+Trem train_0 em Mendes-Queue to enter
+Recompensa 29980",,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 20% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Santos-Mendes-Moving
+Recompensa 17863",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 20% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Mendes-Queue to enter
+Recompensa 17980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 20% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Mendes-Processing
+Recompensa 18500",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 20% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Mendes-Queue to leave
+Recompensa 23980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 20% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Mendes-Santos-Moving
+Recompensa 23801",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 20% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Santos-Souza-Moving
+Recompensa 23957",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 20% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Souza-Queue to enter
+Recompensa 23980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 20% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Souza-Processing
+Recompensa 24500",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 30% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Souza-Queue to leave
+Recompensa 29980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 30% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Souza-Santos-Moving
+Recompensa 29980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Santos-Mendes-Moving
+Recompensa 5863",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Mendes-Queue to enter
+Recompensa 5980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Mendes-Processing
+Recompensa 6500",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Mendes-Queue to leave
+Recompensa 11980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Mendes-Santos-Moving
+Recompensa 11801",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Santos-Queue to enter
+Recompensa 11980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Santos-Processing
+Recompensa 12500",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Santos-Queue to leave
+Recompensa 11980",ROUTING,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Santos-Waiting to route
+Recompensa 11980","Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)","Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",True
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Santos-Souza-Moving
+Recompensa 11957",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Souza-Queue to enter
+Recompensa 11980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Souza-Processing
+Recompensa 12500",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 10% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Souza-Queue to leave
+Recompensa 17980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 10% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Souza-Santos-Moving
+Recompensa 17980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 60% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Santos-Souza-Moving
+Recompensa 41957",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 60% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Souza-Queue to enter
+Recompensa 41980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 60% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Souza-Processing
+Recompensa 42500",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 70% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Souza-Queue to leave
+Recompensa 47980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 70% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Souza-Santos-Moving
+Recompensa 47980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 70% de atendimento
+Fluxo Mendes-Santos com 33% de atendimento
+Trem train_0 em Santos-Queue to enter
+Recompensa 47980",,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Santos-Mendes-Moving
+Recompensa 11863",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Mendes-Queue to enter
+Recompensa 11980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Mendes-Processing
+Recompensa 12500",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 100% de atendimento
+Trem train_0 em Mendes-Queue to leave
+Recompensa 17980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 100% de atendimento
+Trem train_0 em Mendes-Santos-Moving
+Recompensa 17801",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 100% de atendimento
+Trem train_0 em Santos-Queue to enter
+Recompensa 17980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 100% de atendimento
+Trem train_0 em Santos-Processing
+Recompensa 18500",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 100% de atendimento
+Trem train_0 em Santos-Queue to leave
+Recompensa 17980",ROUTING,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 100% de atendimento
+Trem train_0 em Santos-Waiting to route
+Recompensa 17980","Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)","Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",True
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 100% de atendimento
+Trem train_0 em Santos-Mendes-Moving
+Recompensa 17863",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 100% de atendimento
+Trem train_0 em Mendes-Queue to enter
+Recompensa 17980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 100% de atendimento
+Trem train_0 em Mendes-Processing
+Recompensa 18500",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 133% de atendimento
+Trem train_0 em Mendes-Queue to leave
+Recompensa 23980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 133% de atendimento
+Trem train_0 em Mendes-Santos-Moving
+Recompensa 23801",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 133% de atendimento
+Trem train_0 em Santos-Queue to enter
+Recompensa 23980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 133% de atendimento
+Trem train_0 em Santos-Processing
+Recompensa 24500",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 133% de atendimento
+Trem train_0 em Santos-Queue to leave
+Recompensa 23980",ROUTING,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 133% de atendimento
+Trem train_0 em Santos-Waiting to route
+Recompensa 23980","Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)","Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",True
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 133% de atendimento
+Trem train_0 em Santos-Mendes-Moving
+Recompensa 23863",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 133% de atendimento
+Trem train_0 em Mendes-Queue to enter
+Recompensa 23980",,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 10% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Santos-Mendes-Moving
+Recompensa 17863",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 10% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Mendes-Queue to enter
+Recompensa 17980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 10% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Mendes-Processing
+Recompensa 18500",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 10% de atendimento
+Fluxo Mendes-Santos com 100% de atendimento
+Trem train_0 em Mendes-Queue to leave
+Recompensa 23980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 10% de atendimento
+Fluxo Mendes-Santos com 100% de atendimento
+Trem train_0 em Mendes-Santos-Moving
+Recompensa 23801",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 10% de atendimento
+Fluxo Mendes-Santos com 100% de atendimento
+Trem train_0 em Santos-Queue to enter
+Recompensa 23980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 10% de atendimento
+Fluxo Mendes-Santos com 100% de atendimento
+Trem train_0 em Santos-Processing
+Recompensa 24500",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 10% de atendimento
+Fluxo Mendes-Santos com 100% de atendimento
+Trem train_0 em Santos-Queue to leave
+Recompensa 23980",ROUTING,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 10% de atendimento
+Fluxo Mendes-Santos com 100% de atendimento
+Trem train_0 em Santos-Waiting to route
+Recompensa 23980","Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)","Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",True
+"Fluxo Souza-Santos com 10% de atendimento
+Fluxo Mendes-Santos com 100% de atendimento
+Trem train_0 em Santos-Mendes-Moving
+Recompensa 23863",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 10% de atendimento
+Fluxo Mendes-Santos com 100% de atendimento
+Trem train_0 em Mendes-Queue to enter
+Recompensa 23980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 10% de atendimento
+Fluxo Mendes-Santos com 100% de atendimento
+Trem train_0 em Mendes-Processing
+Recompensa 24500",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 10% de atendimento
+Fluxo Mendes-Santos com 133% de atendimento
+Trem train_0 em Mendes-Queue to leave
+Recompensa 29980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 10% de atendimento
+Fluxo Mendes-Santos com 133% de atendimento
+Trem train_0 em Mendes-Santos-Moving
+Recompensa 29801",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 10% de atendimento
+Fluxo Mendes-Santos com 133% de atendimento
+Trem train_0 em Santos-Queue to enter
+Recompensa 29980",,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 20% de atendimento
+Fluxo Mendes-Santos com 100% de atendimento
+Trem train_0 em Santos-Souza-Moving
+Recompensa 29957",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 20% de atendimento
+Fluxo Mendes-Santos com 100% de atendimento
+Trem train_0 em Souza-Queue to enter
+Recompensa 29980",,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 40% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Santos-Mendes-Moving
+Recompensa 35863",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 40% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Mendes-Queue to enter
+Recompensa 35980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 40% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Mendes-Processing
+Recompensa 36500",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 40% de atendimento
+Fluxo Mendes-Santos com 100% de atendimento
+Trem train_0 em Mendes-Queue to leave
+Recompensa 41980",,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 10% de atendimento
+Fluxo Mendes-Santos com 100% de atendimento
+Trem train_0 em Santos-Souza-Moving
+Recompensa 23957",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 10% de atendimento
+Fluxo Mendes-Santos com 100% de atendimento
+Trem train_0 em Souza-Queue to enter
+Recompensa 23980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 10% de atendimento
+Fluxo Mendes-Santos com 100% de atendimento
+Trem train_0 em Souza-Processing
+Recompensa 24500",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 20% de atendimento
+Fluxo Mendes-Santos com 100% de atendimento
+Trem train_0 em Souza-Queue to leave
+Recompensa 29980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 20% de atendimento
+Fluxo Mendes-Santos com 100% de atendimento
+Trem train_0 em Souza-Santos-Moving
+Recompensa 29980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 30% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Santos-Mendes-Moving
+Recompensa 29863",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 30% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Mendes-Queue to enter
+Recompensa 29980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 30% de atendimento
+Fluxo Mendes-Santos com 67% de atendimento
+Trem train_0 em Mendes-Processing
+Recompensa 30500",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 30% de atendimento
+Fluxo Mendes-Santos com 100% de atendimento
+Trem train_0 em Mendes-Queue to leave
+Recompensa 35980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 30% de atendimento
+Fluxo Mendes-Santos com 100% de atendimento
+Trem train_0 em Mendes-Santos-Moving
+Recompensa 35801",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 30% de atendimento
+Fluxo Mendes-Santos com 100% de atendimento
+Trem train_0 em Santos-Queue to enter
+Recompensa 35980",,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 133% de atendimento
+Trem train_0 em Santos-Souza-Moving
+Recompensa 23957",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 133% de atendimento
+Trem train_0 em Souza-Queue to enter
+Recompensa 23980",,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 100% de atendimento
+Trem train_0 em Santos-Souza-Moving
+Recompensa 17957",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 100% de atendimento
+Trem train_0 em Souza-Queue to enter
+Recompensa 17980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 0% de atendimento
+Fluxo Mendes-Santos com 100% de atendimento
+Trem train_0 em Souza-Processing
+Recompensa 18500",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 10% de atendimento
+Fluxo Mendes-Santos com 100% de atendimento
+Trem train_0 em Souza-Queue to leave
+Recompensa 23980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False
+"Fluxo Souza-Santos com 10% de atendimento
+Fluxo Mendes-Santos com 100% de atendimento
+Trem train_0 em Souza-Santos-Moving
+Recompensa 23980",AUTOMATIC,"Demand(flow=Flow(origin='Souza', destination='Santos', product='product'), volume=60000.0, operated=0.0, promised=0.0)",False

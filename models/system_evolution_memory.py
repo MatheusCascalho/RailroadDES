@@ -1,7 +1,7 @@
 from collections import deque
 from dataclasses import dataclass, field
 from queue import Full
-
+from typing import Callable
 from models.des_model import DESModel
 from models.observers import AbstractSubject, to_notify, AbstractObserver
 from models.railroad import Railroad
@@ -45,10 +45,11 @@ class Experience:
 
 
 class RailroadEvolutionMemory(AbstractSubject):
-    def __init__(self, railroad: Railroad=None, memory_size: int=1000) -> None:
+    def __init__(self, railroad: Railroad=None, memory_size: int=1000, state_factory: Callable = TFRStateFactory) -> None:
         self._memory = deque(maxlen=memory_size)
         self._railroad = railroad
         self.previous_state = None
+        self.state_factory = state_factory
         super().__init__()
 
     @property
@@ -64,12 +65,12 @@ class RailroadEvolutionMemory(AbstractSubject):
         self.previous_state = state
 
 
-    def take_a_snapshot(self, *args, **kwargs):
+    def take_a_snapshot(self, *args, **kwargs) -> TFRState:
         is_initial = kwargs.get('is_initial', False)
         if not self.railroad:
             critical("Memory does not know the railroad and therefore does not perform any snapshots")
             return
-        state = TFRStateFactory(self.railroad, is_initial=is_initial)
+        state = self.state_factory(railroad=self.railroad, is_initial=is_initial)
         return state
 
     def save_consequence(self, *args, **kwargs):
@@ -117,20 +118,16 @@ class ExperienceProducer(AbstractObserver):
     def __init__(self, queue, memory_size: int=100_000):
         self._memory = deque(maxlen=memory_size)
         self.queue = queue
+        self.existing_keys = set()
         super().__init__()
 
     def update(self):
-        existing_keys = set(self._experience_key(e) for e in self._memory)
-        new_items = [
-            experience
-            for system_memory in self.subjects
-            for experience in system_memory
-            if self._experience_key(experience) not in existing_keys
-        ]
-        for memory_element in new_items:
-            self.queue.put(memory_element, timeout=1)
+        experience = self.subjects[0].last_item
+        if experience and self._experience_key(experience) not in self.existing_keys:
+            self.queue.put(experience, timeout=1)
+            self.existing_keys.add(self._experience_key(experience=experience))
 
-        self._memory.extend(new_items)
+        self._memory.append(experience)
 
     def _experience_key(self, experience):
         return experience.memory_id
