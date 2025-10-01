@@ -139,10 +139,14 @@ class Learner(AbstractObserver):
     @property
     def memory(self):
         return self._memory
+    
+    @property
+    def memory_to_train(self):
+        return [e for e in self.memory if e.action not in ['AUTOMATIC', 'ROUTING']]
 
     def learn(self):
         # Amostra mini-batch
-        batch = random.sample(self.memory, BATCH_SIZE)
+        batch = random.sample(self.memory_to_train, BATCH_SIZE)
         states, actions, rewards, next_states, dones = zip(*batch)
 
         states = torch.FloatTensor([self.state_space.to_array(s) for s in states])
@@ -193,7 +197,7 @@ class Learner(AbstractObserver):
         self.global_step += 1
 
         # treina só se tiver memória suficiente
-        if len(self.memory) >= BATCH_SIZE:
+        if len(self.memory_to_train) >= BATCH_SIZE:
             self.learn()
 
         # atualização periódica da rede alvo
