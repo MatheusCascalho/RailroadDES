@@ -120,7 +120,7 @@ def run_episode(episode_number, output_queue: DillQueue, is_training=True):
         model = dill.load(f)
     state_space = TFRStateSpaceFactory(model)
     def state_factory_wrapper(**kwargs):
-        state = TFRStateFactory(tfr_class=TFRBalanceState, **kwargs)
+        state = TFRStateFactory(**kwargs)
         return state
     local_memory = RailroadEvolutionMemory(state_factory=state_factory_wrapper)
 
@@ -130,7 +130,7 @@ def run_episode(episode_number, output_queue: DillQueue, is_training=True):
     )
     calendar = EventCalendar(event_factory=event_factory)
     sim = DESSimulator(clock=model.mesh.load_points[0].clock, calendar=calendar)
-    if is_training:
+    if False:
         experience_producer = ExperienceProducer(queue=experience_queue)
         local_memory.add_observers([experience_producer])
         router = RandomRouter(demands=model.demands)
@@ -151,8 +151,8 @@ def run_episode(episode_number, output_queue: DillQueue, is_training=True):
             policy_net_path=policy_net_path,
             target_net_path=target_net_path,
             epsilon_decay_steps=50,
-            epsilon_start=1,
-            epsilon_end=1
+            epsilon_start=0.9,
+            epsilon_end=0
         )
         local_memory.add_observers([learner])
         router = DQNRouter(
