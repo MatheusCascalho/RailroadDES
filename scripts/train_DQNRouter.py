@@ -31,15 +31,20 @@ import cProfile
 
 warnings.filterwarnings('ignore')
 # N_EPISODES = 10
-EPISODES_BY_PROCESS = 100
-NUM_PROCESSES = max(1, multiprocessing.cpu_count() - 5)
+EPISODES_BY_PROCESS = 25
+NUM_PROCESSES = 1#max(1, multiprocessing.cpu_count() - 5)
 TRAINING_STEPS = 100
-# base_model = 'tests/artifacts/model_to_train_15_sim_v2.dill'
-base_model = 'tests/artifacts/simple_model_to_train_1_sim_v2.dill'
+base_model = 'tests/artifacts/model_to_train_15_sim_v2.dill'
+# base_model = 'tests/artifacts/simple_model_to_train_1_sim_v2.dill'
 # policy_net_path='serialized_models/dqn/policy_net_TargetBased_parallel_simple_model.dill'
 # target_net_path='serialized_models/dqn/target_net_TargetBased_parallel_simple_model.dill'
-policy_net_path='serialized_models/dqn/policy_net_BALANCE_parallel_simple_model.dill'
-target_net_path='serialized_models/dqn/target_net_BALANCE_parallel_simple_model.dill'
+# policy_net_path='serialized_models/dqn/policy_net_BALANCE_parallel_simple_model.dill'
+# target_net_path='serialized_models/dqn/target_net_BALANCE_parallel_simple_model.dill'
+
+policy_net_path='serialized_models/dqn/policy_net_15_trains_normalized_reward.dill'
+target_net_path='serialized_models/dqn/target_net_15_trains_normalized_reward.dill'
+
+
 
 @dataclass
 class OutputData:
