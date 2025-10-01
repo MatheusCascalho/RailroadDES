@@ -78,7 +78,7 @@ class TFRState:
             r += cs.reward()
         for fs in self.flow_states:
             r += fs.reward()
-        return r
+        return r / 1e5
 
     def detailed_reward(self):
         map = {ts.name: ts.reward() for ts in self.train_states}
