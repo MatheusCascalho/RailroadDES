@@ -61,7 +61,7 @@ class Railroad(DESModel):
         for train in self.trains:
             self.router.route(current_time=simulator.current_date, train=train, state=self.state, is_initial=True)
             train.activity_system.update()
-            segments = self.mesh.get_segments(train.current_task)
+            segments = self.mesh.get_segments(train.current_task.path.path)
             scheduler = ArriveScheduler(
                 rail_segments=segments,
                 simulator=simulator
@@ -82,7 +82,7 @@ class Railroad(DESModel):
             train: TrainInterface = exception.train
             self.router.route(train=train,current_time=exception.current_time, state=self.state)
             event.data['event_name'] = train.current_task.demand.flow
-            segments = self.mesh.get_segments(train.current_task)
+            segments = self.mesh.get_segments(train.current_task.path.path)
             scheduler = ArriveScheduler(
                 rail_segments=segments,
                 simulator=simulator

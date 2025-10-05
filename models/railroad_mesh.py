@@ -59,7 +59,7 @@ class RailroadMesh:
     unload_points: tuple[NodeInterface]
     transit_times: list[TransitTime]
     name_to_node: dict[str, NodeInterface] = field(init=False, default_factory=dict)
-    id_to_name: dict[int, str] = field(init=False, default_factory=dict)
+    id_to_name: dict[str, str] = field(init=False, default_factory=dict)
     segments: list[RailSegment] = field(init=False, default_factory=list)
     graph: dict[NodeInterface, list[RailSegment]] = field(default_factory=lambda : defaultdict(list), init=False)
 
@@ -124,17 +124,16 @@ class RailroadMesh:
     def __len__(self):
         return len(self.load_points) + len(self.unload_points)
 
-    def get_segments(self, task: Task):
+    def get_segments(self, path: list[str]) -> list[RailSegment]:
         segments = []
-        last = ''
-        for n in task.path.path:
+        for n in path:
             if '-' not in n:
                 continue
             o, d = n.split('-')
             if o in self.graph:
                 s = self.graph[o][0]
             else:
-                s = self.graph[d][0].reversed()
+                s = self.graph[d][0].reversed() # type: ignore
             segments.append(s)
         return segments
 
