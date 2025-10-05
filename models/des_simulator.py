@@ -49,6 +49,8 @@ class DESSimulator(Entity, DESSimulatorInterface):
                 except NotCompletedEvent as error:
                     event.reschedule(time_to_happen=timedelta(hours=1))
                     self.calendar.push(time=timedelta(hours=1), event=event, callback=None)
+                if all([d.is_completed for d in model.router.demands]):
+                    break
             # except Exception as e:
             #     print("Forced Stop")
             #     break
