@@ -16,12 +16,14 @@ class Router(ABC):
     def __init__(self, demands: list[Demand]):
         self.demands = demands
         self.decision_map = defaultdict(list)
+        self.choosed_tasks = []
         self.completed_tasks = []
         self.running_tasks = {}
 
     def route(self, train: TrainInterface, current_time, state, is_initial=False):
         completed = train.current_task
-        self.completed_tasks.append(completed)
+        if completed.demand.flow.origin != 'origin':
+            self.completed_tasks.append(completed)
         if completed in self.running_tasks:
             self.running_tasks.pop(completed)
         task = self.choose_task(
@@ -30,6 +32,7 @@ class Router(ABC):
             model_state=state, 
             current_location=train.current_location,
         )
+        self.choosed_tasks.append(task)
         self.decision_map[task.model_state].append(task)
         train.current_task = task
         self.running_tasks[task] = train
