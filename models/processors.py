@@ -111,13 +111,19 @@ class ProcessorSystem(DiscreteEventSystem):
             return event
         raise ProcessException.no_promise_to_do()
 
-    def get_process_time(self) -> timedelta():
+    def get_process_time(self, train_size = 0) -> timedelta():
         if not self.is_idle:
             volume = self.current_train.capacity
             product = self.current_train.product
             rate = self.rates[product].rate
             steps = volume / rate
             process_time = steps * self.rates[product].discretization
+            return process_time
+        if train_size:
+            rates = list(self.rates.values())
+            rate = min(r.rate for r in rates)
+            steps = train_size / rate
+            process_time = steps * rates[0].discretization
             return process_time
         return timedelta()
 
