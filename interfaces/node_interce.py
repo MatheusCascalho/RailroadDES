@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from datetime import timedelta
 from models.entity import Entity
 from models.clock import Clock
 
@@ -40,5 +41,9 @@ class NodeInterface(Entity, ABC):
     @property
     @abstractmethod
     def daily_capacity(self):
+        pass
+
+    @abstractmethod
+    def process_time(self, train_size) -> timedelta:
         pass
 

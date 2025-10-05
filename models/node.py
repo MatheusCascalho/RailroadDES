@@ -173,6 +173,10 @@ class Node(NodeInterface):
             for r in s.rates.values()
         ]
         return sum(daily_rates)
+    
+    def process_time(self, train_size) -> timedelta:
+        process_time = [slot.get_process_time(train_size=train_size) for slot in self.process_units]
+        return max(process_time)
 
 
 
