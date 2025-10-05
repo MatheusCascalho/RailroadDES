@@ -31,8 +31,8 @@ import cProfile
 
 warnings.filterwarnings('ignore')
 # N_EPISODES = 10
-EPISODES_BY_PROCESS = 25
-NUM_PROCESSES = 1#max(1, multiprocessing.cpu_count() - 5)
+EPISODES_BY_PROCESS = 100
+NUM_PROCESSES = max(1, multiprocessing.cpu_count() - 5)
 TRAINING_STEPS = 100
 base_model = 'tests/artifacts/model_to_train_15_sim_v2.dill'
 # base_model = 'tests/artifacts/simple_model_to_train_1_sim_v2.dill'
@@ -130,7 +130,7 @@ def run_episode(episode_number, output_queue: DillQueue, is_training=True):
     )
     calendar = EventCalendar(event_factory=event_factory)
     sim = DESSimulator(clock=model.mesh.load_points[0].clock, calendar=calendar)
-    if False:
+    if is_training:
         experience_producer = ExperienceProducer(queue=experience_queue)
         local_memory.add_observers([experience_producer])
         router = RandomRouter(demands=model.demands)
@@ -151,10 +151,15 @@ def run_episode(episode_number, output_queue: DillQueue, is_training=True):
             policy_net_path=policy_net_path,
             target_net_path=target_net_path,
             epsilon_decay_steps=50,
-            epsilon_start=0.9,
+            epsilon_start=0,#.9,
             epsilon_end=0
         )
         local_memory.add_observers([learner])
+        
+        # experience_producer = ExperienceProducer(queue=experience_queue)
+        # local_memory.add_observers([experience_producer])
+        # tanto o learner local como o externo irão aprender com a simulação
+
         router = DQNRouter(
             state_space=state_space,
             demands=model.demands,
@@ -166,7 +171,8 @@ def run_episode(episode_number, output_queue: DillQueue, is_training=True):
     model.router = router
     local_memory.railroad = model
     sim.simulate(model=model, time_horizon=timedelta(days=30))
-
+    if not is_training:
+        learner.save()
     output = OutputData(
         operated_volume=router.operated_volume(),
         total_demand=router.total_demand(),
@@ -176,8 +182,7 @@ def run_episode(episode_number, output_queue: DillQueue, is_training=True):
     )
     if is_training:
         output_queue.put(output)
-    else:
-        error(f'Episode {output.episode_number} - PID: {output.process_id} - Volume: {output.operated_volume} - Demanda: {output.total_demand}')
+    error(f'Episode {output.episode_number} - PID: {output.process_id} - Volume: {output.operated_volume} - Demanda: {output.total_demand}')
 
 
 
@@ -197,7 +202,7 @@ def training_process_wrapper(output_queue):
 
 
 if __name__ == '__main__':
-    is_training = True
+    is_training = False
     if is_training:
         with Manager() as manager:
             output_queue = manager.Queue()
