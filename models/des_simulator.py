@@ -27,7 +27,7 @@ class DESSimulator(Entity, DESSimulatorInterface):
     def add_event(self, time, callback, **data):
         self.calendar.push(time, callback, **data)
 
-    def simulate(self, model: DESModel, time_horizon=timedelta(hours=28), starting_time_horizon=timedelta(days=360)):
+    def simulate(self, model: DESModel, time_horizon=timedelta(hours=28), starting_time_horizon=timedelta(days=30)):
         self.validate_clock(model=model)
         self.model = model
         self.model.starting_events(simulator=self, time_horizon=starting_time_horizon)
