@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import List
 from models.demand import Flow
-from models.states import ActivityState
+from models.states import ActivityState, LoadState
 from torch.nn import Embedding
 import torch
 import numpy as np
@@ -14,9 +14,9 @@ class TrainState:
     activity: ActivityState
     load_state: LoadState
     transit_time: float = 0
-    transit_weight_punishment: float = -2
-    loading_weight_reward: float = 500
-    queue_weight_punishment: float = -20
+    transit_weight_punishment: float = -20
+    loading_weight_reward: float = 5000
+    queue_weight_punishment: float = -1_000
 
     def reward(self) -> float:
         r = 0
@@ -24,8 +24,10 @@ class TrainState:
             r += self.loading_weight_reward
         elif self.activity == ActivityState.MOVING:
             r += self.transit_time * self.transit_weight_punishment
-        else:
-            r += self.queue_weight_punishment
+        if self.load_state == LoadState.LOADED:
+            r += self.loading_weight_reward
+        # else:
+            # r += self.queue_weight_punishment
         return r
 
     def __str__(self):
@@ -36,14 +38,14 @@ class FlowState:
     flow: Flow
     has_demand: bool
     missing_volume: float
-    completed_flow_weight_reward: float = 5000
+    completed_flow_weight_reward: float = 500
 
     @property
     def name(self):
         return str(self.flow)
 
     def reward(self) -> float:
-        r = (1-self.missing_volume) * self.completed_flow_weight_reward
+        r = 0#(1-self.missing_volume) #* self.completed_flow_weight_reward
         return r
     
     def __str__(self):
@@ -54,7 +56,7 @@ class FlowState:
 class ConstraintState:
     name: str
     is_blocked: bool
-    blocked_constraint_weight: float = -10
+    blocked_constraint_weight: float = 0#-10
 
     def reward(self) -> float:
         r = self.blocked_constraint_weight if self.is_blocked else 0
@@ -67,12 +69,21 @@ class TFRState:
     constraint_states: List[ConstraintState]
     flow_states: List[FlowState]
     is_initial: bool
+    imbalance_weight_penalty: float = -1e3
 
     def __post_init__(self):
         pass
 
+    def railroad_balance(self):
+        loaded_trains = [t for t in self.train_states if t.load_state == LoadState.LOADED]
+        not_loaded_trains = [t for t in self.train_states if t.load_state != LoadState.LOADED]
+        return len(not_loaded_trains) - len(loaded_trains)
+        
+
     def reward(self) -> float:
         r = 0
+        imbalance = max(self.railroad_balance(), 0)
+        r += self.imbalance_weight_penalty * imbalance
         for ts in self.train_states:
             r += ts.reward()
         for cs in self.constraint_states:
