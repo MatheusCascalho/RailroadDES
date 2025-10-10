@@ -8,7 +8,8 @@ def TFRStateFactory(railroad: DESModel, is_initial=False, tfr_class = TFRState) 
                 name=t.ID,
                 local=t.current_location,
                 activity=t.current_activity.name,
-                transit_time=railroad.get_transit_time(t)
+                transit_time=railroad.get_transit_time(t),
+                load_state=t.load_system.state_machine.current_state.name
             )
             for t in railroad.trains
         ]
