@@ -54,7 +54,7 @@ def learner_id_gen():
     i = 0
     while True:
         yield f"Learner_{i}"
-        i += 1
+
 leaner_id = learner_id_gen()
 
 class Learner(AbstractObserver):
@@ -256,10 +256,27 @@ class DQNRouter(Router):
                     raise Exception('It is not possible to identify the train that will be routed by the system state')
                 state = self.state_space.to_array(state)
                 state = torch.FloatTensor(state).unsqueeze(0)
-                demand_index = self.policy_net(state).argmax().item()
-                selected_demand = self.action_space.get_demand(demand_index)
+                # demand_index = self.policy_net(state).argmax().item()
+                # selected_demand = self.action_space.get_demand(demand_index)
+                # Passa o estado pela rede
+                q_values = self.policy_net(state).detach().cpu().numpy().flatten()
 
-        
+                # Ordena os índices das ações pelo valor Q (do maior para o menor)
+                sorted_indices = q_values.argsort()[::-1]
+
+                # Se quiser, também pode obter os Q-values ordenados:
+                sorted_q_values = q_values[sorted_indices]
+
+                # Exemplo: selecionar o melhor, o segundo melhor, etc.
+                i = 0
+                while i < len(self.action_space.demands):
+                    best_action_index = sorted_indices[i]
+                    try:
+                        # Exemplo: obter a ação correspondente ao melhor Q
+                        selected_demand = self.action_space.get_demand(best_action_index)
+                        break
+                    except:
+                        i += 1        
 
         task = self.demand_to_task(
             selected_demand=selected_demand,
