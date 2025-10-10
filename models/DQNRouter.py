@@ -62,9 +62,9 @@ class Learner(AbstractObserver):
             self,
             state_space: TFRStateSpace,
             action_space: ActionSpace,
-            policy_net_path: str = 'serialized_models/policy_net.dill',
-            target_net_path: str = 'serialized_models/target_net.dill',
-            target_update_freq: int = 10_000,   # agora em steps, não episódios
+            policy_net_path: str = 'serialized_models/policy_net.pytorch',
+            target_net_path: str = 'serialized_models/target_net.pytorch',
+            target_update_freq: int = 2_000,   # agora em steps, não episódios
             epsilon_start: float = 1,
             epsilon_end: float = 0.001,
             epsilon_decay_steps: int = 100,
@@ -74,7 +74,7 @@ class Learner(AbstractObserver):
         self.action_space = action_space
 
         suffix = f"{state_space.cardinality}x{self.action_space.n_actions}_TFRState_v2"
-        offset = len('.dill')
+        offset = len('.pytorch')
 
         policy_net_path = policy_net_path[:-offset] + f"_{suffix}" + policy_net_path[-offset:]
         target_net_path = target_net_path[:-offset] + f"_{suffix}" + target_net_path[-offset:]
@@ -122,15 +122,20 @@ class Learner(AbstractObserver):
         self.q_values = deque(maxlen=500)
 
     def load_policies(self, filepath: str):
-        try:
-            with open(filepath, 'rb') as f:
-                policy = dill.load(f)
-        except FileNotFoundError:
-            policy = DQN(
-                n_states=self.state_space.cardinality,
-                n_actions=self.action_space.n_actions,
-            )
-        return policy
+        model = DQN(
+            n_states=self.state_space.cardinality,
+            n_actions=self.action_space.n_actions,
+        )
+        if os.path.exists(filepath):
+            try:
+                model.load_state_dict(torch.load(filepath, map_location="cpu"))
+                print(f"[INFO] Pesos carregados de {filepath}")
+            except Exception as e:
+                print(f"[WARN] Falha ao carregar {filepath}: {e}")
+                print("[INFO] Nova rede DQN criada.")
+        else:
+            print(f"[INFO] Nenhum modelo encontrado em {filepath}. Nova rede criada.")
+        return model
 
     @property
     def memory(self):
@@ -205,10 +210,13 @@ class Learner(AbstractObserver):
         self.epsilon = self.epsilon_start + fraction * (self.epsilon_end - self.epsilon_start)
 
     def save(self, *args, **kwargs):
-        with open(self.policy_net_path, 'wb') as f:
-            dill.dump(self.policy_net, f)
-        with open(self.target_net_path, 'wb') as f:
-            dill.dump(self.target_net, f)
+        os.makedirs(os.path.dirname(self.policy_net_path), exist_ok=True)
+        torch.save(self.policy_net.state_dict(), self.policy_net_path)
+        torch.save(self.target_net.state_dict(), self.target_net_path)
+        self.logger.info(f"[step={self.global_step}] Pesos salvos em disco.")
+
+    def __del__(self):
+        self.save()
 
 
 class DQNRouter(Router):
