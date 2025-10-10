@@ -125,6 +125,7 @@ class RailroadEvolutionMemory(AbstractSubject):
                     if train.current_activity.name in [ActivityState.QUEUE_TO_ENTER, ActivityState.QUEUE_TO_LEAVE]
                 ]
             )
+            balance = element.next_state.railroad_balance()
             self.cumulated_reward += element.reward
             simulation_ellapsed = (self.railroad.mesh.load_points[0].clock.current_time - self.initial_time).total_seconds()/(60*60)
 
@@ -136,6 +137,7 @@ class RailroadEvolutionMemory(AbstractSubject):
                 f"cumulated_reward={self.cumulated_reward:.5f} | "
                 f"operated_volume={opvol:.2f} | "
                 f"demand={demand:.2f} | "
+                f"balance={balance} | "
                 f"simulation_time[h]={simulation_ellapsed:.2f}"
             )
 
