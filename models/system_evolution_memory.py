@@ -5,6 +5,7 @@ from typing import Callable
 from models.des_model import DESModel
 from models.observers import AbstractSubject, to_notify, AbstractObserver
 from models.railroad import Railroad
+from models.states import ActivityState
 from models.tfr_state_factory import TFRStateFactory, TFRState
 from models.demand import Flow
 from multiprocessing import Queue
@@ -12,6 +13,9 @@ import dill
 import os
 from logging import critical
 from models.pickle_debugger import find_pickle_issues as find_unpicklables
+import logging
+import numpy as np
+
 
 def memory_id_gen():
     i = 0
@@ -51,6 +55,23 @@ class RailroadEvolutionMemory(AbstractSubject):
         self.previous_state = None
         self.state_factory = state_factory
         super().__init__()
+        self.initial_time = None
+        # Configuração de logger
+        self.mem_id = next(memory_id)
+        self.cumulated_reward = 0 
+        self.logger = logging.getLogger(f'memory_{memory_id}')
+        self.logger.setLevel(logging.INFO)
+        # evita múltiplos handlers duplicados
+        if not self.logger.handlers:
+            log_dir = "logs/memory"
+            os.makedirs(log_dir, exist_ok=True)
+            fh = logging.FileHandler(os.path.join(log_dir, f"memory.log"))
+            fh.setLevel(logging.INFO)
+            formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
+            fh.setFormatter(formatter)
+            self.logger.addHandler(fh)
+            sh = logging.StreamHandler()
+            self.logger.addHandler(sh)
 
     @property
     def railroad(self) -> Railroad:
@@ -59,6 +80,7 @@ class RailroadEvolutionMemory(AbstractSubject):
     @railroad.setter
     def railroad(self, railroad: Railroad) -> None:
         self._railroad = railroad
+        self.initial_time = self.railroad.mesh.load_points[0].clock.current_time
 
     def save_previous_state(self, *args, **kwargs):
         state = self.take_a_snapshot(is_initial=kwargs.get('is_initial', False))
@@ -93,6 +115,30 @@ class RailroadEvolutionMemory(AbstractSubject):
         element = Experience(state=s1, action=a, reward=r, next_state=s2, is_done=s2.is_final)
         if not element.is_static():
             self._memory.append(element)
+
+            opvol = sum([d.operated for d in self.railroad.demands])
+            demand = sum([d.volume for d in self.railroad.demands])
+            queues = np.median(
+                [
+                    t.penalty().total_seconds()/(60*60) 
+                    for t, train in self.railroad.router.running_tasks.items() 
+                    if train.current_activity.name in [ActivityState.QUEUE_TO_ENTER, ActivityState.QUEUE_TO_LEAVE]
+                ]
+            )
+            self.cumulated_reward += element.reward
+            simulation_ellapsed = (self.railroad.mesh.load_points[0].clock.current_time - self.initial_time).total_seconds()/(60*60)
+
+            self.logger.info(
+                f"mem_id={self.mem_id} | "
+                f"mem_size={len(self._memory)} | "
+                f"queues[h]={queues:.4f} | "
+                f"current_reward={element.reward:.5f} | "
+                f"cumulated_reward={self.cumulated_reward:.5f} | "
+                f"operated_volume={opvol:.2f} | "
+                f"demand={demand:.2f} | "
+                f"simulation_time[h]={simulation_ellapsed:.2f}"
+            )
+
 
     def __repr__(self):
         states = len(self.memory)
