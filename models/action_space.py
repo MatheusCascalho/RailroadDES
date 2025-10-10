@@ -22,7 +22,7 @@ class ActionSpace:
     def get_demand(self, i):
         
         if i >= len(self.demands) - 2:
-            return self.sample()
+            raise Exception('Invalid Demand')
         return self.demands[i]
     
     @property
