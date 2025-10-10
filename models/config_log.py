@@ -9,7 +9,7 @@ def configurar_logs():
                         format='%(asctime)s - %(levelname)s - %(message)s',
                         handlers=[
                             logging.StreamHandler(),  # Exibe no terminal
-                            logging.FileHandler(f'logs/logs_treinamento_{t}.log', 'w', 'utf-8')  # Salva em arquivo
+                            logging.FileHandler(f'logs/logs_treinamento.log', 'w', 'utf-8')  # Salva em arquivo
                         ])
 
 class CriticalFilter(logging.Filter):
