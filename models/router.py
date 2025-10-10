@@ -33,7 +33,6 @@ class Router(ABC):
             current_location=train.current_location,
         )
         self.choosed_tasks.append(task)
-        self.decision_map[task.model_state].append(task)
         train.current_task = task
         self.running_tasks[task] = train
 
