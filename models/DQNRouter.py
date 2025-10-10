@@ -68,7 +68,9 @@ class Learner(AbstractObserver):
             epsilon_start: float = 1,
             epsilon_end: float = 0.001,
             epsilon_decay_steps: int = 100,
+            batch_size: int = BATCH_SIZE
     ):
+        self.batch_size = batch_size
         self._memory = deque(maxlen=100_000)
         self.state_space = state_space
         self.action_space = action_space
@@ -114,7 +116,7 @@ class Learner(AbstractObserver):
             sh = logging.StreamHandler()
             self.logger.addHandler(sh)
 
-        self.logger.info("Learner inicializado com Double DQN + ε linear")
+        self.logger.info(f"Learner inicializado com Double DQN + ε linear{'' if self.batch_size == BATCH_SIZE else 'TREINAMENTO ONLINE'}")
 
         # ---- buffers de métricas ----
         self.losses = deque(maxlen=500)
@@ -143,11 +145,11 @@ class Learner(AbstractObserver):
     
     @property
     def memory_to_train(self):
-        return [e for e in self.memory if e.action not in ['AUTOMATIC', 'ROUTING']]
+        return self.memory if self.batch_size == BATCH_SIZE else [e for e in self.memory if e.action not in ['AUTOMATIC', 'ROUTING']]
 
     def learn(self):
         # Amostra mini-batch
-        batch = random.sample(self.memory_to_train, BATCH_SIZE)
+        batch = random.sample(self.memory_to_train, self.batch_size)
         states, actions, rewards, next_states, dones = zip(*batch)
 
         states = torch.FloatTensor([self.state_space.to_array(s) for s in states])
@@ -178,8 +180,8 @@ class Learner(AbstractObserver):
         self.losses.append(loss.item())
         self.rewards.extend(rewards.squeeze().tolist())
         self.q_values.extend(current_q.detach().squeeze().tolist())
-
-        if self.global_step % 1000 == 0:  # log periódico
+        freq = 100 if self.batch_size == BATCH_SIZE else 10
+        if self.global_step % freq == 0:  # log periódico
             avg_loss = np.mean(list(self.losses)) if self.losses else 0
             avg_reward = np.mean(list(self.rewards)) if self.rewards else 0
             avg_q = np.mean(list(self.q_values)) if self.q_values else 0
@@ -198,7 +200,7 @@ class Learner(AbstractObserver):
         self.global_step += 1
 
         # treina só se tiver memória suficiente
-        if len(self.memory_to_train) >= BATCH_SIZE:
+        if len(self.memory_to_train) >= self.batch_size:
             self.learn()
 
         # atualização periódica da rede alvo
