@@ -1,8 +1,8 @@
-from models.railroad import Railroad
+from models.des_model import DESModel
 from models.TFRState import TFRState, TrainState, ConstraintState, FlowState, TFRStateSpace
 from models.states import ActivityState
 
-def TFRStateFactory(railroad: Railroad, is_initial=False, tfr_class = TFRState) -> TFRState:
+def TFRStateFactory(railroad: DESModel, is_initial=False, tfr_class = TFRState) -> TFRState:
         trains = [
             TrainState(
                 name=t.ID,
@@ -40,7 +40,7 @@ def TFRStateFactory(railroad: Railroad, is_initial=False, tfr_class = TFRState) 
         )
         return state
 
-def TFRStateSpaceFactory(railroad: Railroad) -> TFRStateSpace:
+def TFRStateSpaceFactory(railroad: DESModel) -> TFRStateSpace:
     space = TFRStateSpace(
         mesh_edges=[
             (t.origin.name, t.destination.name) 
