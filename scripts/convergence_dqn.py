@@ -71,7 +71,7 @@ with open(file_name, "w", encoding='utf-8') as f:
 
 # --- AQUI COMEÇA A PARTE DO SERVIDOR HTTP ---
 
-PORT = 8000
+PORT = 8001
 Handler = http.server.SimpleHTTPRequestHandler
 
 def start_server():

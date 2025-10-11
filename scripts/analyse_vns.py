@@ -12,7 +12,7 @@ import time
 from datetime import datetime
 
 
-df = pd.read_csv('logs/vns/vns_05out_17h.log', sep='|').reset_index()
+df = pd.read_csv('logs/vns/vns.log', sep='|').reset_index()
 df.columns=['time', 'neighborhood', 'neitgborhood_type', 'fitness', 'is_local_optimal', 'start', 'end', 'simulation_time', 'c']
 df['fitness'] = df['fitness'].apply(lambda x:None if 'fitness_logistic_time' not in x else float(x[len('fitness_logistic_time=')+1:]))
 df['is_local_optimal'] = df['is_local_optimal'].apply(lambda x:False if 'False' in x else True)
@@ -23,7 +23,7 @@ df['time'] = pd.to_datetime(df['time'].apply(lambda x:x[:len('2025-10-05 12:00:2
 df = df.set_index('time')
 
 # Cria os gráficos separadamente, usando o índice (timestamp) no eixo X
-fig1 = px.line(df, x=df.index, y="fitness", title="Busca de melehor tempo", markers=True)
+fig1 = px.scatter(df, x=df.index, y="fitness", title="Busca de melehor tempo", color='neitgborhood_type')
 fig2 = px.line(df[df['is_local_optimal']], x=df[df['is_local_optimal']].index, y="fitness", title="Busca de melehor tempo", markers=True)
 fig3 = px.histogram(df, x="simulation_time", title="Tempo de simulação")
 # fig3 = px.line(df, x=df.index, y="Q_avg", title="Valor Médio de Q", markers=True)
@@ -55,7 +55,7 @@ with open(file_name, "w", encoding='utf-8') as f:
 
 # --- AQUI COMEÇA A PARTE DO SERVIDOR HTTP ---
 
-PORT = 8002
+PORT = 8003
 Handler = http.server.SimpleHTTPRequestHandler
 
 def start_server():
