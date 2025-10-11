@@ -188,9 +188,9 @@ class Learner(AbstractObserver):
             self.logger.info(
                 f"[step={self.global_step}] "
                 f"ε={self.epsilon:.3f} | "
-                f"loss={avg_loss:.4f} | "
-                f"reward_avg={avg_reward:.2f} | "
-                f"Q_avg={avg_q:.2f}"
+                f"loss={avg_loss:.6f} | "
+                f"reward_avg={avg_reward:.6f} | "
+                f"Q_avg={avg_q:.6f}"
             )
 
     def update(self, experience=None):
@@ -206,6 +206,7 @@ class Learner(AbstractObserver):
         # atualização periódica da rede alvo
         if self.global_step % self.target_update_freq == 0:
             self.target_net.load_state_dict(self.policy_net.state_dict())
+            self.logger.info('Target net Updated!')
 
         # atualização do epsilon (linear)
         fraction = min(self.global_step / self.epsilon_decay_steps, 1.0)
