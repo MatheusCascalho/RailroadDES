@@ -1,10 +1,13 @@
 from abc import abstractmethod
 from datetime import timedelta
 from random import randint
+import stat
 from typing import Callable, Generator
+import torch
 
 from dataclasses import dataclass
 from copy import copy
+from models.DQNRouter import Learner
 from models.demand import Flow
 from models.solution_based_router import Solution, SolutionBasedRouter
 import numpy as np
@@ -22,9 +25,11 @@ class Neighborhood:
 
 
 class SwapToFast(Neighborhood):
-    def __init__(self, solution: Solution, router: SolutionBasedRouter) -> None:
+    def __init__(self, solution: Solution, router: SolutionBasedRouter, learner: Learner, k) -> None:
         super().__init__(solution)
         self.router = router
+        self.learner = learner
+        self.k = k
 
     def neighborhood(self):
         solution_size = len(self.solution.flow_sequence)
@@ -35,19 +40,61 @@ class SwapToFast(Neighborhood):
                 continue
             if penalties[worst_index] == timedelta():
                 break
-            cycle_times =np.array([
-                self.router.get_cycle_time(f).total_seconds()
-                for f in self.solution.flow_sequence[worst_index+1:]
-            ])
-            same_flow = np.array(self.solution.flow_sequence[worst_index+1:])==self.solution.flow_sequence[worst_index]
-            cycle_times[same_flow] = np.inf
-            best_index = worst_index + np.argmin(cycle_times) + 1
-            new_solution = copy(self.solution.flow_sequence)
-            new_solution[worst_index] = self.solution.flow_sequence[best_index]
-            new_solution[best_index] = self.solution.flow_sequence[worst_index]
-            new_solution = Solution(flow_sequence=new_solution)
-            yield new_solution
+            if self.k == 'DQN':
+                state = self.router.choosed_tasks[worst_index].model_state
+            else:
+                state = None
+            if state is not None:
+                flow = self.choose_flow(state=state, current_flow=self.solution.flow_sequence[worst_index])
+                new_solution = copy(self.solution.flow_sequence)
+                new_solution.append(new_solution[worst_index])
+                new_solution[worst_index] = flow #self.solution.flow_sequence[best_index]
+                # new_solution[best_index] = self.solution.flow_sequence[worst_index]
+                new_solution = Solution(flow_sequence=new_solution)
+                yield new_solution
+            else:
+                cycle_times =np.array([
+                    self.router.get_cycle_time(f).total_seconds()
+                    for f in self.solution.flow_sequence[worst_index+1:]
+                ])
+                same_flow = np.array(self.solution.flow_sequence[worst_index+1:])==self.solution.flow_sequence[worst_index]
+                cycle_times[same_flow] = np.inf
+                best_index = worst_index + np.argmin(cycle_times) + 1
+                new_solution = copy(self.solution.flow_sequence)
+                new_solution[worst_index] = self.solution.flow_sequence[best_index]
+                new_solution[best_index] = self.solution.flow_sequence[worst_index]
+                new_solution = Solution(flow_sequence=new_solution)
+                yield new_solution
             penalties[worst_index] = timedelta()
+
+    def choose_flow(self, state, current_flow):
+        state = self.learner.state_space.to_array(state)
+        state = torch.FloatTensor(state).unsqueeze(0)
+        # demand_index = self.policy_net(state).argmax().item()
+        # selected_demand = self.action_space.get_demand(demand_index)
+        # Passa o estado pela rede
+        q_values = self.learner.policy_net(state).detach().cpu().numpy().flatten()
+
+        # Ordena os índices das ações pelo valor Q (do maior para o menor)
+        sorted_indices = q_values.argsort()[::-1]
+
+        # Se quiser, também pode obter os Q-values ordenados:
+        sorted_q_values = q_values[sorted_indices]
+
+        # Exemplo: selecionar o melhor, o segundo melhor, etc.
+        i = 0
+        while i < len(self.learner.action_space.demands):
+            best_action_index = sorted_indices[i]
+            try:
+                # Exemplo: obter a ação correspondente ao melhor Q
+                selected_demand = self.learner.action_space.get_demand(best_action_index)
+                if selected_demand.flow == current_flow:
+                    i += 1
+                    continue
+                return selected_demand.flow
+            except:
+                i += 1        
+
 
 
 class Move(Neighborhood):
@@ -168,6 +215,7 @@ class VNSalgorithm:
             if fitness < self.current_fitness:
                 self.solution = neighbor
                 self.current_fitness = fitness
+                self.logger.info(f'Current Best Solution: {self.solution}')
                 return neighbor, fitness
         return self.solution, self.current_fitness
 
@@ -188,6 +236,8 @@ class VNSalgorithm:
                             k = 0  # volta à primeira vizinhança
                     else:
                         k += 1
+                    if self.current_fitness <= 31:
+                        break
                 except StopIteration:
                     self.neighborhoods.append(Move(self.solution).neighborhood)
                     self.neighborhoods_structures.append(Move)
