@@ -16,6 +16,8 @@ from models.pickle_debugger import find_pickle_issues as find_unpicklables
 import logging
 import numpy as np
 
+VERBOSE = False
+
 
 def memory_id_gen():
     i = 0
@@ -128,18 +130,18 @@ class RailroadEvolutionMemory(AbstractSubject):
             balance = element.next_state.railroad_balance()
             self.cumulated_reward += element.reward
             simulation_ellapsed = (self.railroad.mesh.load_points[0].clock.current_time - self.initial_time).total_seconds()/(60*60)
-
-            self.logger.info(
-                f"mem_id={self.mem_id} | "
-                f"mem_size={len(self._memory)} | "
-                f"queues[h]={queues:.4f} | "
-                f"current_reward={element.reward:.5f} | "
-                f"cumulated_reward={self.cumulated_reward:.5f} | "
-                f"operated_volume={opvol:.2f} | "
-                f"demand={demand:.2f} | "
-                f"balance={balance} | "
-                f"simulation_time[h]={simulation_ellapsed:.2f}"
-            )
+            if VERBOSE:
+                self.logger.info(
+                    f"mem_id={self.mem_id} | "
+                    f"mem_size={len(self._memory)} | "
+                    f"queues[h]={queues:.4f} | "
+                    f"current_reward={element.reward:.5f} | "
+                    f"cumulated_reward={self.cumulated_reward:.5f} | "
+                    f"operated_volume={opvol:.2f} | "
+                    f"demand={demand:.2f} | "
+                    f"balance={balance} | "
+                    f"simulation_time[h]={simulation_ellapsed:.2f}"
+                )
 
 
     def __repr__(self):
