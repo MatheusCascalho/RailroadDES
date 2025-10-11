@@ -28,10 +28,12 @@ import os
 from time import sleep
 from dataclasses import dataclass
 import cProfile
+from memory_profiler import profile
+
 
 warnings.filterwarnings('ignore')
 # N_EPISODES = 10
-EPISODES_BY_PROCESS = 100
+EPISODES_BY_PROCESS = 25
 NUM_PROCESSES = max(1, multiprocessing.cpu_count() - 5)
 TRAINING_STEPS = 100
 base_model = 'tests/artifacts/model_to_train_15_sim_v2.dill'
@@ -41,8 +43,8 @@ base_model = 'tests/artifacts/model_to_train_15_sim_v2.dill'
 # policy_net_path='serialized_models/dqn/policy_net_BALANCE_parallel_simple_model.dill'
 # target_net_path='serialized_models/dqn/target_net_BALANCE_parallel_simple_model.dill'
 
-policy_net_path='serialized_models/dqn/policy_net_15_trains_normalized_reward.dill'
-target_net_path='serialized_models/dqn/target_net_15_trains_normalized_reward.dill'
+policy_net_path='serialized_models/dqn/policy_net_15_trains_10out25.pytorch'
+target_net_path='serialized_models/dqn/target_net_15_trains_10out25.pytorch'
 
 
 
@@ -54,7 +56,7 @@ class OutputData:
     process_id: int
     episode_number: int
 
-def profile(func):
+def proc_profile(func):
     def wrapper(*args, **kwargs):
         profiler = cProfile.Profile()
         profiler.enable()
@@ -115,7 +117,7 @@ def logging_loop(stop_event, output_queue):
             # sleep(.1)
             continue
 
-def run_episode(episode_number, output_queue: DillQueue, is_training=True):
+def run_episode(episode_number, output_queue: DillQueue, is_training=True, experience_queue=None):
     with open(base_model, 'rb') as f:
         model = dill.load(f)
     state_space = TFRStateSpaceFactory(model)
@@ -138,21 +140,23 @@ def run_episode(episode_number, output_queue: DillQueue, is_training=True):
 
         action_space = ActionSpace(model.demands)
         def always_the_same():
-            yield model.demands[1]
-            i = random.randint(0,1)
-            yield model.demands[i]
-
+            i = 0
             while True:
-                yield action_space.sample()
+                yield model.demands[i]#action_space.sample()
+                i += 1
+                if i >= len(model.demands):
+                    i = 0
         alws = always_the_same()
         learner = Learner(
             state_space=state_space,
             action_space=ActionSpace(model.demands),
             policy_net_path=policy_net_path,
             target_net_path=target_net_path,
-            epsilon_decay_steps=50,
-            epsilon_start=0,#.9,
-            epsilon_end=0
+            epsilon_decay_steps=900,
+            epsilon_start=0.9,
+            epsilon_end=0,
+            batch_size=100 if is_training else 15,
+            target_update_freq=100
         )
         local_memory.add_observers([learner])
         
@@ -187,64 +191,68 @@ def run_episode(episode_number, output_queue: DillQueue, is_training=True):
 
 
 # @profile
-def run_training_loop(output_queue, is_training=True):
-    for episode in range(EPISODES_BY_PROCESS):
+def run_training_loop(output_queue, is_training=True, episodes_by_process=EPISODES_BY_PROCESS, experience_queue=None):
+    for episode in range(episodes_by_process):
         run_episode(
             episode_number=episode,
             output_queue=output_queue,
-            is_training=is_training
+            is_training=is_training,
+            experience_queue=experience_queue
         )
     info(f"Trainamento do processo {os.getpid()} finalizado!")
 
-def training_process_wrapper(output_queue):
-    p = Process(target=run_training_loop, args=(output_queue,))
+def training_process_wrapper(output_queue, experience_queue):
+    p = Process(target=run_training_loop, args=(output_queue,True, EPISODES_BY_PROCESS, experience_queue,))
     return p
 
+
+def random_search():
+    with Manager() as manager:
+        output_queue = manager.Queue()
+        experience_queue = manager.Queue()
+        stop_signal_log = Event()
+
+        # iniciar processo
+        logging_process = Process(target=logging_loop, args=(stop_signal_log, output_queue))
+        logging_process.start()
+        logging_pid = logging_process.pid
+        stop_signal = Event()
+        save_signal = Event()
+
+        learner_process = Process(target=learning_loop, args=(experience_queue, stop_signal, save_signal))
+        learner_process.start()
+
+        for step in range(TRAINING_STEPS):
+            save_signal.clear()
+            # Inicia os processos dos atores
+            actor_processes = [
+                training_process_wrapper(output_queue, experience_queue)
+                for _ in range(NUM_PROCESSES)
+            ]
+
+            for proc in actor_processes:
+                proc.start()
+
+            # Aguarda os atores terminarem
+            for proc in actor_processes:
+                proc.join()
+            save_signal.set()
+            sleep(.5)
+        # sleep(1)
+        stop_signal.set()
+        learner_process.join()
+        stop_signal.clear()
+
+        # while not output_queue.empty():
+        #     continue
+        stop_signal_log.set()
+        logging_process.join()
 
 if __name__ == '__main__':
     is_training = False
     if is_training:
-        with Manager() as manager:
-            output_queue = manager.Queue()
-            experience_queue = manager.Queue()
-            stop_signal_log = Event()
-
-            # iniciar processo
-            logging_process = Process(target=logging_loop, args=(stop_signal_log, output_queue))
-            logging_process.start()
-            logging_pid = logging_process.pid
-            stop_signal = Event()
-            save_signal = Event()
-
-            learner_process = Process(target=learning_loop, args=(experience_queue, stop_signal, save_signal))
-            learner_process.start()
-
-            for step in range(TRAINING_STEPS):
-                save_signal.clear()
-                # Inicia os processos dos atores
-                actor_processes = [
-                    training_process_wrapper(output_queue)
-                    for _ in range(NUM_PROCESSES)
-                ]
-
-                for proc in actor_processes:
-                    proc.start()
-
-                # Aguarda os atores terminarem
-                for proc in actor_processes:
-                    proc.join()
-                save_signal.set()
-                sleep(.5)
-            # sleep(1)
-            stop_signal.set()
-            learner_process.join()
-            stop_signal.clear()
-
-            # while not output_queue.empty():
-            #     continue
-            stop_signal_log.set()
-            logging_process.join()
+        random_search()
     else:
-        run_training_loop(None, is_training=False)
+        run_training_loop(None, is_training=False, episodes_by_process=100)
         print('Finish"')
 
