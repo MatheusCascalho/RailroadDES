@@ -12,18 +12,69 @@ import time
 from datetime import datetime
 
 
-df = pd.read_csv('logs/vns/vns.log', sep='|').reset_index()
-df.columns=['time', 'neighborhood', 'neitgborhood_type', 'fitness', 'is_local_optimal', 'start', 'end', 'simulation_time', 'c']
-df['fitness'] = df['fitness'].apply(lambda x:None if 'fitness_logistic_time' not in x else float(x[len('fitness_logistic_time=')+1:]))
-df['is_local_optimal'] = df['is_local_optimal'].apply(lambda x:False if 'False' in x else True)
-df['simulation_time'] = df['simulation_time'].apply(lambda x:float(x[len('simulation_time=')+1:]))
-df['time'] = pd.to_datetime(df['time'].apply(lambda x:x[:len('2025-10-05 12:00:23,310')]))
+# df = pd.read_csv('logs/vns/vns_FINAL.log', sep='|').reset_index()
+# df.columns=['time', 'neighborhood', 'neitgborhood_type', 'fitness', 'is_local_optimal', 'start', 'end', 'simulation_time', 'c']
+# df['fitness'] = df['fitness'].apply(lambda x:None if 'fitness_logistic_time' not in x else float(x[len('fitness_logistic_time=')+1:]))
+# df['is_local_optimal'] = df['is_local_optimal'].apply(lambda x:False if 'False' in x else True)
+# df['simulation_time'] = df['simulation_time'].apply(lambda x:float(x[len('simulation_time=')+1:]))
+# df['time'] = pd.to_datetime(df['time'].apply(lambda x:x[:len('2025-10-05 12:00:23,310')]))
 
+import re
+import pandas as pd
+
+def read_vns_log(file_path: str) -> pd.DataFrame:
+    """
+    Lê logs no formato:
+    2025-10-11 06:09:53,855 [INFO] [step=2] k=2 | neighbor=0 | neighborhood=SimToSwapCycle.<locals>.wrapper | fitness_logistic_time=64.19 | is_local_optimal=False | start=1760173779.4603 | end=1760173793.8550 | simulation_time=14.3947 |
+
+    Retorna:
+        pd.DataFrame com uma linha por evento de log e colunas nomeadas.
+    """
+    
+    # Lê o conteúdo do arquivo
+    with open(file_path, "r") as f:
+        log_data = f.read()
+    
+    # Regex que captura dinamicamente todos os campos nomeados
+    pattern = re.compile(
+        r'(?P<datetime>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3}) '
+        r'\[INFO\] \[step=(?P<step>\d+)\] '
+        r'k=(?P<k>\d+) \| '
+        r'neighbor=(?P<neighbor>\d+) \| '
+        r'neighborhood=(?P<neighborhood>[\w.<>\-]+) \| '
+        r'fitness_logistic_time=(?P<fitness_logistic_time>-?[\d.]+) \| '
+        r'is_local_optimal=(?P<is_local_optimal>\w+) \| '
+        r'start=(?P<start>[\d.]+) \| '
+        r'end=(?P<end>[\d.]+) \| '
+        r'simulation_time=(?P<simulation_time>[\d.]+)'
+    )
+
+    # Extrair todas as correspondências
+    matches = [m.groupdict() for m in pattern.finditer(log_data)]
+
+    # Criar DataFrame
+    df = pd.DataFrame(matches)
+
+    # Conversão de tipos
+    if not df.empty:
+        df["time"] = pd.to_datetime(df["datetime"], format="%Y-%m-%d %H:%M:%S,%f")
+        df["step"] = df["step"].astype(int)
+        df["k"] = df["k"].astype(int)
+        df["neitgborhood_type"] = df["neighbor"].astype(int)
+        df["fitness"] = df["fitness_logistic_time"].astype(float)
+        df["is_local_optimal"] = df["is_local_optimal"].map({"True": True, "False": False})
+        df["start"] = df["start"].astype(float)
+        df["end"] = df["end"].astype(float)
+        df["simulation_time"] = df["simulation_time"].astype(float)
+
+    return df
+df = read_vns_log(file_path='logs/vns/vns_FINAL.log')
+df.to_csv('resultado_vns.csv')
 # Define a coluna 'timestamp' como o índice do DataFrame
 df = df.set_index('time')
 
 # Cria os gráficos separadamente, usando o índice (timestamp) no eixo X
-fig1 = px.scatter(df, x=df.index, y="fitness", title="Busca de melehor tempo", color='neitgborhood_type')
+fig1 = px.scatter(df, x=df.index, y="fitness", title="Busca de melehor tempo", color='neighborhood')
 fig2 = px.line(df[df['is_local_optimal']], x=df[df['is_local_optimal']].index, y="fitness", title="Busca de melehor tempo", markers=True)
 fig3 = px.histogram(df, x="simulation_time", title="Tempo de simulação")
 # fig3 = px.line(df, x=df.index, y="Q_avg", title="Valor Médio de Q", markers=True)
@@ -55,7 +106,7 @@ with open(file_name, "w", encoding='utf-8') as f:
 
 # --- AQUI COMEÇA A PARTE DO SERVIDOR HTTP ---
 
-PORT = 8003
+PORT = 8004
 Handler = http.server.SimpleHTTPRequestHandler
 
 def start_server():
