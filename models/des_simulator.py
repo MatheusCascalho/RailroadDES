@@ -37,24 +37,18 @@ class DESSimulator(Entity, DESSimulatorInterface):
         end_date = self.initial_date + time_horizon
         while not self.calendar.is_empty and self.current_date <= end_date:
             # get next event and execute callback
+            event = self.calendar.pop()
+            self.clock.jump(event.time_until_happen)
+            self.calendar.update_events(time_step=event.time_until_happen)
             try:
-                event = self.calendar.pop()
-                self.clock.jump(event.time_until_happen)
-                self.calendar.update_events(time_step=event.time_until_happen)
-                try:
-                    event.callback(**event.data)
-                except FinishedTravelException as error:
-                    self.model.solver_exceptions(exception=error, event=event, simulator=self)
-                    event.callback(**event.data)
-                except NotCompletedEvent as error:
-                    event.reschedule(time_to_happen=timedelta(hours=1))
-                    self.calendar.push(time=timedelta(hours=1), event=event, callback=None)
-                if all([d.is_completed for d in model.router.demands]):
-                    break
-            # except Exception as e:
-            #     print("Forced Stop")
-            #     break
-            except DivisionByZero:
+                event.callback(**event.data)
+            except FinishedTravelException as error:
+                self.model.solver_exceptions(exception=error, event=event, simulator=self)
+                event.callback(**event.data)
+            except NotCompletedEvent as error:
+                event.reschedule(time_to_happen=timedelta(hours=1))
+                self.calendar.push(time=timedelta(hours=1), event=event, callback=None)
+            if all([d.is_completed for d in model.router.demands]):
                 break
         debug(f"Finish simulation")
 

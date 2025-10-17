@@ -65,6 +65,11 @@ class Router(ABC):
             starts_moving=is_moving
         )
         return task
+    
+    def save(self, file: str):
+        decisions = [asdict(t.demand.flow) for t in self.completed_tasks]
+        with open(file, 'w') as f:
+            json.dump(decisions, f, indent=2, ensure_ascii=False)
 
 class RandomRouter(Router):
     def __init__(self, demands):
@@ -83,10 +88,7 @@ class RandomRouter(Router):
 
         return task
 
-    def save(self, file: str):
-        decisions = [asdict(t.demand.flow) for t in self.completed_tasks]
-        with open(file, 'w') as f:
-            json.dump(decisions, f, indent=2, ensure_ascii=False)
+
 
 class TaskSpy(AbstractObserver):
     def __init__(self, recorder, phisical_state, valuable_state, previous_flow):

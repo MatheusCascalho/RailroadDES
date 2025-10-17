@@ -4,7 +4,7 @@ import dill
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-from models.router import RepeatedRouter, ChainedHistoryRouter
+from models.router import RandomRouter, RepeatedRouter, ChainedHistoryRouter
 from models.demand import Flow
 from models.stock_graphic import StockGraphic
 from tests.artifacts.railroad_artifacts import create_model
@@ -15,25 +15,47 @@ from models.operated_volume import OperatedVolume
 from datetime import timedelta
 from models.clock import Clock
 from datetime import datetime
+from models.solution_based_router import Solution, SolutionBasedRouter
+from scripts.get_best_solutions import extrair_listas_best_solution
+import os
+os.environ["STREAMLIT_SERVER_FILE_WATCHER_TYPE"] = "none"
+
+base_model = 'tests/artifacts/model_to_train_15_sim_v2.dill'
+
+caminho = "logs/vns/vns_FINAL.log"  # substitua pelo caminho do seu arquivo
+resultados = extrair_listas_best_solution(caminho)
+print(f"{len(resultados)} listas encontradas:")
+# for i, lst in enumerate(resultados, 1):
+#     print(f"{i}: {lst}")
+
 
 st.set_page_config(layout="wide")
 
 # Título da página
 st.title("Simulação Ferroviária")
 
-def simulate(to_repeat: bool):
+def simulate(to_repeat: bool, sequence):
     sim = DESSimulator(clock=Clock(start=datetime(2025,4,1), discretization=timedelta(hours=1)))
     # model = create_model(sim=sim, n_trains=3)
-    with open('tests/artifacts/model_2.dill', 'rb') as f:
+    with open(base_model, 'rb') as f:
         model = dill.load(f)
-        model.router = ChainedHistoryRouter(model.router.demands)
+        for up in list(model.mesh.unload_points) + list(model.mesh.load_points):
+            up.stocks['product'].capacity *= 100_00
+        flow_sequence = [d.flow for o in sequence for d in model.router.demands if d.flow.origin == o]
+        solution = Solution(flow_sequence=flow_sequence)
+        model.router = SolutionBasedRouter(
+            demands=model.router.demands,
+            train_size=6e3,
+            railroad_mesh=model.mesh,
+            initial_solution=solution
+        )
         sim.clock = model.mesh.load_points[0].clock
 
     if to_repeat:
         with open('decisions.json', 'r') as f:
             decisions = json.load(f)
         model.router = RepeatedRouter(model.router.demands, to_repeat=[Flow(**d) for d in decisions])
-    sim.simulate(model=model, time_horizon=timedelta(days=20))
+    sim.simulate(model=model, time_horizon=timedelta(days=30))
     decision_map = {s: [{'penalty': t.penalty().total_seconds()/(60*60), 'reward': t.reward()} for t in model.router.decision_map[s]] for s in model.router.decision_map}
 
 
@@ -65,11 +87,12 @@ complete_map = {}
 if st.button("REPETIR"):
     st.session_state.repeat_button = not st.session_state.repeat_button
 if st.session_state.simulate_button:
-    for i in range(r):
-        model = simulate(to_repeat=False)
+    for i, sequence in enumerate(resultados):
+        model = simulate(to_repeat=False, sequence=sequence)
         model.router.save('decisions.json')
         decision_maps.append(model.router.decision_map)
         with open('tests/model_session.dill', 'wb') as f:
+            model.router.flow_sequence = None
             dill.dump(model, f)
 
         gantt = Gantt().build_gantt_with_all_trains(model.trains, final_date=model.mesh.load_points[0].clock.current_time)
@@ -82,14 +105,14 @@ if st.session_state.simulate_button:
         opvol_table = op_vol.operated_volume_by_flow()
         volumes.append({'vol':opvol_table['operated'].sum(), 'df': opvol_table})
 
-        if not complete_map:
-            complete_map = decision_maps[0]
-        else:
-            for key, value in decision_maps[-1].items():
-                if key in complete_map:
-                    complete_map[key].extend(value)
-                else:
-                    complete_map[key] = value
+        # if not complete_map:
+        #     complete_map = decision_maps[0]
+        # else:
+        #     for key, value in decision_maps[-1].items():
+        #         if key in complete_map:
+        #             complete_map[key].extend(value)
+        #         else:
+        #             complete_map[key] = value
 
     with open('tests/decision_map_trained.dill', 'wb') as f:
         dill.dump(complete_map, f)
@@ -101,7 +124,7 @@ if st.session_state.simulate_button:
         dill.dump(volumes, f)
 
 elif st.session_state.repeat_button:
-    model = simulate(to_repeat=True)
+    model = simulate(to_repeat=True, sequence=[])
 
 
 try:
@@ -155,3 +178,6 @@ try:
 
 except Exception as e:
     st.write("Não existe modelo executado!")
+
+# if __name__=='__main__':
+#     simulate(False, [])
