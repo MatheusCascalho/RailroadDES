@@ -4,18 +4,18 @@ import dill
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-from models.router import RandomRouter, RepeatedRouter, ChainedHistoryRouter
-from models.demand import Flow
-from models.stock_graphic import StockGraphic
+from src.router import RandomRouter, RepeatedRouter, ChainedHistoryRouter
+from src.demand import Flow
+from src.stock_graphic import StockGraphic
 from tests.artifacts.railroad_artifacts import create_model
-from models.des_simulator import DESSimulator
+from src.des_simulator import DESSimulator
 from tests.artifacts.stock_node_artifacts import simple_clock
-from models.gantt import Gantt
-from models.operated_volume import OperatedVolume
+from src.gantt import Gantt
+from src.operated_volume import OperatedVolume
 from datetime import timedelta
-from models.clock import Clock
+from src.clock import Clock
 from datetime import datetime
-from models.solution_based_router import Solution, SolutionBasedRouter
+from src.solution_based_router import Solution, SolutionBasedRouter
 from scripts.get_best_solutions import extrair_listas_best_solution
 import os
 os.environ["STREAMLIT_SERVER_FILE_WATCHER_TYPE"] = "none"

@@ -1,12 +1,12 @@
 import pytest
 from datetime import datetime, timedelta
-from models.constants import Process, EventName
-from models.time_table import (
+from src.constants import Process, EventName
+from src.time_table import (
     TimeTable,
     TimeEvent,
     TimeRegister
 )
-from models.exceptions import EventSequenceError, TimeSequenceErro, RepeatedProcessError, AlreadyRegisteredError
+from src.exceptions import EventSequenceError, TimeSequenceErro, RepeatedProcessError, AlreadyRegisteredError
 
 
 

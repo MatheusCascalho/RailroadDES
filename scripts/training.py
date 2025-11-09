@@ -4,15 +4,15 @@ import sys
 sys.path.append('../')
 
 import json
-from models.router import RepeatedRouter, ChainedHistoryRouter
-from models.demand import Flow
-from models.stock_graphic import StockGraphic
+from src.router import RepeatedRouter, ChainedHistoryRouter
+from src.demand import Flow
+from src.stock_graphic import StockGraphic
 from tests.artifacts.railroad_artifacts import create_model
-from models.des_simulator import DESSimulator
-from models.gantt import Gantt
-from models.operated_volume import OperatedVolume
+from src.des_simulator import DESSimulator
+from src.gantt import Gantt
+from src.operated_volume import OperatedVolume
 from datetime import timedelta
-from models.clock import Clock
+from src.clock import Clock
 from datetime import datetime
 import dill
 from tqdm import tqdm

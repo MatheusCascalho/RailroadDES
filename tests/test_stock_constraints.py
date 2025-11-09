@@ -1,8 +1,8 @@
 import pytest
-from models.stock import OwnStock
-from models.clock import Clock
+from src.stock import OwnStock
+from src.clock import Clock
 from datetime import datetime, timedelta
-from models.stock_constraints import StockToLoadTrainConstraint, StockToUnloadTrainConstraint
+from src.stock_constraints import StockToLoadTrainConstraint, StockToUnloadTrainConstraint
 
 
 @pytest.fixture

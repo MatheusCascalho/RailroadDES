@@ -1,9 +1,9 @@
 import pytest
 from datetime import datetime, timedelta
-from models.clock import Clock
-from models.stock import OwnStock
-from models.stock_replanish import SimpleStockReplanisher, ReplenishRate
-from models.exceptions import StockException
+from src.clock import Clock
+from src.stock import OwnStock
+from src.stock_replanish import SimpleStockReplanisher, ReplenishRate
+from src.exceptions import StockException
 
 
 @pytest.fixture

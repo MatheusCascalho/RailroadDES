@@ -1,4 +1,4 @@
-from models.train import Train
+from src.train import Train
 import pytest
 
 

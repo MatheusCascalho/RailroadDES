@@ -1,9 +1,9 @@
-from models.time_table import (
+from src.time_table import (
     TimeTable,
     TimeEvent,
     TimeRegister
 )
-from models.constants import Process, EventName
+from src.constants import Process, EventName
 from datetime import datetime
 import pytest
 

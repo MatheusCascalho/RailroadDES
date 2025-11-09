@@ -2,10 +2,10 @@ import pytest
 from datetime import datetime, timedelta
 from unittest.mock import MagicMock
 import ipdb
-from models.clock import Clock
-from models.constants import EventName
-from models.exceptions import StockException
-from models.stock import OwnStock, StockEvent, StockEventPromise, StockHistory
+from src.clock import Clock
+from src.constants import EventName
+from src.exceptions import StockException
+from src.stock import OwnStock, StockEvent, StockEventPromise, StockHistory
 
 # ============================================
 # Testes StockEvent

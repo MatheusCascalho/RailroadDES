@@ -5,8 +5,8 @@ import os
 import numpy as np
 from collections import defaultdict
 import pandas as pd
-from models.tfr_state_factory import TFRStateSpaceFactory
-from models.action_space import ActionSpace
+from src.tfr_state_factory import TFRStateSpaceFactory
+from src.action_space import ActionSpace
 import networkx as nx
 import matplotlib.pyplot as plt
 # from pyvis.network import Network

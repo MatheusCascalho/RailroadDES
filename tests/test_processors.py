@@ -1,14 +1,14 @@
 import pytest
 from unittest.mock import MagicMock
 from datetime import timedelta, datetime
-from models import model_queue as mq
-from models.clock import Clock
-from models.constants import Process
-from models.node_data_model import ProcessorRate
-from models.stock_constraints import StockToLoadTrainConstraint, StockToUnloadTrainConstraint
-from models.exceptions import ProcessException
-from models.processors import ProcessorSystem, ProcessorSystemBuilder
-from models.states import ProcessorState
+from src import model_queue as mq
+from src.clock import Clock
+from src.constants import Process
+from src.node_data_model import ProcessorRate
+from src.stock_constraints import StockToLoadTrainConstraint, StockToUnloadTrainConstraint
+from src.exceptions import ProcessException
+from src.processors import ProcessorSystem, ProcessorSystemBuilder
+from src.states import ProcessorState
 
 
 @pytest.fixture

@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from pytest import fixture
-from models.clock import Clock
-from models.des_simulator import DESSimulator
+from src.clock import Clock
+from src.des_simulator import DESSimulator
 
 
 class FakeSimulator(DESSimulator):

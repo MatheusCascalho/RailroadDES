@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from datetime import timedelta
-from models.entity import Entity
-from models.clock import Clock
+from src.entity import Entity
+from src.clock import Clock
 
 
 class NodeInterface(Entity, ABC):

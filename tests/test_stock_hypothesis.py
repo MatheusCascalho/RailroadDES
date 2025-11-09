@@ -2,9 +2,9 @@ import pytest
 from hypothesis import given, strategies as st, assume, example
 from datetime import datetime, timedelta
 
-from models.clock import Clock
-from models.constants import EventName
-from models.stock import OwnStock, StockEventPromise
+from src.clock import Clock
+from src.constants import EventName
+from src.stock import OwnStock, StockEventPromise
 
 # ============================================
 # Estratégias auxiliares

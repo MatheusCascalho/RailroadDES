@@ -1,7 +1,7 @@
 from pytest import fixture
-from models.node_data_model import StockNodeData
-from models.node_factory import NodeStockFactory
-from models.clock import Clock
+from src.node_data_model import StockNodeData
+from src.node_factory import NodeStockFactory
+from src.clock import Clock
 from datetime import datetime, timedelta
 
 @fixture

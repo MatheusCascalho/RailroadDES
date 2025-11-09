@@ -1,23 +1,23 @@
 import pytest
 from datetime import timedelta
 
-from models.DQNRouter import DQNRouter
-from models.event import DecoratedEventFactory
-from models.event_calendar import EventCalendar
-from models.exceptions import TrainExceptions
+from src.DQNRouter import DQNRouter
+from src.event import DecoratedEventFactory
+from src.event_calendar import EventCalendar
+from src.exceptions import TrainExceptions
 from hypothesis import given, strategies as st
 from hypothesis import HealthCheck, settings
-from models.operated_volume import OperatedVolume
-from models.railroad_mesh import TransitTime, RailroadMesh
+from src.operated_volume import OperatedVolume
+from src.railroad_mesh import TransitTime, RailroadMesh
 # from tests.artifacts.train_artifacts import simple_train
-from models.demand import Demand, Flow
-from models.railroad import Railroad
-from models.des_simulator import DESSimulator
-from models.gantt import Gantt
-from models.stock_graphic import StockGraphic
-from models.system_evolution_memory import RailroadEvolutionMemory
-from models.tfr_state_factory import TFRStateSpaceFactory
-from models.target import SimpleTargetManager
+from src.demand import Demand, Flow
+from src.railroad import Railroad
+from src.des_simulator import DESSimulator
+from src.gantt import Gantt
+from src.stock_graphic import StockGraphic
+from src.system_evolution_memory import RailroadEvolutionMemory
+from src.tfr_state_factory import TFRStateSpaceFactory
+from src.target import SimpleTargetManager
 from tests.artifacts.simulator_artifacts import FakeSimulator
 from pytest import mark
 import dill
