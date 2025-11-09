@@ -1,8 +1,8 @@
 import pytest
-from src.stock import OwnStock
-from src.clock import Clock
+from src.domain.entities.stock import OwnStock
+from src.simulation.clock import Clock
 from datetime import datetime, timedelta
-from src.stock_constraints import StockToLoadTrainConstraint, StockToUnloadTrainConstraint
+from src.domain.constraints.stock_constraints import StockToLoadTrainConstraint, StockToUnloadTrainConstraint
 
 
 @pytest.fixture

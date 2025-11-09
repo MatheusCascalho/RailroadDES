@@ -1,18 +1,18 @@
 import json
 
 import pytest
-from src.model_queue import Queue
-from src.constants import Process
-from src.node import Node
+from src.domain.entities.model_queue import Queue
+from src.domain.constants import Process
+from src.domain.entities.node import Node
 from faker import Faker
 from factory import Factory, LazyAttribute
-from src.node_data_model import StockData, ProcessorRate, StockNodeData, RateData
+from src.domain.entities.node_data_model import StockData, ProcessorRate, StockNodeData, RateData
 from faker_food import FoodProvider
-from src.railroad_mesh import RailroadMesh
-from src.node_factory import NodeStockFactory
-from src.clock import Clock
+from src.domain.entities.railroad_mesh import RailroadMesh
+from src.domain.factories.node_factory import NodeStockFactory
+from src.simulation.clock import Clock
 from datetime import datetime, timedelta
-from src.railroad_mesh import TransitTime
+from src.domain.entities.railroad_mesh import TransitTime
 
 
 @pytest.fixture

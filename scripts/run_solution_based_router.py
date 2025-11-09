@@ -1,15 +1,15 @@
 import dill
 from torch import mode
-from src.DQNRouter import Learner
-from src.action_space import ActionSpace
-from src.event import DecoratedEventFactory, Event
-from src.event_calendar import EventCalendar
+from src.control.memory_based_control.reinforcement_learning.DQNRouter import Learner
+from src.control.memory_based_control.reinforcement_learning.action_space import ActionSpace
+from src.events.event import DecoratedEventFactory, Event
+from src.simulation.event_calendar import EventCalendar
 from src.des_simulator import DESSimulator
-from src.solution_based_router import SolutionBasedRouter
+from src.control.solution_based_control.solution_based_router import SolutionBasedRouter
 from datetime import timedelta
-from src.VNS import VNSalgorithm, SwapToFast, Move
-from src.system_evolution_memory import RailroadEvolutionMemory
-from src.tfr_state_factory import TFRStateFactory, TFRStateSpaceFactory
+from src.optimization.VNS import VNSalgorithm, SwapToFast, Move
+from src.control.memory_based_control.system_evolution_memory import RailroadEvolutionMemory
+from src.control.memory_based_control.reinforcement_learning.tfr_state_factory import TFRStateFactory, TFRStateSpaceFactory
 
 SECONDS_IN_DAY = 60*60*24
 base_model = 'tests/artifacts/model_to_train_15_sim_v2.dill'

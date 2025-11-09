@@ -1,7 +1,7 @@
-from src.railroad_mesh import RailSegment
-from src.time_table import EventName, TimeEvent
+from src.domain.entities.railroad_mesh import RailSegment
+from src.domain.entities.time_table import EventName, TimeEvent
 from datetime import datetime, timedelta
-from src.arrive_scheduler import ArriveScheduler
+from src.events.arrive_scheduler import ArriveScheduler
 from unittest.mock import MagicMock
 from pytest import mark
 

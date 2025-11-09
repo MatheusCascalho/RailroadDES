@@ -1,4 +1,4 @@
-from src.constants import Process
+from src.domain.constants import Process
 from tests.artifacts.node_artifacts import mock_train, mock_simulator, mock_slot, basic_node
 
 

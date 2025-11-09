@@ -1,11 +1,11 @@
-from src.railroad_mesh import TransitTime, RailroadMesh
-from src.railroad import Railroad
+from src.domain.entities.railroad_mesh import TransitTime, RailroadMesh
+from src.domain.entities.railroad import Railroad
 from faker import Faker
 from factory import Factory, LazyAttribute
 import json
 from pytest import fixture
-from src.demand import Demand, Flow
-from src.router import RandomRouter
+from src.domain.entities.demand import Demand, Flow
+from src.control.router import RandomRouter
 from random import randint
 
 # Inicializando o Faker fora da Factory

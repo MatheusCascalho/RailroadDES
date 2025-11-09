@@ -1,9 +1,9 @@
-from src.time_table import (
+from src.domain.entities.time_table import (
     TimeTable,
     TimeEvent,
     TimeRegister
 )
-from src.constants import Process, EventName
+from src.domain.constants import Process, EventName
 from datetime import datetime
 import pytest
 

@@ -5,8 +5,8 @@ import os
 import numpy as np
 from collections import defaultdict
 import pandas as pd
-from src.tfr_state_factory import TFRStateSpaceFactory
-from src.action_space import ActionSpace
+from src.control.memory_based_control.reinforcement_learning.tfr_state_factory import TFRStateSpaceFactory
+from src.control.memory_based_control.reinforcement_learning.action_space import ActionSpace
 import networkx as nx
 import matplotlib.pyplot as plt
 # from pyvis.network import Network

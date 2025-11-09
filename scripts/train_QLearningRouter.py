@@ -1,29 +1,29 @@
 import sys
 from concurrent.futures.process import ProcessPoolExecutor
 
-from src.TFRState import TFRBalanceState
+from src.control.memory_based_control.reinforcement_learning.TFRState import TFRBalanceState
 
 # Adicionando o diretório ao sys.path
 sys.path.append('')
 sys.path.append('.')
 import random
-from src.QLearningRouter import QRouter, QTable
-from src.action_space import ActionSpace
-from src.tfr_state_factory import TFRStateFactory, TFRStateSpaceFactory
-from src.system_evolution_memory import RailroadEvolutionMemory, ExperienceProducer
-from src.event import DecoratedEventFactory
-from src.event_calendar import EventCalendar
+from src.control.memory_based_control.QLearningRouter import QRouter, QTable
+from src.control.memory_based_control.reinforcement_learning.action_space import ActionSpace
+from src.control.memory_based_control.reinforcement_learning.tfr_state_factory import TFRStateFactory, TFRStateSpaceFactory
+from src.control.memory_based_control.system_evolution_memory import RailroadEvolutionMemory, ExperienceProducer
+from src.events.event import DecoratedEventFactory
+from src.simulation.event_calendar import EventCalendar
 from src.des_simulator import DESSimulator
 import dill
 from datetime import datetime, timedelta
-from src.clock import Clock
+from src.simulation.clock import Clock
 from tqdm import tqdm
 from logging import info, critical, error
 import warnings
-from src.target import SimpleTargetManager
+from src.control.target_based_control.target import SimpleTargetManager
 from multiprocessing import Event, Process, Pool, Manager
 import multiprocessing
-from src.dill_queue import DillQueue
+from scripts.dill_queue import DillQueue
 import os
 from time import sleep
 from dataclasses import dataclass

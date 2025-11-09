@@ -1,4 +1,4 @@
-from src.train import Train
+from src.domain.entities.train import Train
 import pytest
 
 

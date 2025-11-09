@@ -1,8 +1,8 @@
-from src.TFRState import TFRState, TFRStateSpace, TFRBalanceState
-from src.tfr_state_factory import TFRStateFactory, TFRStateSpaceFactory
+from src.control.memory_based_control.reinforcement_learning.TFRState import TFRState, TFRStateSpace, TFRBalanceState
+from src.control.memory_based_control.reinforcement_learning.tfr_state_factory import TFRStateFactory, TFRStateSpaceFactory
 import dill
 from src.des_simulator import DESSimulator
-from src.clock import Clock
+from src.simulation.clock import Clock
 from datetime import datetime, timedelta
 
 base_model = 'tests/artifacts/simple_model_to_train_1_sim_v2.dill'

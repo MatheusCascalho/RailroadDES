@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from asyncio import Task
-from src.observers import SubjectWithOnlyOneObserver
+from src.domain.observers import SubjectWithOnlyOneObserver
 
 
 class TrainInterface(SubjectWithOnlyOneObserver):

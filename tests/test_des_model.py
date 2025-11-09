@@ -1,3 +1,3 @@
-from src.railroad import Railroad
+from src.domain.entities.railroad import Railroad
 
 # def test_

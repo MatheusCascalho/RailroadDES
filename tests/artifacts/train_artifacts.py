@@ -1,11 +1,11 @@
 from datetime import timedelta
 
 from pytest import fixture
-from src.demand import Flow, Demand
-from src.railroad_mesh import RailSegment
-from src.task import Task
-from src.train import Train
-from src.arrive_scheduler import ArriveScheduler
+from src.domain.entities.demand import Flow, Demand
+from src.domain.entities.railroad_mesh import RailSegment
+from src.domain.entities.task import Task
+from src.domain.entities.train import Train
+from src.events.arrive_scheduler import ArriveScheduler
 
 
 @fixture

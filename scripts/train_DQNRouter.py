@@ -4,26 +4,26 @@ import logging
 
 from numpy import save
 
-from src.router import RandomRouter
-from src.TFRState import TFRBalanceState
+from src.control.router import RandomRouter
+from src.control.memory_based_control.reinforcement_learning.TFRState import TFRBalanceState
 import random
-from src.DQNRouter import DQNRouter, Learner
-from src.action_space import ActionSpace
-from src.tfr_state_factory import TFRStateSpaceFactory, TFRStateFactory
-from src.system_evolution_memory import RailroadEvolutionMemory, ExperienceProducer
-from src.event import DecoratedEventFactory
-from src.event_calendar import EventCalendar
+from src.control.memory_based_control.reinforcement_learning.DQNRouter import DQNRouter, Learner
+from src.control.memory_based_control.reinforcement_learning.action_space import ActionSpace
+from src.control.memory_based_control.reinforcement_learning.tfr_state_factory import TFRStateSpaceFactory, TFRStateFactory
+from src.control.memory_based_control.system_evolution_memory import RailroadEvolutionMemory, ExperienceProducer
+from src.events.event import DecoratedEventFactory
+from src.simulation.event_calendar import EventCalendar
 from src.des_simulator import DESSimulator
 import dill
 from datetime import datetime, timedelta
-from src.clock import Clock
+from src.simulation.clock import Clock
 from tqdm import tqdm
 from logging import info, critical, error
 import warnings
-from src.target import SimpleTargetManager
+from src.control.target_based_control.target import SimpleTargetManager
 from multiprocessing import Event, Process, Pool, Manager
 import multiprocessing
-from src.dill_queue import DillQueue
+from scripts.dill_queue import DillQueue
 import os
 from time import sleep
 from dataclasses import dataclass

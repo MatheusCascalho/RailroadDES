@@ -1,6 +1,6 @@
 import pytest
-from src.railroad_mesh import RailroadMesh, TransitTime
-from src.node import Node
+from src.domain.entities.railroad_mesh import RailroadMesh, TransitTime
+from src.domain.entities.node import Node
 from datetime import timedelta
 
 

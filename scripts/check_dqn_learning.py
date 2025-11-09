@@ -1,8 +1,8 @@
-from src.TFRState import FlowState, ConstraintState, TrainState, TFRState
-from src.demand import Flow
-from src.states import ActivityState
-from src.action_space import ActionSpace
-from src.tfr_state_factory import TFRStateSpaceFactory
+from src.control.memory_based_control.reinforcement_learning.TFRState import FlowState, ConstraintState, TrainState, TFRState
+from src.domain.entities.demand import Flow
+from src.domain.states import ActivityState
+from src.control.memory_based_control.reinforcement_learning.action_space import ActionSpace
+from src.control.memory_based_control.reinforcement_learning.tfr_state_factory import TFRStateSpaceFactory
 import dill
 import torch
 import pandas as pd

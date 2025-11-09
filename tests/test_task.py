@@ -1,9 +1,9 @@
 import pytest
 from datetime import datetime, timedelta
-from src.task import Task, TimeEvent, Process
-from src.constants import EventName
-from src.demand import Demand, Flow
-from src.exceptions import EventSequenceError
+from src.domain.entities.task import Task, TimeEvent, Process
+from src.domain.constants import EventName
+from src.domain.entities.demand import Demand, Flow
+from src.domain.exceptions import EventSequenceError
 
 
 # Fixture para criar uma instância de Demand (pode ser substituída por uma classe mock)

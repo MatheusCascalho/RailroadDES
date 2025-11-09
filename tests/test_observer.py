@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import MagicMock
 
-from src.observers import (
+from src.domain.observers import (
     AbstractObserver,
     AbstractSubject,
     SubjectNotifier,

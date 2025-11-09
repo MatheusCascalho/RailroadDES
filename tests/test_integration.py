@@ -1,23 +1,23 @@
 import pytest
 from datetime import timedelta
 
-from src.DQNRouter import DQNRouter
-from src.event import DecoratedEventFactory
-from src.event_calendar import EventCalendar
-from src.exceptions import TrainExceptions
+from src.control.memory_based_control.reinforcement_learning.DQNRouter import DQNRouter
+from src.events.event import DecoratedEventFactory
+from src.simulation.event_calendar import EventCalendar
+from src.domain.exceptions import TrainExceptions
 from hypothesis import given, strategies as st
 from hypothesis import HealthCheck, settings
-from src.operated_volume import OperatedVolume
-from src.railroad_mesh import TransitTime, RailroadMesh
+from src.statistics.operated_volume import OperatedVolume
+from src.domain.entities.railroad_mesh import TransitTime, RailroadMesh
 # from tests.artifacts.train_artifacts import simple_train
-from src.demand import Demand, Flow
-from src.railroad import Railroad
+from src.domain.entities.demand import Demand, Flow
+from src.domain.entities.railroad import Railroad
 from src.des_simulator import DESSimulator
-from src.gantt import Gantt
-from src.stock_graphic import StockGraphic
-from src.system_evolution_memory import RailroadEvolutionMemory
-from src.tfr_state_factory import TFRStateSpaceFactory
-from src.target import SimpleTargetManager
+from src.statistics.gantt import Gantt
+from src.statistics.stock_graphic import StockGraphic
+from src.control.memory_based_control.system_evolution_memory import RailroadEvolutionMemory
+from src.control.memory_based_control.reinforcement_learning.tfr_state_factory import TFRStateSpaceFactory
+from src.control.target_based_control.target import SimpleTargetManager
 from tests.artifacts.simulator_artifacts import FakeSimulator
 from pytest import mark
 import dill

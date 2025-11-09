@@ -1,9 +1,9 @@
-from src.state_machine import (
+from src.simulation.state_machine import (
     StateMachine,
     Transition,
     State
 )
-from src.observers import AbstractObserver
+from src.domain.observers import AbstractObserver
 import pytest
 import random
 

@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from pytest import fixture
-from src.clock import Clock
+from src.simulation.clock import Clock
 from src.des_simulator import DESSimulator
 
 

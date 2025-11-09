@@ -1,9 +1,9 @@
 from src.des_simulator import DESSimulator
-from src.railroad import Railroad
-from src.railroad_mesh import RailroadMesh, TransitTime
-from src.node import Node
-from src.train import Train
-from src.demand import Demand
+from src.domain.entities.railroad import Railroad
+from src.domain.entities.railroad_mesh import RailroadMesh, TransitTime
+from src.domain.entities.node import Node
+from src.domain.entities.train import Train
+from src.domain.entities.demand import Demand
 from datetime import timedelta, datetime
 import pandas as pd
 pd.set_option('display.max_columns', None)
