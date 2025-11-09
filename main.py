@@ -1,4 +1,4 @@
-from src.des_simulator import DESSimulator
+from src.simulation.des_simulator import DESSimulator
 from src.domain.entities.railroad import Railroad
 from src.domain.entities.railroad_mesh import RailroadMesh, TransitTime
 from src.domain.entities.node import Node

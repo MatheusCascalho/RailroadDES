@@ -8,7 +8,7 @@ from src.control.router import RepeatedRouter, ChainedHistoryRouter
 from src.domain.entities.demand import Flow
 from src.statistics.stock_graphic import StockGraphic
 from tests.artifacts.railroad_artifacts import create_model
-from src.des_simulator import DESSimulator
+from src.simulation.des_simulator import DESSimulator
 from src.statistics.gantt import Gantt
 from src.statistics.operated_volume import OperatedVolume
 from datetime import timedelta

@@ -6,7 +6,7 @@ from interfaces.des_simulator_interface import DESSimulatorInterface
 from interfaces.train_interface import TrainInterface
 from src.events.arrive_scheduler import ArriveScheduler
 from src.domain.entities.demand import Demand
-from src.des_model import DESModel
+from src.simulation.des_model import DESModel
 from src.events.event import Event
 from src.domain.exceptions import FinishedTravelException
 from src.domain.entities.railroad_mesh import RailroadMesh

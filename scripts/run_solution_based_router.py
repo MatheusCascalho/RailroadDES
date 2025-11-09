@@ -4,7 +4,7 @@ from src.control.memory_based_control.reinforcement_learning.DQNRouter import Le
 from src.control.memory_based_control.reinforcement_learning.action_space import ActionSpace
 from src.events.event import DecoratedEventFactory, Event
 from src.simulation.event_calendar import EventCalendar
-from src.des_simulator import DESSimulator
+from src.simulation.des_simulator import DESSimulator
 from src.control.solution_based_control.solution_based_router import SolutionBasedRouter
 from datetime import timedelta
 from src.optimization.VNS import VNSalgorithm, SwapToFast, Move

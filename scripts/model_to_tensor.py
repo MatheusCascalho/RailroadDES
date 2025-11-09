@@ -1,7 +1,7 @@
 from src.control.memory_based_control.reinforcement_learning.TFRState import TFRState, TFRStateSpace, TFRBalanceState
 from src.control.memory_based_control.reinforcement_learning.tfr_state_factory import TFRStateFactory, TFRStateSpaceFactory
 import dill
-from src.des_simulator import DESSimulator
+from src.simulation.des_simulator import DESSimulator
 from src.simulation.clock import Clock
 from datetime import datetime, timedelta
 

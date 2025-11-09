@@ -1,4 +1,4 @@
-from src.des_simulator import DESSimulator
+from src.simulation.des_simulator import DESSimulator
 from src.domain.constants import (
     EPSILON,
     TrainActions,

@@ -1,4 +1,4 @@
-from src.des_model import DESModel
+from src.simulation.des_model import DESModel
 from src.control.memory_based_control.reinforcement_learning.TFRState import TFRState, TrainState, ConstraintState, FlowState, TFRStateSpace
 from src.domain.states import ActivityState
 

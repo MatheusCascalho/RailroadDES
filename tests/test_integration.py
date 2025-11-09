@@ -12,7 +12,7 @@ from src.domain.entities.railroad_mesh import TransitTime, RailroadMesh
 # from tests.artifacts.train_artifacts import simple_train
 from src.domain.entities.demand import Demand, Flow
 from src.domain.entities.railroad import Railroad
-from src.des_simulator import DESSimulator
+from src.simulation.des_simulator import DESSimulator
 from src.statistics.gantt import Gantt
 from src.statistics.stock_graphic import StockGraphic
 from src.control.memory_based_control.system_evolution_memory import RailroadEvolutionMemory

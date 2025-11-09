@@ -3,7 +3,7 @@ from interfaces.des_simulator_interface import DESSimulatorInterface
 from src.simulation.event_calendar import EventCalendar
 from datetime import datetime, timedelta
 from src.domain.exceptions import FinishedTravelException, NotCompletedEvent
-from src.des_model import DESModel
+from src.simulation.des_model import DESModel
 from src.simulation.clock import Clock
 from src.domain.entities.entity import Entity
 from logging import debug

@@ -13,7 +13,7 @@ from src.control.memory_based_control.reinforcement_learning.tfr_state_factory i
 from src.control.memory_based_control.system_evolution_memory import RailroadEvolutionMemory, ExperienceProducer
 from src.events.event import DecoratedEventFactory
 from src.simulation.event_calendar import EventCalendar
-from src.des_simulator import DESSimulator
+from src.simulation.des_simulator import DESSimulator
 import dill
 from datetime import datetime, timedelta
 from src.simulation.clock import Clock

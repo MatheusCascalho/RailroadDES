@@ -2,7 +2,7 @@ from collections import deque
 from dataclasses import dataclass, field
 from queue import Full
 from typing import Callable
-from src.des_model import DESModel
+from src.simulation.des_model import DESModel
 from src.domain.observers import AbstractSubject, to_notify, AbstractObserver
 from src.domain.entities.railroad import Railroad
 from src.domain.states import ActivityState

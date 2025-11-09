@@ -13,7 +13,7 @@ from src.control.memory_based_control.reinforcement_learning.tfr_state_factory i
 from src.control.memory_based_control.system_evolution_memory import RailroadEvolutionMemory, ExperienceProducer
 from src.events.event import DecoratedEventFactory
 from src.simulation.event_calendar import EventCalendar
-from src.des_simulator import DESSimulator
+from src.simulation.des_simulator import DESSimulator
 import dill
 from datetime import datetime, timedelta
 from src.simulation.clock import Clock
@@ -43,8 +43,8 @@ base_model = 'tests/artifacts/model_to_train_15_sim_v2.dill'
 # policy_net_path='serialized_models/dqn/policy_net_BALANCE_parallel_simple_model.dill'
 # target_net_path='serialized_models/dqn/target_net_BALANCE_parallel_simple_model.dill'
 
-policy_net_path='serialized_models/dqn/policy_net_15_trains_10out25.pytorch'
-target_net_path='serialized_models/dqn/target_net_15_trains_10out25.pytorch'
+policy_net_path='serialized_models/dqn/policy_net.pytorch'
+target_net_path='serialized_models/dqn/target_net.pytorch'
 
 
 
