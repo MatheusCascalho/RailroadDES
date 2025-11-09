@@ -69,7 +69,7 @@ for col in df.columns:
 
 df['datetime'] = pd.to_datetime(df['datetime'], format="%Y-%m-%d %H:%M:%S,%f")
 df['velocidade'] = df['operated_volume']/df['simulation_time']
-if True:
+if False:
     fig = make_subplots(
         rows=3, cols=1,
         subplot_titles=[
@@ -89,15 +89,15 @@ if True:
         marker=dict(color='blue', size=10, opacity=0.7)
     ))
 
-    #2️⃣ queues_h (eixo Y secundário à direita)
-    fig.add_trace(go.Scatter(
-        y=df["velocidade"],
-        x=df["queues_h"],
-        mode='markers',
-        name='Velocidade',
-        marker=dict(color='orange', size=10, opacity=0.7),
-        yaxis='y2'  # define que usa o segundo eixo Y
-    ))
+    # #2️⃣ queues_h (eixo Y secundário à direita)
+    # fig.add_trace(go.Scatter(
+    #     y=df["velocidade"],
+    #     x=df["queues_h"],
+    #     mode='markers',
+    #     name='Velocidade',
+    #     marker=dict(color='orange', size=10, opacity=0.7),
+    #     yaxis='y2'  # define que usa o segundo eixo Y
+    # ))
     
 
     # Ajustar layout
@@ -114,11 +114,11 @@ fig = go.Figure()
 fig = make_subplots(
     rows=2, cols=1,
     subplot_titles=[
-        "Operated Volume",
+        "Volume Operado total em função da recompensa total da simulação",
         "Velocidade",
         # "Tempo de Simulação"
     ],
-    shared_xaxes=True
+    shared_xaxes=False
 )
 
 # 1️⃣ operated_volume (eixo Y principal à esquerda)
@@ -126,19 +126,22 @@ fig.add_trace(go.Scatter(
     y=resumo["operated_volume"],
     x=resumo["current_reward"], 
     mode='markers',
-    name='Operated Volume',
+    name='Volume Operado total em função da recompensa total da simulação',
     marker=dict(color='blue', size=10, opacity=0.7)
 ))
 
+fig.update_xaxes(title_text="Recompensa Atual", row=1, col=1)
+fig.update_yaxes(title_text="Volume Operado", row=1, col=1)
+
 #2️⃣ queues_h (eixo Y secundário à direita)
-fig.add_trace(go.Scatter(
-    y=resumo["velocidade"],
-    x=resumo["current_reward"],
-    mode='markers',
-    name='Velocidade',
-    marker=dict(color='orange', size=10, opacity=0.7),
-    yaxis='y2'  # define que usa o segundo eixo Y
-))
+# fig.add_trace(go.Scatter(
+#     y=resumo["velocidade"],
+#     x=resumo["current_reward"],
+#     mode='markers',
+#     name='Velocidade',
+#     marker=dict(color='orange', size=10, opacity=0.7),
+#     yaxis='y2'  # define que usa o segundo eixo Y
+# ))
 
 # Ajustar layout
 fig.update_traces(marker=dict(size=10, opacity=0.7, line=dict(width=0.5, color="black")))
@@ -175,46 +178,57 @@ if True:
         fig = make_subplots(
             rows=3, cols=2,
             subplot_titles=[
-                "Queues (h)",
-                "Cumulated Reward",
-                "Velocidade",
-                "Current Reward",
+                "Recompensa Instantânea",
+                "Recompensa Acumulada",
+                "Balanço vazios - carregados",
+                # "Current Reward",
                 "Volume Operado",
-                "balanço de trens vazios - cheios"
+                "Fila Atual [h]",
+                ""
             ],
-            shared_xaxes=True
+            shared_xaxes=False
         )
 
         # === Adicionar cada gráfico scatter ===
         fig.add_trace(go.Scatter(
             x=reorganizado["simulation_time"], y=reorganizado["queues_h"],
-            mode='markers', name="Queues (h)", marker=dict(color='blue', size=5)
-        ), row=1, col=1)
+            mode='markers', name="Fila (h)", marker=dict(color='blue', size=5)
+        ), row=3, col=1)
+        fig.update_yaxes(title_text="Fila Atual [h]", row=3, col=1)
+        fig.update_xaxes(title_text="Instante da simulação [h]", row=3, col=1)
 
         fig.add_trace(go.Scatter(
             x=reorganizado["simulation_time"], y=reorganizado["cumulated_reward"],
-            mode='markers', name="Cumulated Reward", marker=dict(color='orange', size=5)
+            mode='markers', name="Recompensa Acumulada", marker=dict(color='orange', size=5)
         ), row=1, col=2)
+        fig.update_yaxes(title_text="Recompensa Acumulada", row=1, col=2)
+        fig.update_xaxes(title_text="Instante da simulação [h]", row=1, col=2)
 
-        fig.add_trace(go.Scatter(
-            x=reorganizado["simulation_time"], y=reorganizado["velocidade"],
-            mode='markers', name="Operated Volume", marker=dict(color='green', size=5)
-        ), row=2, col=1)
+        # fig.add_trace(go.Scatter(
+        #     x=reorganizado["simulation_time"], y=reorganizado["velocidade"],
+        #     mode='markers', name="Operated Volume", marker=dict(color='green', size=5)
+        # ), row=2, col=1)
 
         fig.add_trace(go.Scatter(
             x=reorganizado["simulation_time"], y=reorganizado["current_reward"],
-            mode='markers', name="Current Reward", marker=dict(color='red', size=5)
-        ), row=2, col=2)
+            mode='markers', name="Recompensa Instantânea", marker=dict(color='red', size=5)
+        ), row=1, col=1)
+        fig.update_yaxes(title_text="Recompensa Instantânea", row=1, col=1)
+        fig.update_xaxes(title_text="Instante da simulação [h]", row=1, col=1)
 
         fig.add_trace(go.Scatter(
             x=reorganizado["simulation_time"], y=reorganizado["operated_volume"],
-            mode='markers', name="Volume Operado", marker=dict(color='red', size=5)
-        ), row=3, col=1)
+            mode='markers', name="Volume Operado Acumulado", marker=dict(color='red', size=5)
+        ), row=2, col=2)
+        fig.update_yaxes(title_text="Volume Operado Acumulado", row=2, col=2)
+        fig.update_xaxes(title_text="Instante da simulação [h]", row=2, col=2)
 
         fig.add_trace(go.Scatter(
             x=reorganizado["simulation_time"], y=reorganizado["balance"],
-            mode='markers', name="Volume Operado", marker=dict(color='black', size=5)
-        ), row=3, col=2)
+            mode='markers', name="Balanço vazios - carregados", marker=dict(color='black', size=5)
+        ), row=2, col=1)
+        fig.update_yaxes(title_text="Balanço vazios - carregados", row=2, col=1)
+        fig.update_xaxes(title_text="Instante da simulação [h]", row=2, col=1)
 
         # === Layout e títulos ===
         fig.update_layout(

@@ -10,7 +10,7 @@ import time
 from datetime import datetime
 
 # caminho para o log
-log_file = "logs/learning/Learner_0.log"
+log_file = "logs/learning/Learner_0 lr 0_001 e recompensa prox 90.log"
 
 # regex para extrair métricas e o timestamp
 pattern = re.compile(
