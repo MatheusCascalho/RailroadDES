@@ -15,7 +15,7 @@ from src.events.stock_replanish import SimpleStockReplanisher, ReplenishRate
 from src.domain.constraints.stock_constraints import StockToLoadTrainConstraint, StockToUnloadTrainConstraint
 from src.domain.entities.node import StockNode
 from src.domain.constraints.maneuvering_constraints import ManeuveringConstraintFactory
-from src.events.processors import ProcessorSystem
+from src.domain.systems.processors import ProcessorSystem
 
 
 class AbstractNodeFactory(ABC):

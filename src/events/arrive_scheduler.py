@@ -1,7 +1,7 @@
 from interfaces.des_simulator_interface import DESSimulatorInterface
 from interfaces.train_interface import TrainInterface
 from src.domain.entities.railroad_mesh import RailSegment
-from src.domain.observers import AbstractObserver
+from src.standards.observers import AbstractObserver
 from src.domain.exceptions import FinishedTravelException
 
 

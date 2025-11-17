@@ -2,7 +2,7 @@ from abc import abstractmethod, ABC
 
 from src.domain.constants import Process
 from src.domain.constraints.node_constraints import ProcessConstraintSystem, BlockReason
-from src.domain.observers import AbstractObserver
+from src.standards.observers import AbstractObserver
 from src.domain.entities.stock import StockInterface
 from datetime import timedelta
 

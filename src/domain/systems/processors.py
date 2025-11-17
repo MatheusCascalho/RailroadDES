@@ -6,9 +6,9 @@ from src.domain.entities import model_queue as mq
 from src.simulation.clock import Clock
 from src.domain.constants import Process, EventName
 from src.domain.entities.node_data_model import ProcessorRate
-from src.domain.discrete_event_system import DiscreteEventSystem
+from src.domain.systems.discrete_event_system import DiscreteEventSystem
 from src.domain.exceptions import ProcessException
-from src.simulation.state_machine import State, Transition, StateMachine
+from src.standards.state_machine import State, Transition, StateMachine
 from src.domain.states import ProcessorState
 from src.domain.constraints.node_constraints import (
     ProcessConstraintSystem

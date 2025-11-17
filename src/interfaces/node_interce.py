@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from datetime import timedelta
-from src.domain.entities.entity import Entity
+from src.interfaces.entity import Entity
 from src.simulation.clock import Clock
 
 

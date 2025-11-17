@@ -1,5 +1,5 @@
 from src.domain.constraints.node_constraints import LiberationConstraintSystem
-from src.domain.observers import AbstractObserver
+from src.standards.observers import AbstractObserver
 from datetime import timedelta
 from src.simulation.clock import Clock
 

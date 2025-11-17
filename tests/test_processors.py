@@ -7,7 +7,7 @@ from src.domain.constants import Process
 from src.domain.entities.node_data_model import ProcessorRate
 from src.domain.constraints.stock_constraints import StockToLoadTrainConstraint, StockToUnloadTrainConstraint
 from src.domain.exceptions import ProcessException
-from src.events.processors import ProcessorSystem, ProcessorSystemBuilder
+from src.domain.systems.processors import ProcessorSystem, ProcessorSystemBuilder
 from src.domain.states import ProcessorState
 
 

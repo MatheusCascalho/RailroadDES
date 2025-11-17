@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field, InitVar
 from datetime import datetime, timedelta
 from src.domain.constants import Process, EventName
-from src.domain.observers import AbstractSubject, to_notify
+from src.standards.observers import AbstractSubject, to_notify
 import numpy as np
 from src.domain.exceptions import EventSequenceError, TimeSequenceErro, RepeatedProcessError, AlreadyRegisteredError
 from logging import warning

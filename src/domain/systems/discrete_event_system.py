@@ -1,5 +1,5 @@
 from src.domain.entities.path import Path
-from src.simulation.state_machine import State, Transition, StateMachine
+from src.standards.state_machine import State, Transition, StateMachine
 from src.domain.states import LoadState, ActivityState
 from abc import abstractmethod
 

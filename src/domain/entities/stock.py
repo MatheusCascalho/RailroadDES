@@ -4,7 +4,7 @@ from src.domain.exceptions import StockException
 from src.domain.constants import EventName, EPSILON
 from dataclasses import dataclass, asdict
 from datetime import datetime, timedelta
-from src.domain.observers import AbstractSubject, Gossiper, SubjectNotifier, to_notify
+from src.standards.observers import AbstractSubject, Gossiper, SubjectNotifier, to_notify
 import pandas as pd
 
 

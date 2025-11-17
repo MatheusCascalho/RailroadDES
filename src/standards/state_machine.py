@@ -9,7 +9,7 @@ A máquina de estados pode ser configurada com observadores, que são notificado
 from dataclasses import dataclass, field
 from typing import Any, Callable
 
-from src.domain.observers import AbstractObserver, AbstractSubject, SubjectNotifier, to_notify
+from src.standards.observers import AbstractObserver, AbstractSubject, SubjectNotifier, to_notify
 
 
 # @dataclass

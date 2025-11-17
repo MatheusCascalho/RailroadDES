@@ -1,5 +1,5 @@
 from src.domain.entities.demand import Demand
-from src.domain.observers import AbstractSubject, to_notify
+from src.standards.observers import AbstractSubject, to_notify
 from src.domain.entities.time_table import TimeTable, TimeEvent
 from src.domain.constants import Process, EventName
 from src.domain.entities.path import Path

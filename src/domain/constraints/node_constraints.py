@@ -1,5 +1,5 @@
-from src.domain.discrete_event_system import DiscreteEventSystem
-from src.simulation.state_machine import State, StateMachine, MultiCriteriaTransition
+from src.domain.systems.discrete_event_system import DiscreteEventSystem
+from src.standards.state_machine import State, StateMachine, MultiCriteriaTransition
 from src.domain.states import ConstraintState
 from abc import abstractmethod, ABC
 from src.domain.constants import Process

@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from queue import Full
 from typing import Callable
 from src.simulation.des_model import DESModel
-from src.domain.observers import AbstractSubject, to_notify, AbstractObserver
+from src.standards.observers import AbstractSubject, to_notify, AbstractObserver
 from src.domain.entities.railroad import Railroad
 from src.domain.states import ActivityState
 from src.control.memory_based_control.reinforcement_learning.tfr_state_factory import TFRStateFactory, TFRState

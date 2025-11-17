@@ -3,7 +3,7 @@ from collections import deque
 from src.domain.entities.demand import Demand
 from interfaces.train_interface import TrainInterface
 from src.control.memory_based_control.reinforcement_learning.TFRState import TFRStateSpace
-from src.domain.observers import AbstractObserver
+from src.standards.observers import AbstractObserver
 from src.control.router import Router
 from src.domain.states import ActivityState
 from src.control.memory_based_control.system_evolution_memory import RailroadEvolutionMemory

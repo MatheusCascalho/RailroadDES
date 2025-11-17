@@ -1,7 +1,7 @@
 from interfaces.train_interface import TrainInterface
 from src.domain.exceptions import ProcessException, NotCompletedEvent
 from src.domain.constraints.node_constraints import ProcessConstraintSystem
-from src.events.processors import ProcessorSystem
+from src.domain.systems.processors import ProcessorSystem
 from src.domain.entities.node_data_model import ProcessorRate
 from src.simulation.des_simulator import DESSimulator
 from src.domain.constants import (
@@ -18,7 +18,7 @@ from src.events.stock_replanish import StockReplenisherInterface
 from src.domain.entities.stock import StockInterface
 from src.domain.constraints.maneuvering_constraints import ManeuveringConstraintFactory
 from collections import defaultdict
-from src.domain.entities.entity import Entity
+from src.interfaces.entity import Entity
 from logging import debug
 
 @dataclass

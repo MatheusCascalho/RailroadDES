@@ -7,7 +7,7 @@ from src.domain.constants import (
 from typing import Callable
 from datetime import timedelta, datetime
 from src.domain.entities.time_table import TimeTable
-from src.domain.discrete_event_system import LoadSystem, ActivitySystem
+from src.domain.systems.discrete_event_system import LoadSystem, ActivitySystem
 from src.domain.exceptions import TrainExceptions, FinishedTravelException
 from src.events.resources import Slot
 from interfaces.train_interface import TrainInterface
@@ -16,7 +16,7 @@ from src.domain.entities.task import Task
 from src.domain.entities.time_table import TimeEvent
 from src.simulation.clock import Clock
 from src.domain.states import ActivityState
-from src.domain.observers import to_notify
+from src.standards.observers import to_notify
 from logging import debug
 
 

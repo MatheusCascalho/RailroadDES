@@ -2,8 +2,8 @@ from collections import defaultdict
 from dataclasses import asdict
 from src.domain.entities.task import Task
 from src.domain.entities.demand import Demand, Flow
-from src.simulation.state_machine import ExpandableStateMachine, Transition, State
-from src.domain.observers import AbstractObserver
+from src.standards.state_machine import ExpandableStateMachine, Transition, State
+from src.standards.observers import AbstractObserver
 from abc import ABC, abstractmethod
 from random import randint
 from interfaces.train_interface import TrainInterface
