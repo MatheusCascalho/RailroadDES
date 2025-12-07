@@ -47,8 +47,8 @@ class DESSimulator(Entity, DESSimulatorInterface):
                 event.callback(**event.data)
             except NotCompletedEvent as error:
                 event.reschedule(time_to_happen=timedelta(hours=1))
-                self.calendar.push(time=timedelta(hours=1), event=event, callback=None)
-            if all([d.is_completed for d in model.router.demands]):
+                self.calendar.push(time=timedelta(hours=1), event=event)
+            if self.model.stop_criteria():
                 break
         debug(f"Finish simulation")
 

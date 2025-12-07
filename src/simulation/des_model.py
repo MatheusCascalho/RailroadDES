@@ -26,4 +26,11 @@ class DESModel(abc.ABC):
     def model_clocks(self) -> list[Clock]:
         pass
 
+    @abc.abstractmethod
+    def stop_criteria(self):
+        """
+        Criterio de parada em simulações
+        """
+        pass
+
 

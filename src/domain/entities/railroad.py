@@ -83,6 +83,9 @@ class Railroad(DESModel):
             )
             train.add_observers([scheduler])
 
+    def stop_criteria(self):
+        return all([d.is_completed for d in self.router.demands])
+
     def to_json(self):
         return dict(
             mesh=self.mesh.to_json(),

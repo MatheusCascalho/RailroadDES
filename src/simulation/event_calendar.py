@@ -9,7 +9,7 @@ class EventCalendar:
         self.calendar: list[Event] = []
         self.event_factory = event_factory
 
-    def push(self, time: float, callback: Callable, **data: Any):
+    def push(self, time: timedelta, callback: Callable = lambda x: None, **data: Any):
         """
         Add event to calendar ordered by time
         :param time: fire time
