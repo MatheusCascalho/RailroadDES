@@ -19,7 +19,7 @@ class DESModel(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def solver_exceptions(self, exception: Exception, event: Event):
+    def solver_exceptions(self, exception: Exception, event: Event, simulator: DESSimulatorInterface):
         pass
 
     @abc.abstractmethod

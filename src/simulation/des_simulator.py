@@ -1,4 +1,5 @@
 from decimal import DivisionByZero
+from turtle import mode
 from interfaces.des_simulator_interface import DESSimulatorInterface
 from src.simulation.event_calendar import EventCalendar
 from datetime import datetime, timedelta
@@ -17,8 +18,18 @@ class DESSimulator(Entity, DESSimulatorInterface):
         self.calendar = calendar
         self.clock = clock
         self.initial_date = clock.current_time
-        self.model = None ## Melhorar isso!
+        self._model: DESModel | None = None ## Melhorar isso!
         super().__init__(name='sim', clock=clock)
+
+    @property
+    def model(self) -> DESModel:
+        if self._model is None:
+            raise Exception('The Model has not been defined yet')
+        return self._model
+    
+    @model.setter
+    def model(self, value):
+        self._model = value
 
     @property
     def current_date(self):
@@ -54,7 +65,11 @@ class DESSimulator(Entity, DESSimulatorInterface):
 
     def solve_exceptions(self, *args, **kwargs):
         error = kwargs.get('error')
+        if error is None:
+            raise Exception('the solver_exception method can only be used to handle simulation exceptions!')
         event = kwargs.get('event')
+        if event is None:
+            raise Exception('Event is not defined!!')
         self.model.solver_exceptions(exception=error, event=event, simulator=self)
 
     def validate_clock(self, model: DESModel):

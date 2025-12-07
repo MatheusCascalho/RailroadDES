@@ -145,18 +145,3 @@ def id_gen():
 
 
 id_gossiper = id_gen()
-
-
-class Gossiper(AbstractObserver):
-    def __init__(self):
-        self.ID = next(id_gossiper)
-        super().__init__()
-    def update(self, *args):
-        print(f"Fofoqueiro {self.ID}: Fui notificado!! Tenho: {len(self.subjects)} Sujeito(s)")
-        for sub in self.subjects:
-            print(f"{sub.volume=}")
-    def __eq__(self, other):
-        return self.ID == other.ID
-    def __str__(self):
-        return f"Fofoqueiro {self.ID}"
-    __repr__ = __str__

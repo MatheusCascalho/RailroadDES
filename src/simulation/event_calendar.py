@@ -51,24 +51,3 @@ class EventCalendar:
 
     def __repr__(self):
         return f"Calendar with {len(self.calendar)} events"
-
-
-if __name__ == '__main__':
-    print("="*50)
-    event_calendar = EventCalendar()
-    event_calendar.push(0, lambda: print('Primeira função'))
-    event_calendar.push(15, lambda: print('Terceira função'))
-    event_calendar.push(2, lambda: print('Segunda função'))
-    for event in event_calendar.calendar:
-        event.callback()
-    print("="*50)
-    event_calendar.pop()
-    for event in event_calendar.calendar:
-        event.callback()
-    print("="*50)
-    print(event_calendar.is_empty)
-    print("=" * 50)
-    event_calendar.pop()
-    event_calendar.pop()
-
-    print(event_calendar.is_empty)

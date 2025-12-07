@@ -29,12 +29,12 @@ class Event:
 
 class EventFactory(ABC):
     @abstractmethod
-    def create(self, time_until_happen, callback, data):
+    def create(self, time_until_happen, callback, data) -> Event:
         pass
 
 
 class DefaultEventFactory(EventFactory):
-    def create(self, time_until_happen, callback, data):
+    def create(self, time_until_happen, callback, data) -> Event:
         return Event(time_until_happen, callback, data)
 
 
@@ -56,7 +56,7 @@ class DecoratedEventFactory(EventFactory):
                 raise e
         return decorated
 
-    def create(self, time_until_happen, callback, data):
+    def create(self, time_until_happen, callback, data) -> Event:
         decorated_callback = self.wrapper(callback)
         return Event(
             time_until_happen,
