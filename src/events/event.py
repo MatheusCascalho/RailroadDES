@@ -3,7 +3,9 @@ from dataclasses import dataclass
 from datetime import timedelta
 from typing import Callable, Any
 from logging import info
+from src.domain.entities.time_table import TimeEvent
 from src.domain.exceptions import FinishedTravelException
+from src.standards.observers import AbstractSubject, to_notify
 
 
 @dataclass
@@ -64,4 +66,26 @@ class DecoratedEventFactory(EventFactory):
             data,
             event_name=f"Decorated {callback.__qualname__}"
         )
+
+
+class RecordEvent:
+    def record(self, train, event_name, process, **kwargs):
+        event = TimeEvent(event=event_name, instant=train.clock.current_time)
+        train.current_task.update(event=event,process=process, **kwargs)
+        train.time_table.update(event, process=process, **kwargs)
+        return event
+
+class EventCommand(AbstractSubject):
+    def __init__(self, pre_time: timedelta = timedelta()):
+        self.pre_time = pre_time
+        self.recorder = RecordEvent()
+        super().__init__()
+
+    @to_notify()
+    @abstractmethod
+    def execute(self):
+        pass
+
+
+
 

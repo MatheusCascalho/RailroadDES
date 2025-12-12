@@ -93,33 +93,30 @@ class Node(NodeInterface):
             none_constraint_are_blocked = all(not c.is_blocked() for c in self.liberation_constraints[train.ID])
             if none_constraint_are_blocked:
                 train.leave(node=self)
-                self.queue_to_leave.pop(current_time=self.clock.current_time)
+                self.queue_to_leave.remove(current_time=self.clock.current_time, train=train)
                 self.liberation_constraints.pop(train.ID)
 
                 # train.leave()
 
-    def process(self, simulator: DESSimulator):
+    def slot_assignment(self, train):
         """
         Percorre a fila de entrada e processa todos os trens que não estiverem com processamento bloqueada
         por alguma restrição
         :return:
         """
         self.pre_processing()
-        for train in self.queue_to_enter.running_queue():
-            process = train.current_process_name
-            slot = self._find_idle_slot(process)
-            if (
-                    slot is None or
-                    self._is_blocked_by_constraints(process)
-            ):
-                self.queue_to_enter.skip_process(process)
-                continue
-            self._start_process(train=train,slot=slot,simulator=simulator)
-
-        self.queue_to_enter.recover()
+        if train not in self.queue_to_enter:
+            raise Exception(f'Train {train} not in Queue to Enter!')
+        process = train.current_process_name
+        slot = self._find_idle_slot(process)
+        if (
+                slot is None or
+                self._is_blocked_by_constraints(process)
+        ):
+            raise Exception(f'Event is Blocked or there is no available slot!!')
         self.pos_processing()
-        if self.queue_to_enter.current_size > 0:
-            raise NotCompletedEvent()
+        
+        return slot
 
     def _is_blocked_by_constraints(self, process: Process):
         return any(c.is_blocked() for c in self.process_constraints if c.process_type() == process)
@@ -128,26 +125,14 @@ class Node(NodeInterface):
         processors = [p for p in self.process_units if p.type == process]
         return next((p for p in processors if p.is_idle), None)
 
-    def _start_process(self, slot, simulator, *args, **kwargs):
-        debug(f'{simulator.current_date}:: Train {self.queue_to_enter.first} starts process at node {self}!')
-        train = self.queue_to_enter.pop(
-            current_time=simulator.current_date
+    def move_to_slot(self, train, slot):
+        debug(f'{self.clock.current_time}:: Train {self.queue_to_enter.first} starts process at node {self}!')
+        self.queue_to_enter.remove(
+            current_time=self.clock.current_time,
+            train=train
         )
-
         slot.put_in(train=train)
 
-        # Update state
-        time = timedelta()
-        # Add next event
-        simulator.add_event(
-            time=time,
-            callback=train.process,
-            simulator=simulator,
-            start=simulator.current_date,
-            process_time=slot.get_process_time(),
-            node=self,
-            slot=slot
-        )
 
     def maneuver_to_dispatch(self, simulator: DESSimulator, **kwargs):
         self.pre_processing()

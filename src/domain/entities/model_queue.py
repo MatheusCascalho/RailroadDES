@@ -61,8 +61,12 @@ class Queue:
     def is_busy(self):
         return self.current_size > 0
 
-    def pop(self, current_time):
-        data = self.elements.pop(0)
+    def remove(self, current_time, train=None):
+        if train is None:
+            data = self.elements.pop(0)
+        else:
+            idx = [i for i, e in enumerate(self.elements) if e.element == train][0]
+            data = self.elements.pop(idx)
         data.departure = current_time
         self.history.append(data)
         return data.element

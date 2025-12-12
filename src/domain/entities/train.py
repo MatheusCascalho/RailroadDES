@@ -198,34 +198,11 @@ class Train(TrainInterface):
         # Add next event to calendar
         node.maneuver_to_dispatch(simulator)
 
-    def start_load(
-        self,
-        simulator: DESSimulator,
-        process_time: timedelta,
-        **kwargs
-    ):
+    def start_process(self):
         if not self._in_slot:
             TrainExceptions.train_is_not_in_slot(train_id=self.ID, location=self.current_location)
         debug(f'{self.clock.current_time}:: Train {self.ID} start load!')
         self.activity_system.start_process()
-        event = TimeEvent(
-            event=EventName.START_PROCESS,
-            instant=self.clock.current_time
-        )
-        self.current_task.update(
-            event=event,
-            process=Process.LOAD,
-            location=None
-        )
-        self.time_table.update(event, process=Process.LOAD)
-
-        # Add next event to calendar
-        simulator.add_event(
-            time=process_time,
-            callback=self.finish_load,
-            simulator=simulator,
-            **kwargs
-        )
 
     def start_unload(
         self,
