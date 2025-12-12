@@ -177,27 +177,16 @@ class Train(TrainInterface):
     # ====== Properties ==========
     # ====== Events ==========
 
-    def finish_load(
+    def finish_process(
         self,
-        simulator: DESSimulator,
-        node: NodeInterface,
-        **kwargs
+        process: Process
     ):
+        if process == Process.LOAD and self.volume < self.capacity:
+            raise Exception(f"Carregamento não foi finalizado!!")
         debug(f'{self.clock.current_time}:: Train {self} finish load!')
         self.activity_system.finish_process()
-        event = TimeEvent(
-            event=EventName.FINISH_PROCESS,
-            instant=self.clock.current_time
-        )
-        self.current_task.update(
-            event=event,
-            process=Process.LOAD,
-            location=None
-        )
-        self.time_table.update(event, process=Process.LOAD, location=None)
-        # Add next event to calendar
-        node.maneuver_to_dispatch(simulator)
 
+        
     def start_process(self):
         if not self._in_slot:
             TrainExceptions.train_is_not_in_slot(train_id=self.ID, location=self.current_location)

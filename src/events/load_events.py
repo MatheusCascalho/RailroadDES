@@ -20,7 +20,7 @@ class StartLoad(EventCommand):
     def __init__(
             self,
             train: Train,
-            node: Node,
+            node: Node
         ) -> None:
         super().__init__()
         self.node = node
@@ -35,4 +35,23 @@ class StartLoad(EventCommand):
         self.node.move_to_slot(train=self.train,slot=slot)
         self.train.start_process()
         self.recorder.record(train=self.train, event_name=EventName.START_PROCESS, process=Process.LOAD)
+
+
+class FinishLoad(EventCommand):
+    def __init__(
+        self,
+        train: Train,
+        node: Node,
+        process_time: timedelta
+    ) -> None:
+        super().__init__(pre_time=process_time)
+        self.node = node
+        self.train = train
+
+    @to_notify()
+    def execute(self):
+        self.train.finish_process(process=Process.LOAD)
+        self.recorder.record(train=self.train, event_name=EventName.FINISH_PROCESS, process=Process.LOAD)
+        self.node.maneuver_to_dispatch(train=self.train)
+        
         

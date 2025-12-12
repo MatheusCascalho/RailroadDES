@@ -134,20 +134,17 @@ class Node(NodeInterface):
         slot.put_in(train=train)
 
 
-    def maneuver_to_dispatch(self, simulator: DESSimulator, **kwargs):
+    def maneuver_to_dispatch(self, train: TrainInterface):
         self.pre_processing()
-        for slot in self.process_units:
-            if slot.current_train and slot.current_train.ready_to_leave:
-                debug(f'{simulator.current_date}:: Train {slot.current_train.ID} entering on leaving queue!')
-                train = slot.free_up()
-                constraint = self.maneuvering_constraint_factory.create(train_id=train.ID)
-                self.liberation_constraints[train.ID].append(constraint)
-                simulator.add_event(
-                    time=constraint.post_operation_time,
-                    callback=self.dispatch,
-                    event_name=str(train.current_flow) if train.is_empty else 'AUTOMATIC'
-                )
-
+        slots = [s for s in self.process_units if s.current_train == train]
+        if not slots:
+            raise Exception(f'Trem {train.ID} não está em nenhum slot do nó {self}')
+        slot = slots[0]
+        if slot.current_train and slot.current_train.ready_to_leave:
+            debug(f'{self.clock}:: Train {slot.current_train.ID} entering on leaving queue!')
+            train = slot.free_up() # type: ignore
+            constraint = self.maneuvering_constraint_factory.create(train_id=train.ID)
+            self.liberation_constraints[train.ID].append(constraint)
         self.pos_processing()
 
     @property
