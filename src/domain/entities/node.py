@@ -3,7 +3,7 @@ from src.domain.entities.train import Train
 from src.domain.exceptions import ProcessException
 from src.domain.constraints.node_constraints import ProcessConstraintSystem
 from src.domain.systems.processors import ProcessorSystem
-from src.events.event_chain import SimpleLoadNodeChain
+from src.events.event_chain import SimpleLoadNodeChain, SimpleUnloadNodeChain
 from src.domain.constants import (
     Process
 )
@@ -74,7 +74,8 @@ class Node(NodeInterface):
         
 
     def make_event_chain(self, train: Train):
-        event_chain = SimpleLoadNodeChain(
+        chain_class = SimpleLoadNodeChain if train.process == Process.LOAD else SimpleUnloadNodeChain
+        event_chain = chain_class(
             train=train, node=self, process_time=self.process_time, event_queue=self.event_queue
         )
         return event_chain
