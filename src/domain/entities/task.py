@@ -52,7 +52,7 @@ class Task(AbstractSubject):
         self.train_id = None
         self.model_state = state
 
-    def update(self, event: TimeEvent, process: Process, location: str=None):
+    def update(self, event: TimeEvent, process: Process, location: str | None =None):
         """
         Updates the task's timetable and the invoiced volume based on the event.
 

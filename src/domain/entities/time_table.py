@@ -232,7 +232,7 @@ class TimeTable(AbstractSubject):
     __repr__ = __str__
 
     @to_notify()
-    def update(self, event: TimeEvent, process: Process = Process.UNLOAD, location: str = None):
+    def update(self, event: TimeEvent, process: Process = Process.UNLOAD, location: str | None = None):
         """
         Updates the last TimeRegister with the provided event, or creates a new TimeRegister if necessary.
 
