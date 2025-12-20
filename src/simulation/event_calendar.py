@@ -2,12 +2,27 @@ import math
 from typing import Callable, Any
 from datetime import timedelta
 from src.events.event import Event, EventFactory, DefaultEventFactory
+from src.events.event_chain import EventChain
+from src.events.event_queue import EventQueue
+from src.standards.observers import AbstractObserver
 
 
-class EventCalendar:
+class EventCalendar(AbstractObserver):
     def __init__(self, event_factory: EventFactory = DefaultEventFactory()):
         self.calendar: list[Event] = []
         self.event_factory = event_factory
+        super().__init__()
+
+    @property
+    def event_queue(self) -> EventQueue:
+        return self.subjects[0] # type: ignore
+
+    def update(self):
+        event_command = self.event_queue.pop()
+        self.push(
+            time=event_command.pre_time,
+            callback=event_command.execute,
+        )
 
     def push(self, time: timedelta, callback: Callable = lambda x: None, **data: Any):
         """

@@ -1,16 +1,14 @@
 from interfaces.train_interface import TrainInterface
-from src.domain.exceptions import ProcessException, NotCompletedEvent
+from src.domain.entities.train import Train
+from src.domain.exceptions import ProcessException
 from src.domain.constraints.node_constraints import ProcessConstraintSystem
 from src.domain.systems.processors import ProcessorSystem
-from src.domain.entities.node_data_model import ProcessorRate
-from src.simulation.des_simulator import DESSimulator
+from src.events.event_chain import SimpleLoadNodeChain
 from src.domain.constants import (
     Process
 )
 from dataclasses import dataclass
 from typing import Any
-from datetime import timedelta, datetime
-from src.domain.entities.railroad_mesh import RailSegment
 from interfaces.node_interce import NodeInterface
 from src.domain.entities.model_queue import Queue
 from src.simulation.clock import Clock
@@ -18,7 +16,6 @@ from src.events.stock_replanish import StockReplenisherInterface
 from src.domain.entities.stock import StockInterface
 from src.domain.constraints.maneuvering_constraints import ManeuveringConstraintFactory
 from collections import defaultdict
-from src.interfaces.entity import Entity
 from logging import debug
 
 @dataclass
@@ -45,6 +42,7 @@ class Node(NodeInterface):
         self.process_units = process_units
         self.maneuvering_constraint_factory = maneuvering_constraint_factory
         self.liberation_constraints = defaultdict(list)
+        self.event_chain = []
 
     @property
     def constraints(self):
@@ -62,20 +60,24 @@ class Node(NodeInterface):
         return s
 
     # ====== Events ==========
-    def receive(self, train: TrainInterface, simulator: DESSimulator, **kwargs):
+    def receive(self, train: Train):
         """
         Adiciona trem à fila de entrada e registra o log de chegada
         :param train:
         :return:
-        """
+        """        
         train.arrive(node=self)
         self.queue_to_enter.push(train, arrive=self.clock.current_time)
+        event_chain = self.make_event_chain(train=train)
+        self.event_chain.append(event_chain)
         debug(f'{self.clock.current_time}:: Train {train.ID} received in node {self}!')
-        simulator.add_event(
-            time=timedelta(),
-            callback=self.process,
-            simulator=simulator
+        
+
+    def make_event_chain(self, train: Train):
+        event_chain = SimpleLoadNodeChain(
+            train=train, node=self, process_time=self.process_time, event_queue=self.event_queue
         )
+        return event_chain
 
     def to_json(self):
         return {}

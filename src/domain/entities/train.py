@@ -193,69 +193,6 @@ class Train(TrainInterface):
         debug(f'{self.clock.current_time}:: Train {self.ID} start load!')
         self.activity_system.start_process()
 
-    def start_unload(
-        self,
-        simulator: DESSimulator,
-        start: datetime,
-        process_time: timedelta,
-        node: NodeInterface,
-        slot: Slot,
-        **kwargs
-   ):
-        if not self._in_slot:
-            raise Exception("Train is not in slot!")
-        debug(f'{self.clock.current_time}:: Train unloading!')
-        # Changing State
-        self.activity_system.start_process()
-        event = TimeEvent(
-            event=EventName.START_PROCESS,
-            instant=self.clock.current_time
-        )
-        self.current_task.update(
-            event=event,
-            process=Process.UNLOAD,
-            location=None
-        )
-        self.time_table.update(event, process=Process.UNLOAD, location=None)
-
-        # Add next event to calendar
-        simulator.add_event(
-            time=process_time,
-            callback=self.finish_unload,
-            simulator=simulator,
-            node=node,
-            slot=slot
-        )
-
-    def finish_unload(
-        self,
-        simulator: DESSimulator,
-        node: NodeInterface,
-        slot: Slot,
-        **kwargs
-    ):
-        self.activity_system.finish_process()
-        event = TimeEvent(
-            event=EventName.FINISH_PROCESS,
-            instant=self.clock.current_time
-        )
-        self.current_task.update(
-            event=event,
-            process=Process.UNLOAD,
-            location=None
-        )
-        self.time_table.update(event, process=Process.UNLOAD, location=None)
-
-        debug(f'{self.clock.current_time}:: Train {self} finish unload!')
-
-        # Add next event to calendar
-        simulator.add_event(
-            time=timedelta(),
-            callback=node.maneuver_to_dispatch,
-            simulator=simulator,
-            # slot=slot,
-        )
-
     def maneuvering_to_enter(self, simulator: DESSimulator, node: NodeInterface, **kwargs):
         self.state.action = TrainActions.MANEUVERING_TO_ENTER
 

@@ -1,6 +1,3 @@
-from datetime import datetime
-
-import pandas as pd
 from datetime import timedelta
 from interfaces.des_simulator_interface import DESSimulatorInterface
 from interfaces.train_interface import TrainInterface
@@ -13,6 +10,8 @@ from src.domain.entities.railroad_mesh import RailroadMesh
 from src.control.router import Router, RandomRouter
 from src.domain.states import ActivityState
 from src.control.memory_based_control.reinforcement_learning.tfr_state_factory import TFRStateFactory
+from src.simulation.event_calendar import EventCalendar
+from src.events.event_queue import EventQueue
 
 SECONDS_IN_HOUR = 60*60
 
@@ -23,17 +22,18 @@ class Railroad(DESModel):
             mesh: RailroadMesh,
             trains: list[TrainInterface],
             demands: list[Demand],
-            router: Router = None
+            calendar: EventCalendar,
+            event_queue: EventQueue,
+            router: Router | None = None
     ):
-        super().__init__(
-            controllable_events=[],
-            uncontrollable_events=[]
-        )
+        super().__init__(calendar=calendar)
         self.mesh = mesh
         self.trains = trains
         self.demands = demands
         self._router = router
-        # self.petri_model = self.build_petri_model()
+        self.event_queue = event_queue
+        for node in self.mesh:
+            node.event_queue = self.event_queue
 
     # ===== Events =========
     @property
