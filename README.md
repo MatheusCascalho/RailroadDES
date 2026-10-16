@@ -13,3 +13,13 @@ As simulações podem ser analisadas por métricas e gráficos de volume transpo
 
 * Python version: 3.11
 * SO: Ubuntu
+
+## Servidor web local
+
+Para abrir uma pagina de visao geral do projeto no navegador, execute na raiz do repositorio:
+
+```bash
+python web_server.py
+```
+
+Acesse `http://localhost:8000`. O endpoint `http://localhost:8000/health` retorna o status do servidor. Para usar outra porta, passe `--port`, por exemplo `python web_server.py --port 8080`.
